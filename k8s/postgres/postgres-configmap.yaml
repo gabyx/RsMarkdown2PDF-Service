@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-secret-credentials
+  labels:
+    app: postgresdb
+data:
+  POSTGRES_DB: markdown-api
+  POSTGRES_USER: development
+  POSTGRES_PASSWORD: development
+

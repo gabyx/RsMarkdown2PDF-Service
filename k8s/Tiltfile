@@ -18,3 +18,10 @@ k8s_yaml([
 	'mongodb/deployment.yaml'
 ])
 k8s_resource(workload='mongodb', port_forwards=[27017])
+
+
+k8s_yaml([
+    'postgres/volume.yaml',
+    'postgres/postgres-configmap.yaml',
+    'postgres/deployment.yaml'
+])
