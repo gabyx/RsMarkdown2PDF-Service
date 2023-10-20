@@ -1,0 +1,20 @@
+
+allow_k8s_contexts('default')
+
+k8s_yaml([
+	'rabbitmq/namespace.yaml',
+	'rabbitmq/configmap.yaml',
+	'rabbitmq/rbac.yaml',
+	'rabbitmq/services.yaml',
+	'rabbitmq/statefulset.yaml'
+])
+k8s_resource(workload='rabbitmq', port_forwards=15672)
+
+
+# k8s_yaml('mongodb/secrets.yaml')
+k8s_yaml([
+	'mongodb/secrets.yaml',
+	'mongodb/volume.yaml',
+	'mongodb/deployment.yaml'
+])
+k8s_resource(workload='mongodb', port_forwards=[27017])
