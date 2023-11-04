@@ -26,6 +26,8 @@ RUN groupadd $APP_USER \
     && useradd -g $APP_USER $APP_USER \
     && mkdir -p ${APP}
 
+RUN apt update && apt-get install -y libpq5 && apt-get clean && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
 COPY --from=builder /api/target/release/api ${APP}/api
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
