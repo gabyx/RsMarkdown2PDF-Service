@@ -5,5 +5,5 @@ metadata:
   labels:
     app: api
 data:
-  
+  DATABASE_URL: postgres://development:development@postgresdb/markdown-api
 
