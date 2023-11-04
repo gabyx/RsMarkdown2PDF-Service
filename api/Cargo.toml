@@ -21,6 +21,13 @@ features = ['derive']
 version = "2.1.0"
 features = ["postgres"]
 
+[dependencies.uuid]
+version = "1.5.0"
+features = [
+    "v4",
+    "serde"
+]
+
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
