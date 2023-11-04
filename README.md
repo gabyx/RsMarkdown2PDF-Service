@@ -6,6 +6,11 @@ The easiest way to run this is using `tilt` and on a working k8s cluster, such a
 
 ### Starting everything
 
+With `tilt` installed and a k8s cluster running:
+
+    cd k8s
+    ./deploy.sh
+
 
 ## Development loop (local) for faster feedback
 
