@@ -17,7 +17,7 @@ features = ['json']
 version = "1.0"
 features = ['derive']
 
-[depdencies.diesel]
+[dependencies.diesel]
 version = "2.1.0"
 features = ["postgres"]
 
