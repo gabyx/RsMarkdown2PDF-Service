@@ -1,7 +1,7 @@
-use std::env;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use std::env;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
@@ -16,7 +16,7 @@ pub fn establish_connection() -> PgConnection {
 }
 
 pub fn migrate_if_needed() {
-	let mut connection = establish_connection();
+    let mut connection = establish_connection();
     println!("Starting to run pending migrations.");
     connection
         .run_pending_migrations(MIGRATIONS)

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-http --multipart PUT localhost:8000/api/job metadata='{ "name": "sample"}' file@sample.md
+http --multipart PUT localhost:8000/api/job name=sample stylesheet=fancy.css file@sample.md

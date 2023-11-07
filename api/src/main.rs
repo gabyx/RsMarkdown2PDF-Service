@@ -1,17 +1,18 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::serde::{json::Json, Deserialize, Serialize};
 use dotenvy::dotenv;
+use rocket::serde::{json::Json, Serialize};
+use std::io::Error;
 use uuid::Uuid;
 
 use rocket::form::Form;
 use rocket::fs::TempFile;
+use rocket::response::status::NotFound;
 
-mod files;
 mod database;
+mod files;
 mod messages;
-
 
 #[derive(Debug, Serialize)]
 struct SubmittedJob {
@@ -24,25 +25,28 @@ async fn get_all_jobs() -> Json<Vec<messages::Job>> {
     Json(result)
 }
 
-#[derive(FromForm, Deserialize, Debug)]
-struct JobMetadata {
-    name: String,
-}
-
 #[derive(FromForm, Debug)]
 struct JobUpload<'r> {
-    metadata: Json<JobMetadata>,
+    name: String,
+    stylesheet: String,
     file: TempFile<'r>,
 }
 
 #[put("/api/job", data = "<job>")]
-async fn submit_job(job: Form<JobUpload<'_>>) -> Json<SubmittedJob> {
-    println!("received job metadata: {:?}, file size in bytes: {}", job.metadata, job.file.len());
-    let job_id = Uuid::new_v4();
-    Json(SubmittedJob { id: job_id })
+fn submit_job(mut job: Form<JobUpload<'_>>) -> Result<Json<SubmittedJob>, NotFound<String>> {
+    println!(
+        "received job name: {:?}, file size in bytes: {}",
+        &job.name,
+        &job.file.len()
+    );
+    let name = job.name.clone();
+    let stylesheet = job.stylesheet.clone();
+    let job_bundle = files::create_job_bundle(&mut job.file, name, stylesheet);
+    match job_bundle {
+        Ok(bundle) => Ok(Json(SubmittedJob { id: bundle.id })),
+        Err(e) => Err(NotFound(e.to_string())),
+    }
 }
-
-
 
 #[launch]
 fn rocket() -> _ {
