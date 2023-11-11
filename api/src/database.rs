@@ -11,15 +11,15 @@ pub fn establish_connection() -> PgConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
 
     // TODO: figure out how to properly configure the logger.
-    println!("Connected to the database!");
+    info!("Connected to the database!");
     connection
 }
 
 pub fn migrate_if_needed() {
     let mut connection = establish_connection();
-    println!("Starting to run pending migrations.");
+    info!("Starting to run pending migrations.");
     connection
         .run_pending_migrations(MIGRATIONS)
         .expect("Could not run migrations");
-    println!("Finished running pending migrations.");
+    info!("Finished running pending migrations.");
 }

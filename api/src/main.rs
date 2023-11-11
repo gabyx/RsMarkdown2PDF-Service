@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate rocket;
 
+use std::io::Error;
 use dotenvy::dotenv;
 use rocket::serde::{json::Json, Serialize};
-use std::io::Error;
 use uuid::Uuid;
 
 use rocket::form::Form;
@@ -33,8 +33,8 @@ struct JobUpload<'r> {
 }
 
 #[put("/api/job", data = "<job>")]
-fn submit_job(mut job: Form<JobUpload<'_>>) -> Result<Json<SubmittedJob>, NotFound<String>> {
-    println!(
+async fn submit_job(mut job: Form<JobUpload<'_>>) -> Result<Json<SubmittedJob>, NotFound<String>> {
+    debug!(
         "received job name: {:?}, file size in bytes: {}",
         &job.name,
         &job.file.len()
@@ -42,7 +42,7 @@ fn submit_job(mut job: Form<JobUpload<'_>>) -> Result<Json<SubmittedJob>, NotFou
     let name = job.name.clone();
     let stylesheet = job.stylesheet.clone();
     let job_bundle = files::create_job_bundle(&mut job.file, name, stylesheet);
-    match job_bundle {
+    match job_bundle.await {
         Ok(bundle) => Ok(Json(SubmittedJob { id: bundle.id })),
         Err(e) => Err(NotFound(e.to_string())),
     }
