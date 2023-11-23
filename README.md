@@ -36,6 +36,17 @@ and redeploy the services, configuration maps as far as possible.
 
 ## Development
 
+### Debugging in Rust
+
+- Either use VS Code with the rust extension or
+- debug in `neovim` as fancy-pancy as possible by using the
+  [`nvim-dap.lua`](.nvim/nvim-dap.lua) file which is automatically loaded if you
+  use the plugin `{ "klen/nvim-config-local" }` which will execute
+  [`.nvim/nvim.lua`](.nvim/nvim.lua) when you open this repo in `nvim`. When you
+  start the debugger (see plugin
+  [`nvim-dap`](https://github.com/mfussenegger/nvim-dap)) it will prompt you
+  which executable you want to debug.
+
 ### Githooks
 
 You can install Githooks by running the manual
