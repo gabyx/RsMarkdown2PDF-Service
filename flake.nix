@@ -60,11 +60,13 @@
         # Things needed only at compile-time.
         nativeBuildInputs = with pkgs; [
           rustToolchain
-          pkg-config
+          k3s
+          docker
+          tilt
         ];
 
         # Things needed at runtime.
-        buildInputs = with pkgs; [openssl llvmPackages_15.lldb];
+        buildInputs = with pkgs; [];
       in
         with pkgs; {
           devShells.default = mkShell {
