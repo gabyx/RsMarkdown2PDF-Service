@@ -1,5 +1,8 @@
 rootDir := justfile_directory()
 
+start-server:
+    sudo k3s server
+
 deploy:
     k8s/deploy.sh
 
