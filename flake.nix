@@ -60,6 +60,7 @@
         # Things needed only at compile-time.
         nativeBuildInputs = with pkgs; [
           rustToolchain
+
           k3s
           docker
           tilt
@@ -67,7 +68,7 @@
         ];
 
         # Things needed at runtime.
-        buildInputs = with pkgs; [];
+        buildInputs = with pkgs; [postgresql];
       in
         with pkgs; {
           devShells.default = mkShell {

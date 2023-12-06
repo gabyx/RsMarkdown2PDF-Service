@@ -1,6 +1,10 @@
 rootDir := justfile_directory()
 
 build:
+    cd "{{rootDir}}" && cargo build
+
+watch:
+    cd "{{rootDir}}" && cargo watch -x 'run'
 
 format:
     cd "{{rootDir}}" && cargo fmt

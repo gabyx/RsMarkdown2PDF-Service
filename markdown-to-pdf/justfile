@@ -1,6 +1,7 @@
 rootDir := justfile_directory()
 
 build:
+    cargo build
 
 format:
     cd "{{rootDir}}" && cargo fmt
