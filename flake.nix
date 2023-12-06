@@ -65,6 +65,9 @@
           docker
           tilt
           httpie
+          kustomize
+
+          black
         ];
 
         # Things needed at runtime.

@@ -3,43 +3,80 @@
 This is a demo project to showcase a small microservice architecture by exposing
 
 - a simple [`web` frontend service](web/src/main.rs) which enables the user to
-  upload a Markdown file and let it convert in
-- the backend [`markdown-to-pdf` service](markdown-to-pdf/src/main.rs) which is
-- controlled by the backend [`api` service](api/src/main.rs).
+  upload a Markdown file and let it convert by sending it to
+- the [`api` service](api/src/main.rs) which will add a job into the `rabbitmq`
+  queue, such that
+- the [`converter` service](markdown-to-pdf/src/main.rs) eventually (when idle)
+  pull a jobs from the `rabbitmq` queue and stores the result in the database
+
+## Requirements
+
+- Either use the `flake.nix` by doing `nix develop --command zsh` which setups a
+  development shell with all tools installed
+- Or you need to have the following installed:
+  - `rust` with `rustup toolchain install nightly`
+  - `libpq` must be installed. Comes with `postgres`.
+  - `tilt`, `kustomize`, `httpie`, etc.
 
 ## Run Instructions
 
 The easiest way to run this is using `tilt` and on a working Kubernetes cluster,
-such as `k3s`.
+such as `k3s`. Start the `k3s` server with
+
+```shell
+just start-server
+```
 
 With `tilt` installed and a Kubernetes cluster running:
 
 ```shell
-cd k8s
-./deploy.sh
+just deploy
 ```
 
 ## Local Development Loop for Fast Feedback
 
-All `rust` projects can be run locally using `cargo run`.
+All components can be build with e.g.
 
-The `.env` file configures the tools to connect to the services running in the
-Kubernetes cluster.
+```shell
+cd components/<name> && just build
+```
+
+which will build with `cargo.`
+
+The [`.env`](components/api/.env) file configures the tools to connect to the
+services running in the Kubernetes cluster.
 
 ## Development Loop using `tilt` (Kubernetes)
 
 The tool `tilt` will run all services and build all docker containers to the
 `ttl.sh` registry (ephemeral images).
 
-It will watch for changes to any files (including the [service manifests](k8s)
-and redeploy the services, configuration maps as far as possible.
+It will watch for changes to any files (including the
+[service manifests](manifests) and redeploy the services, configuration maps as
+far as possible.
+
+To start the loop run:
+
+```shell
+just deploy up
+```
+
+and to remove all resources from the development cluster use:
+
+```shell
+just deploy down
+```
+
+You can inspect continuously the state of the cluster with `k9s` and also watch
+`tilt` what its doing by inspecting
+[http://localhost:10350](http://localhost:10350).
 
 ## Development
 
 ### Debugging in Rust
 
 - Either use VS Code with the rust extension or
-- debug in `neovim` as fancy-pancy as possible by using the
+- Debug in `neovim` as fancy-pancy as possible by using the
   [`nvim-dap.lua`](.nvim/nvim-dap.lua) file which is automatically loaded if you
   use the plugin `{ "klen/nvim-config-local" }` which will execute
   [`.nvim/nvim.lua`](.nvim/nvim.lua) when you open this repo in `nvim`. When you

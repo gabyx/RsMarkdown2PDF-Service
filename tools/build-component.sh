@@ -1,5 +1,6 @@
-#/usr/bin/env bash
-# Build a specific component.
+#!/usr/bin/env bash
+# Build a specific component. Started by specifiying a file which then
+# locates the component and builds it.
 
 function build {
     local path
