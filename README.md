@@ -1,13 +1,24 @@
 # Markdown to PDF Service.
 
+<!--toc:start-->
+
+- [Markdown to PDF Service.](#markdown-to-pdf-service)
+  - [Requirements](#requirements)
+  - [Run Instructions](#run-instructions)
+  - [Local Development Loop for Fast Feedback](#local-development-loop-for-fast-feedback)
+  - [Development Loop using `tilt` (Kubernetes)](#development-loop-using-tilt-kubernetes)
+  - [Development](#development) - [Debugging in Rust](#debugging-in-rust) -
+  [Githooks](#githooks)
+  <!--toc:end-->
+
 This is a demo project to showcase a small microservice architecture by exposing
 
 - a simple [`web` frontend service](web/src/main.rs) which enables the user to
-  upload a Markdown file and let it convert by sending it to
+  upload Markdown files (single or multiple) and let it convert by sending it to
 - the [`api` service](api/src/main.rs) which will add a job into the `rabbitmq`
   queue, such that
 - the [`converter` service](markdown-to-pdf/src/main.rs) eventually (when idle)
-  pull a jobs from the `rabbitmq` queue and stores the result in the database
+  pulls a job from the `rabbitmq` queue and stores the result in the database.
 
 ## Requirements
 
