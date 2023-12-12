@@ -1,0 +1,51 @@
+def get_component_path(name=None, *args):
+    if name:
+        return os.path.join(root_dir, "components", name, *args)
+    else:
+        return os.path.join(root_dir, "components")
+
+
+def get_manifest_path(name, *args):
+    return os.path.join(root_dir, "manifests", name, *args)
+
+
+def get_component_config(tiltfile=None, name=None):
+    if tiltfile != None:
+        if not os.path.isfile(tiltfile):
+            fail("Tiltfile:", tiltfile, "does not exist.")
+        name = os.path.basename(os.path.dirname(tiltfile))
+
+    elif not name:
+        fail("Name not given")
+
+    comp_dir = get_component_path(name)
+    manifest_dir = get_manifest_path(name)
+    dockerfile = get_component_path(name, "docker", "Dockerfile")
+
+    return {
+        "name": name,
+        "dir": comp_dir,
+        "manifest-dir": manifest_dir,
+        "dockerfile": dockerfile if os.path.exists(dockerfile) else None,
+    }
+
+
+root_dir = str(local(["git", "rev-parse", "--show-toplevel"])).strip()
+component_dirs = (
+    str(
+        local(
+            [
+                "find",
+                get_component_path(),
+                "-mindepth",
+                "1",
+                "-maxdepth",
+                "1",
+                "-type",
+                "d",
+            ]
+        )
+    )
+    .strip()
+    .split()
+)
