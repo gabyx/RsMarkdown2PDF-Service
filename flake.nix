@@ -3,7 +3,6 @@
 
   nixConfig = {
     substituters = [
-      # Replace the official cache with a mirror located in China
       # Add here some other mirror if needed.
       "https://cache.nixos.org/"
     ];
