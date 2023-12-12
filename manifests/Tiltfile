@@ -17,6 +17,7 @@ else:
     default_registry("ttl.sh/markdown-api-aksjhfkajsdf832486748237")
 
 # Load all components.
+
 for p in component_dirs:
     f = os.path.join(p, "Tiltfile")
     if os.path.exists(f):
@@ -24,15 +25,13 @@ for p in component_dirs:
 
 # All other needed stuff such as database and the rabbitmq queue.
 config = get_component_config(name='rabbitmq')
-print(config)
 k8s_yaml(kustomize(config["manifest-dir"]))
 k8s_resource(workload=config["name"], port_forwards=15672)
 
 config = get_component_config(name='mongodb')
-print(config)
 k8s_yaml(kustomize(config["manifest-dir"]))
 k8s_resource(workload=config["name"], port_forwards=27017)
 
-config = get_component_config('postgresdb')
+config = get_component_config(name='postgresdb')
 k8s_yaml(kustomize(config["manifest-dir"]))
 k8s_resource(workload=config["name"], port_forwards=5432)
