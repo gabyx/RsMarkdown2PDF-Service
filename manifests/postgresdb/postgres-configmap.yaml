@@ -8,4 +8,3 @@ data:
   POSTGRES_DB: markdown-api
   POSTGRES_USER: development
   POSTGRES_PASSWORD: development
-

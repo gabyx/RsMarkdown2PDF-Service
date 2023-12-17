@@ -11,5 +11,14 @@ for dir in "${components[@]}"; do
     (cd "$dir" && just format)
 done
 
-readarray -t starlark_files < <(find . -name "Tiltfile")
-black "${starlark_files[@]}"
+git hooks exec --containerized \
+    ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
+
+git hooks exec --containerized \
+    ns:githooks-configs/scripts/format-configs-all.yaml -- --force --dir "."
+
+git hooks exec --containerized \
+    ns:githooks-docs/scripts/format-docs-all.yaml -- --force --dir "."
+
+git hooks exec --containerized \
+    ns:githooks-python/scripts/format-python-all.yaml -- --force --dir "."
