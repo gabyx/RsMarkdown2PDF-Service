@@ -60,6 +60,7 @@
         nativeBuildInputsBasic = with pkgs; [
           rustToolchain
           just
+          parallel
           docker
           tilt
           kustomize

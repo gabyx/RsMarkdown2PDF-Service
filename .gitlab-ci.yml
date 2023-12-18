@@ -20,4 +20,13 @@ build:
   image: nixpkgs/nix-flakes:nixos-22.11
   script:
     - git config --global safe.directories "*"
-    - nix develop . --command just build
+    - nix develop . --command just build --set parallel true
+
+images:
+  stage: images
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - apk add git jq curl bash just
+    - just image
