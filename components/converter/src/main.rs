@@ -14,6 +14,7 @@ async fn main() {
     let log = Arc::new(log::create_logger());
     log::info!(log, "Configuring 'converter' service.");
 
+    log::info!(log, "Loading environment variables.");
     dotenv().ok();
 
     // Open a connection to RabbitMQ server.
@@ -21,7 +22,7 @@ async fn main() {
         "localhost",
         5672,
         &env::var("RABBITMQ_USERNAME").expect("Username must be set."),
-        &env::var("RABBITMQ_USERNAME").expect("Password must be set."),
+        &env::var("RABBITMQ_PASSWORD").expect("Password must be set."),
     ))
     .await
     .unwrap();

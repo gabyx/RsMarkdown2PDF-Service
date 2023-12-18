@@ -7,6 +7,6 @@ print("Configuring component:", config["name"])
 docker_build(
     ref=config["name"], context=config["comp-dir"], dockerfile=config["dockerfile"]
 )
-#
-# k8s_yaml(kustomize(config["manifest-dir"]))
-# k8s_resource(workload=config["name"], port_forwards="8080:8001")
+
+k8s_yaml(kustomize(config["manifest-dir"]))
+k8s_resource(workload=config["name"])
