@@ -1,0 +1,20 @@
+stages:
+  # - format
+  - build
+  # - test
+  # - publish
+
+# format:
+#   stage: format
+#   image: nixpkgs/nix-flakes:nixos-22.11
+#   script:
+#     - git config --global safe.directories "*"
+#     - nix develop . --command just format
+#     -
+
+build:
+  stage: build
+  image: nixpkgs/nix-flakes:nixos-22.11
+  script:
+    - git config --global safe.directories "*"
+    - nix develop . --command just build
