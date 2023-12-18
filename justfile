@@ -20,9 +20,9 @@ build regex=".*":
     cd {{root_dir}} && \
         "{{root_dir}}/tools/run-components-parallel.sh" "{{parallel}}" "{{regex}}" build
 
-image regex=".*":
+build-image regex=".*":
     cd {{root_dir}} && \
-        "{{root_dir}}/tools/run-components-parallel.sh" "{{parallel}}" "{{regex}}" build
+        "{{root_dir}}/tools/run-components-parallel.sh" "{{parallel}}" "{{regex}}" build-image
 
 # Formatting.
 format:
