@@ -110,8 +110,9 @@ You can install Githooks by running the manual
 [install here](https://github.com/gabyx/Githooks#quick-secure) and then running:
 
 ```shell
+cd repository
 git hooks install
-git hooks config enable-containerized-hooks --globally --set
+git hooks config enable-containerized-hooks --global --set
 ```
 
 in this repository. To show all running hooks run `git hooks list`. To disable

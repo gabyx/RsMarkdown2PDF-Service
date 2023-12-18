@@ -25,8 +25,8 @@ build-image regex=".*":
         "{{root_dir}}/tools/run-components-parallel.sh" "{{parallel}}" "{{regex}}" build-image
 
 # Formatting.
-format:
-    tools/format.sh
+format regex=".*":
+       tools/format.sh "{{parallel}}" "{{regex}}"
 
 # Private stuff not for direct execution.
 [private]

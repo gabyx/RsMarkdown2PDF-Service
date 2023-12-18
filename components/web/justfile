@@ -2,5 +2,6 @@ rootDir := justfile_directory()
 
 build:
 
-format:
+build-image:
 
+format:

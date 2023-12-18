@@ -1,31 +1,40 @@
 stages:
   - format
   - build
-  # - build-image
-  # - test
-  # - publish
+
+.defaults-rules: &defaults-rules
+  - if: "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature|bugfix/ || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    when: always
 
 format:
   stage: format
   image: docker:24
+  rules:
+    - *defaults-rules
   services:
     - docker:24-dind
+  variables:
+    GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
   script:
-    - apk add git jq curl bash just
-    - curl -sL https://raw.githubusercontent.com/gabyx/githooks/main/scripts/install.sh | bash -s -- -- --use-manual
+    - apk add git jq curl bash just findutils
     - just format
 
 build:
   stage: build
   image: nixpkgs/nix-flakes:nixos-22.11
+  rules:
+    - *defaults-rules
   script:
     - git config --global safe.directories "*"
-    - nix develop . --command just build --set parallel true
-# build-image:
-#   stage: build-image
-#   image: docker:24
-#   services:
-#     - docker:24-dind
-#   script:
-#     - apk add git jq curl bash just
-#     - just image
+    - nix develop . --command just --set parallel true build
+
+build-image:
+  stage: build
+  image: docker:24
+  rules:
+    - *defaults-rules
+  services:
+    - docker:24-dind
+  script:
+    - apk add git bash just findutils parallel
+    - just --set parallel true build-image
