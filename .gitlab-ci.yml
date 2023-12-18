@@ -6,12 +6,14 @@ stages:
 
 format:
   stage: format
-  tags:
-    - saas-linux-small-amd64
+  image: docker:24
+  services:
+    - docker:24-dind
   script:
-    - git config --global safe.directories "*"
+    - apk add git jq curl bash just
     - curl -sL https://raw.githubusercontent.com/gabyx/githooks/main/scripts/install.sh | \
       bash -s -- -- --use-manual
+    - just format
 
 build:
   stage: build
