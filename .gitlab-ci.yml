@@ -1,16 +1,17 @@
 stages:
-  # - format
+  - format
   - build
   # - test
   # - publish
 
-# format:
-#   stage: format
-#   image: nixpkgs/nix-flakes:nixos-22.11
-#   script:
-#     - git config --global safe.directories "*"
-#     - nix develop . --command just format
-#     -
+format:
+  stage: format
+  tags:
+    - saas-linux-small-amd64
+  script:
+    - git config --global safe.directories "*"
+    - curl -sL https://raw.githubusercontent.com/gabyx/githooks/main/scripts/install.sh | \
+      bash -s -- -- --use-manual
 
 build:
   stage: build
