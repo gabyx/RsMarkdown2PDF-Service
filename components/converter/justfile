@@ -1,7 +1,15 @@
-rootDir := justfile_directory()
+root_dir := justfile_directory()
 
 build:
     cargo build
 
+build-image:
+    # docker build -t "md2pdf-converter:test" -f docker/Dockerfile "{{root_dir}}/.."
+
+watch:
+    cd "{{root_dir}}" && cargo watch -x 'run'
+
 format:
-    cd "{{rootDir}}" && cargo fmt
+    cd "{{root_dir}}" && \
+    	docker run -v "$(pwd):/workspace" -w "/workspace" \
+    	instrumentisto/rust:nightly-alpine cargo fmt
