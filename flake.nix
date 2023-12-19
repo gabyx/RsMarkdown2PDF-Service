@@ -57,24 +57,35 @@
         rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
 
         # Things needed only at compile-time.
-        nativeBuildInputs = with pkgs; [
+        nativeBuildInputsBasic = with pkgs; [
           rustToolchain
-
-          k3s
+          just
+          parallel
           docker
           tilt
-          httpie
           kustomize
+        ];
 
-          black
+        # Things needed only at compile-time.
+        nativeBuildInputsDev = with pkgs; [
+          k3s
+          httpie
         ];
 
         # Things needed at runtime.
         buildInputs = with pkgs; [postgresql];
       in
         with pkgs; {
-          devShells.default = mkShell {
-            inherit buildInputs nativeBuildInputs;
+          devShells = {
+            default = mkShell {
+              inherit buildInputs;
+              nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev;
+            };
+
+            ci = mkShell {
+              inherit buildInputs;
+              nativeBuildInputs = nativeBuildInputsBasic;
+            };
           };
         }
     );

@@ -49,12 +49,21 @@ just deploy
 All components can be build with e.g.
 
 ```shell
-cd components/<name> && just build
+just [--set parallel true] build
 ```
 
-which will build with `cargo.`
+which will run the build task over all components.
 
-The [`.env`](components/api/.env) file configures the tools to connect to the
+to build a single component `<component>` either run `just build` inside the
+`components/<components>` directory or use
+
+```shell
+just component <component> build`
+```
+
+inside the repository root.
+
+The [`.env`](components/api/.env) files configures the tools to connect to the
 services running in the Kubernetes cluster.
 
 ## Development Loop using `tilt` (Kubernetes)
@@ -101,8 +110,9 @@ You can install Githooks by running the manual
 [install here](https://github.com/gabyx/Githooks#quick-secure) and then running:
 
 ```shell
+cd repository
 git hooks install
-git hooks config enable-containerized-hooks --globally --set
+git hooks config enable-containerized-hooks --global --set
 ```
 
 in this repository. To show all running hooks run `git hooks list`. To disable
