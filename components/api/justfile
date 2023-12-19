@@ -4,10 +4,7 @@ build:
     cd "{{root_dir}}" && cargo build
 
 build-image:
-    # docker build -t "md2pdf-converter:test" -f docker/Dockerfile "{{root_dir}}/.."
-
-image:
-    docker build -t "md2pdf-api:test" -f docker/Dockerfile "{{rootDir}}/.."
+    docker build -t "md2pdf-api:test" -f docker/Dockerfile "{{root_dir}}/.."
 
 watch:
     cd "{{root_dir}}" && cargo watch -x 'run'
