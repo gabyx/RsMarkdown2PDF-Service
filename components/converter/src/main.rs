@@ -4,22 +4,23 @@ use amqprs::{
     connection::{Connection, OpenConnectionArguments},
     consumer::DefaultConsumer,
 };
-use common::log;
+use common::log::{create_logger, info};
 
+use async_std::task;
 use dotenv::dotenv;
-use std::{env, sync::Arc};
+use std::{env, sync::Arc, time::Duration};
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 1)]
 async fn main() {
-    let log = Arc::new(log::create_logger());
-    log::info!(log, "Configuring 'converter' service.");
+    let log = Arc::new(create_logger());
+    info!(log, "Configuring 'converter' service.");
 
-    log::info!(log, "Loading environment variables.");
+    info!(log, "Loading environment variables.");
     dotenv().ok();
 
     // Open a connection to RabbitMQ server.
     let connection = Connection::open(&OpenConnectionArguments::new(
-        "localhost",
+        &env::var("RABBITMQ_HOST").expect("Host must be set."),
         5672,
         &env::var("RABBITMQ_USERNAME").expect("Username must be set."),
         &env::var("RABBITMQ_PASSWORD").expect("Password must be set."),
@@ -31,45 +32,8 @@ async fn main() {
         .await
         .unwrap();
 
-    // // open a channel on the connection
-    // let channel = connection.open_channel(None).await.unwrap();
-    // channel
-    //     .register_callback(DefaultChannelCallback)
-    //     .await
-    //     .unwrap();
-    //
-    // // declare a server-named transient queue
-    // let (queue_name, _, _) = channel
-    //     .queue_declare(QueueDeclareArguments::default())
-    //     .await
-    //     .unwrap()
-    //     .unwrap();
-    //
-    // // bind the queue to exchange
-    // let routing_key = "amqprs.example";
-    // let exchange_name = "amq.topic";
-    // channel
-    //     .queue_bind(QueueBindArguments::new(
-    //         &queue_name,
-    //         exchange_name,
-    //         routing_key,
-    //     ))
-    //     .await
-    //     .unwrap();
-    //
-    // //////////////////////////////////////////////////////////////////////////////
-    // // start consumer, auto ack
-    // let args = BasicConsumeArguments::new(&queue_name, "basic_consumer")
-    //     .manual_ack(false)
-    //     .finish();
-    //
-    // channel
-    //     .basic_consume(DefaultConsumer::new(args.no_ack), args)
-    //     .await
-    //     .unwrap();
-    //
-    // // consume forever
-    // println!("consume forever..., ctrl+c to exit");
-    // let guard = Notify::new();
-    // guard.notified().await;
+    loop {
+        info!(log, "Waiting for stuff...");
+        task::sleep(Duration::from_secs(1)).await;
+    }
 }

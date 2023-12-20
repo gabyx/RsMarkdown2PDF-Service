@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   creationTimestamp: null
+  namespace: md2pdf
   labels:
     app: mongodb
   name: mongodb

@@ -40,9 +40,9 @@ impl Fairing for LogFairing {
         Ok(rocket.manage(self.clone()))
     }
 
-    async fn on_liftoff(&self, rocket: &Rocket<Orbit>) {}
+    async fn on_liftoff(&self, _: &Rocket<Orbit>) {}
 
-    async fn on_request(&self, request: &mut Request<'_>, _: &mut Data<'_>) {}
+    async fn on_request(&self, _: &mut Request<'_>, _: &mut Data<'_>) {}
 
-    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {}
+    async fn on_response<'r>(&self, _: &'r Request<'_>, _: &mut Response<'r>) {}
 }

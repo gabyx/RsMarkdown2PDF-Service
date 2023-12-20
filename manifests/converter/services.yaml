@@ -1,0 +1,20 @@
+# We do not use any external ports yet.
+# Converter is an internal thing.
+#
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   namespace: md2pdf
+#   name: converter
+#   labels:
+#     app: converter
+#     type: LoadBalancer
+# spec:
+#   type: NodePort
+#   ports:
+#     - name: http
+#       protocol: TCP
+#       port: 8001
+#       targetPort: 8001
+#   selector:
+#     app: converter

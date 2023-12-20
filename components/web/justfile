@@ -1,5 +1,7 @@
 rootDir := justfile_directory()
 
+watch:
+
 build:
 
 build-image:

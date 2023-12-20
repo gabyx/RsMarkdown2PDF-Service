@@ -2,8 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: converter
+  namespace: md2pdf
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: converter

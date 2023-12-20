@@ -3,6 +3,7 @@ kind: PersistentVolume
 apiVersion: v1
 metadata:
   name: postgres-volume
+  namespace: md2pdf
   labels:
     type: local
 spec:
@@ -17,9 +18,10 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: postgres-volume-claim
+  namespace: md2pdf
   labels:
     app: postgres
-  name: postgres-volume-claim
 spec:
   storageClassName: manual
   accessModes:

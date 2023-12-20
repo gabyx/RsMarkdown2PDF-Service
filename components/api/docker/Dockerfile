@@ -1,34 +1,40 @@
 ARG COMPONENT="api"
+ARG SRC_DIR="/build/components"
 
 ## Build Stage ##############################################################
 FROM rust:1.73.0 as builder
 ARG COMPONENT
+ARG SRC_DIR
 
 # Trigger a build for just the dependencies
 # to better cache cargo rebuilds.
-WORKDIR /build
-RUN USER=root cargo new --lib common
-RUN USER=root cargo new --bin $COMPONENT
+WORKDIR "$SRC_DIR"
+RUN cargo new --lib common && \
+    cargo new --bin $COMPONENT
 
-WORKDIR /build/common
+WORKDIR "$SRC_DIR/common"
 COPY ./common/Cargo.toml ./Cargo.toml
 RUN cargo build --release
 
-WORKDIR /build/$COMPONENT
+WORKDIR "$SRC_DIR/$COMPONENT"
 COPY ./$COMPONENT/Cargo.toml ./Cargo.toml
 RUN cargo build --release
-RUN rm src/*.rs
 
 # Now build the real thing
-ADD ./$COMPONENT ./
-ADD ./common /build/common
-RUN rm ./target/release/deps/$COMPONENT*
-RUN rm ./target/release/deps/common*
+WORKDIR "$SRC_DIR/$COMPONENT"
+RUN rm -rf "$SRC_DIR/$COMPONENT/src" \
+    rm -rf "$SRC_DIR/common/src"
+ADD ./$COMPONENT "$SRC_DIR/$COMPONENT"
+ADD ./common "$SRC_DIR/common"
+
+RUN rm ./target/release/deps/$COMPONENT* || true
+RUN rm ./target/release/deps/common* || true
 RUN cargo build --release
 
 ## Service Stage ##############################################################
 FROM ubuntu:latest
 ARG COMPONENT
+ARG SRC_DIR
 
 ARG APP=/usr/src/app
 EXPOSE 8000
@@ -45,7 +51,7 @@ RUN apt update && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
-COPY --from=builder /build/$COMPONENT/target/release/$COMPONENT "${APP}/app"
+COPY --from=builder "$SRC_DIR/$COMPONENT/target/release/$COMPONENT" "${APP}/app"
 RUN chown -R "$APP_USER:$APP_USER" "${APP}"
 
 USER $APP_USER
