@@ -1,8 +1,6 @@
 use amqprs::{
-    callbacks::{DefaultChannelCallback, DefaultConnectionCallback},
-    channel::{BasicConsumeArguments, QueueBindArguments, QueueDeclareArguments},
+    callbacks::DefaultConnectionCallback,
     connection::{Connection, OpenConnectionArguments},
-    consumer::DefaultConsumer,
 };
 use common::log::{create_logger, info};
 

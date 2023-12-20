@@ -3,7 +3,6 @@ parallel := "false" # Run tasks over components in parallel.
 
 # Administrative stuff.
 ###############################################################################
-start-docker-registry:
 start-server:
     sudo k3s server
 
