@@ -1,4 +1,4 @@
-cm = load_dynamic(os.path.join(config.main_dir, "common/Tiltfile"))
+cm = load_dynamic(os.path.join(config.main_dir, ".tilt/Tiltfile"))
 get_component_config = cm["get_component_config"]
 
 config = get_component_config(__file__)

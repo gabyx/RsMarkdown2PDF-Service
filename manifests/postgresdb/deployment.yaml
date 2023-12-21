@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgresdb
+  namespace: md2pdf
 spec:
   replicas: 1
   selector:
@@ -27,17 +28,3 @@ spec:
         - name: db-data
           persistentVolumeClaim:
             claimName: postgres-volume-claim
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgresdb
-  labels:
-    app: postgresdb
-spec:
-  type: NodePort
-  ports:
-    - port: 5432
-  selector:
-    app: postgresdb

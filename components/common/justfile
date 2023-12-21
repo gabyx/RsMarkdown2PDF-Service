@@ -6,10 +6,10 @@ build *args:
     cd "{{root_dir}}" && cargo build "${@:1}"
 
 build-image *args:
-    docker build --progress plain "${@:1}" -t "md2pdf-api:test" -f docker/Dockerfile "{{root_dir}}/.."
+    @echo "Nothing to build for this component"
 
 watch:
-    cd "{{root_dir}}" && cargo watch -x 'build'
+    cd "{{root_dir}}" && cargo watch -x 'run'
 
 format:
     cd "{{root_dir}}" && \

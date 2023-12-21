@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: test-rabbitmq
+  namespace: md2pdf
   name: rabbitmq
   labels:
     app: rabbitmq

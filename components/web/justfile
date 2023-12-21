@@ -1,7 +1,11 @@
+set positional-arguments
+set shell := ["bash", "-cue"]
 rootDir := justfile_directory()
 
-build:
+watch:
 
-build-image:
+build *args:
+
+build-image *args:
 
 format:

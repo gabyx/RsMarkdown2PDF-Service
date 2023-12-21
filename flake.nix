@@ -59,6 +59,8 @@
         # Things needed only at compile-time.
         nativeBuildInputsBasic = with pkgs; [
           rustToolchain
+          cargo-watch
+
           just
           parallel
           docker

@@ -11,16 +11,16 @@ regex="$2"
 task="$3"
 shift 3
 
-printInfo "Run task '$task' in parallel over all components"
+printInfo "Run task '$task' in parallel over all components with:" "$@"
 
 cd "$ROOT_DIR"
 
 readarray -t comps < <(just list-components "$regex")
 
 if [ "$parallel" = "true" ]; then
-    parallel just component {} "$task" ::: "${comps[@]}"
+    parallel just component {} "$task" "$@" ::: "${comps[@]}"
 else
     for comp in "${comps[@]}"; do
-        just component "$comp" "$task"
+        just component "$comp" "$task" "$@"
     done
 fi

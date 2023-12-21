@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: default
+  namespace: md2pdf
   name: api
   labels:
     app: api
