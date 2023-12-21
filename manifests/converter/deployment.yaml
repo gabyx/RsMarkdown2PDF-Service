@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: converter
   namespace: md2pdf
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api
+      app: converter
   template:
     metadata:
       labels:
-        app: api
+        app: converter
     spec:
       containers:
-        - name: api
-          image: api:latest
-          ports:
-            - containerPort: 8000
+        - name: converter
+          image: converter:latest
+          # ports:
+          #   - containerPort: 8000
           envFrom:
             - configMapRef:
-                name: api-config
+                name: converter-config

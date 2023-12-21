@@ -1,7 +1,7 @@
 allow_k8s_contexts(["default", "local-k3s"])
 
 load(
-    "common/Tiltfile",
+    ".tilt/Tiltfile",
     "root_dir",
     "component_dirs",
     "get_component_config",

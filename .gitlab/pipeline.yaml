@@ -1,13 +1,12 @@
 stages:
-  - format
-  - build
+  - check
 
 .defaults-rules: &defaults-rules
   - if: "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature|bugfix/ || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
     when: always
 
 format:
-  stage: format
+  stage: check
   image: docker:24
   rules:
     - *defaults-rules
@@ -16,11 +15,11 @@ format:
   variables:
     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
   script:
-    - apk add git jq curl bash just findutils
+    - apk add git jq curl bash just findutils parallel
     - just format
 
 build:
-  stage: build
+  stage: check
   image: nixpkgs/nix-flakes:nixos-22.11
   rules:
     - *defaults-rules
@@ -29,7 +28,7 @@ build:
     - nix develop . --command just --set parallel true build
 
 build-image:
-  stage: build
+  stage: check
   image: docker:24
   rules:
     - *defaults-rules

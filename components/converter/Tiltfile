@@ -1,10 +1,12 @@
-cm = load_dynamic(os.path.join(config.main_dir, "common/Tiltfile"))
+cm = load_dynamic(os.path.join(config.main_dir, ".tilt/Tiltfile"))
 get_component_config = cm["get_component_config"]
 
 config = get_component_config(__file__)
 print("Configuring component:", config["name"])
 
-# docker_build(ref=config["name"], context=config["dir"], dockerfile=config["dockerfile"])
-#
-# k8s_yaml(kustomize(config["manifest-dir"]))
-# k8s_resource(workload=config["name"], port_forwards="8080:8001")
+docker_build(
+    ref=config["name"], context=config["comp-dir"], dockerfile=config["dockerfile"]
+)
+
+k8s_yaml(kustomize(config["manifest-dir"]))
+k8s_resource(workload=config["name"])

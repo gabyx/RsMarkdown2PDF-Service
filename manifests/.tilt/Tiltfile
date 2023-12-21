@@ -18,13 +18,15 @@ def get_component_config(tiltfile=None, name=None):
     elif not name:
         fail("Name not given")
 
-    comp_dir = get_component_path(name)
+    comp_dir = get_component_path()
+    dir = get_component_path(name)
     manifest_dir = get_manifest_path(name)
     dockerfile = get_component_path(name, "docker", "Dockerfile")
 
     return {
+        "comp-dir": comp_dir,
         "name": name,
-        "dir": comp_dir,
+        "dir": dir,
         "manifest-dir": manifest_dir,
         "dockerfile": dockerfile if os.path.exists(dockerfile) else None,
     }
