@@ -26,14 +26,13 @@ build:
   script:
     - git config --global safe.directories "*"
     - nix develop . --command just --set parallel true build
-
-build-image:
-  stage: check
-  image: docker:24
-  rules:
-    - *defaults-rules
-  services:
-    - docker:24-dind
-  script:
-    - apk add git bash just findutils parallel
-    - just --set parallel true build-image
+# build-image:
+#   stage: check
+#   image: docker:24
+#   rules:
+#     - *defaults-rules
+#   services:
+#     - docker:24-dind
+#   script:
+#     - apk add git bash just findutils parallel
+#     - just --set parallel true build-image
