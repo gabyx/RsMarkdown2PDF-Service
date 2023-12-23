@@ -5,7 +5,7 @@ config = get_component_config(__file__)
 print("Configuring component:", config["name"])
 
 docker_build(
-    ref=config["name"], context=config["comp-dir"], dockerfile=config["dockerfile"]
+    ref=config["name"], context=cm["root_dir"], dockerfile=config["dockerfile"]
 )
 
 k8s_yaml(kustomize(config["manifest-dir"]))

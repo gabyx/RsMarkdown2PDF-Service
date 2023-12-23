@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: md2pdf
+data:
+  DATABASE_URL: postgres://development:development@postgresdb.md2pdf/markdown-api

@@ -16,8 +16,11 @@ else:
     # Use ephemeral image registry 'ttl.sh',
     default_registry("ttl.sh/markdown-api-aksjhfkajsdf832486748237")
 
-# Load all components.
+# Load common components.
+config = get_component_config(name="common")
+k8s_yaml(kustomize(config["manifest-dir"]))
 
+# Load all other components.
 for p in component_dirs:
     f = os.path.join(p, "Tiltfile")
     if os.path.exists(f):

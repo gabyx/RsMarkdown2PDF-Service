@@ -1,0 +1,9 @@
+[workspace]
+members = [
+   "components/api",
+   "components/common",
+   "components/converter",
+   # "components/web"
+]
+
+resolver = "2"

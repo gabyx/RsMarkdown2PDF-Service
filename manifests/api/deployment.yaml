@@ -20,4 +20,8 @@ spec:
             - containerPort: 8000
           envFrom:
             - configMapRef:
+                name: db-config
+            - configMapRef:
+                name: queue-config
+            - configMapRef:
                 name: api-config
