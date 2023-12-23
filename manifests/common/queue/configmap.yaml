@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: queue-config
+  namespace: md2pdf
+data:
+  RABBITMQ_HOST: rabbitmq.md2pdf
+  RABBITMQ_USERNAME: guest
+  RABBITMQ_PASSWORD: guest
+
+  CONVERTER_QUEUE: md2pdf.jobs
+  CONVERTER_QUEUE_DURABLE: "false"
+  CONVERTER_QUEUE_ROUTING_KEY: md2pdf.job
+  CONVERTER_EXCHANGE: md2pdf.job-exchange

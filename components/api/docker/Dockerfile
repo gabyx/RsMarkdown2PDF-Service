@@ -1,40 +1,33 @@
 ARG COMPONENT="api"
-ARG SRC_DIR="/build/components"
+ARG ROOT_DIR="/build"
 
-## Build Stage ##############################################################
-FROM rust:1.73.0 as builder
+## Base Stage ##############################################################
+FROM rust:1.74 AS chef
+ARG ROOT_DIR
+RUN cargo install cargo-chef --locked
+WORKDIR "$ROOT_DIR"
+
+## Planner Stage ##############################################################
+FROM chef as planner
+COPY . .
+RUN rm -rf rust-toolchain.toml
+RUN cargo chef prepare --recipe-path recipe.json
+
+## Planner Stage ##############################################################
+FROM chef AS builder
 ARG COMPONENT
-ARG SRC_DIR
-
-# Trigger a build for just the dependencies
-# to better cache cargo rebuilds.
-WORKDIR "$SRC_DIR"
-RUN cargo new --lib common && \
-    cargo new --bin $COMPONENT
-
-WORKDIR "$SRC_DIR/common"
-COPY ./common/Cargo.toml ./Cargo.toml
-RUN cargo build --release
-
-WORKDIR "$SRC_DIR/$COMPONENT"
-COPY ./$COMPONENT/Cargo.toml ./Cargo.toml
-RUN cargo build --release
-
-# Now build the real thing
-WORKDIR "$SRC_DIR/$COMPONENT"
-RUN rm -rf "$SRC_DIR/$COMPONENT/src" \
-    rm -rf "$SRC_DIR/common/src"
-ADD ./$COMPONENT "$SRC_DIR/$COMPONENT"
-ADD ./common "$SRC_DIR/common"
-
-RUN rm ./target/release/deps/$COMPONENT* || true
-RUN rm ./target/release/deps/common* || true
-RUN cargo build --release
+ARG ROOT_DIR
+COPY --from=planner /$ROOT_DIR/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY . .
+RUN rm -rf rust-toolchain.toml
+RUN cargo build --release -p "$COMPONENT"
 
 ## Service Stage ##############################################################
 FROM ubuntu:latest
 ARG COMPONENT
-ARG SRC_DIR
+ARG ROOT_DIR
 
 ARG APP=/usr/src/app
 EXPOSE 8000
@@ -51,7 +44,7 @@ RUN apt update && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
-COPY --from=builder "$SRC_DIR/$COMPONENT/target/release/$COMPONENT" "${APP}/app"
+COPY --from=builder "$ROOT_DIR/target/release/$COMPONENT" "${APP}/app"
 RUN chown -R "$APP_USER:$APP_USER" "${APP}"
 
 USER $APP_USER

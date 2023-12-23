@@ -1,8 +1,10 @@
 use std::sync::Arc;
 
 use crate::log;
-use rocket::fairing::{Fairing, Info, Kind};
-use rocket::{Build, Data, Orbit, Request, Response, Rocket};
+use rocket::{
+    fairing::{Fairing, Info, Kind},
+    Build, Data, Orbit, Request, Response, Rocket,
+};
 
 /// Newtype struct wrapper around the passed-in slog::Logger
 #[derive(Debug, Clone)]

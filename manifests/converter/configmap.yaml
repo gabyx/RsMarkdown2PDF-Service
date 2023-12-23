@@ -6,8 +6,3 @@ metadata:
   labels:
     app: converter
 data:
-  DATABASE_URL: postgres://development:development@postgresdb.md2pdf/markdown-api
-
-  RABBITMQ_HOST: rabbitmq.md2pdf
-  RABBITMQ_USERNAME: guest
-  RABBITMQ_PASSWORD: guest

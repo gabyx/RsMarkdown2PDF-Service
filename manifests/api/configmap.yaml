@@ -6,4 +6,3 @@ metadata:
   labels:
     app: api
 data:
-  DATABASE_URL: postgres://development:development@postgresdb.md2pdf/markdown-api

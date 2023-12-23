@@ -8,6 +8,7 @@ edition = "2021"
 slog = "2.7.0"
 slog-term = "2.9.0"
 slog-async = "2.7.0"
+amqprs = "1.5.1"
 
 [dependencies.rocket]
 version = "=0.5.0-rc.3"

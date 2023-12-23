@@ -1,1 +1,8 @@
 **/target
+**/manifest
+
+**/.gitlab
+**/.githooks
+**/.nvim
+
+

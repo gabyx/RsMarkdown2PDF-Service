@@ -4,7 +4,7 @@ metadata:
   name: converter
   namespace: md2pdf
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: converter
@@ -19,5 +19,9 @@ spec:
           # ports:
           #   - containerPort: 8000
           envFrom:
+            - configMapRef:
+                name: db-config
+            - configMapRef:
+                name: queue-config
             - configMapRef:
                 name: converter-config

@@ -1,17 +1,18 @@
 set positional-arguments
 set shell := ["bash", "-cue"]
-root_dir := justfile_directory()
+comp_dir := justfile_directory()
+root_dir := `git rev-parse --show-toplevel`
 
 build *args:
-    cd {{root_dir}} && cargo build "${@:1}"
+    cd "{{comp_dir}}" && cargo build "${@:1}"
 
 build-image *args:
-    docker build --progress plain "${@:1}" -t "md2pdf-converter:test" -f docker/Dockerfile "{{root_dir}}/.."
+    docker build --progress plain "${@:1}" -t "md2pdf-converter:test" -f docker/Dockerfile "{{root_dir}}"
 
 watch:
-    cd "{{root_dir}}" && cargo watch -x 'build'
+    cd "{{comp_dir}}" && cargo watch -x 'build'
 
 format:
-    cd "{{root_dir}}" && \
-    	docker run -v "$(pwd):/workspace" -w "/workspace" \
-    	instrumentisto/rust:nightly-alpine cargo fmt
+    cd "{{comp_dir}}" && \
+    	docker run -v "{{root_dir}}:/repo" -v "$(pwd):/workspace" -w "/workspace" \
+    	instrumentisto/rust:nightly-alpine cargo fmt -- --config-path /repo

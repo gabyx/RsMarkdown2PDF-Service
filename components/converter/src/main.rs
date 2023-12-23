@@ -1,12 +1,28 @@
 use amqprs::{
-    callbacks::DefaultConnectionCallback,
-    connection::{Connection, OpenConnectionArguments},
+    channel::{BasicConsumeArguments, Channel},
+    consumer::DefaultConsumer,
 };
-use common::log::{create_logger, info};
+use common::{
+    log::{create_logger, info},
+    queue::{get_queue_config, setup_queue_connection},
+};
 
-use async_std::task;
 use dotenv::dotenv;
-use std::{env, sync::Arc, time::Duration};
+use std::sync::Arc;
+use tokio::sync::Notify;
+
+async fn install_consumer(log: &slog::Logger, channel: &Channel, queue_name: &str) {
+    info!(log, "Installing consumer on the queue");
+
+    let args = BasicConsumeArguments::new(&queue_name, "converter")
+        .manual_ack(true)
+        .finish();
+
+    channel
+        .basic_consume(DefaultConsumer::new(args.no_ack), args)
+        .await
+        .unwrap();
+}
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 1)]
 async fn main() {
@@ -16,22 +32,12 @@ async fn main() {
     info!(log, "Loading environment variables.");
     dotenv().ok();
 
-    // Open a connection to RabbitMQ server.
-    let connection = Connection::open(&OpenConnectionArguments::new(
-        &env::var("RABBITMQ_HOST").expect("Host must be set."),
-        5672,
-        &env::var("RABBITMQ_USERNAME").expect("Username must be set."),
-        &env::var("RABBITMQ_PASSWORD").expect("Password must be set."),
-    ))
-    .await
-    .unwrap();
-    connection
-        .register_callback(DefaultConnectionCallback)
-        .await
-        .unwrap();
+    let (creds, queue_config) = get_queue_config();
+    let (_connection, channel) = setup_queue_connection(&log, &creds, &queue_config).await;
 
-    loop {
-        info!(log, "Waiting for stuff...");
-        task::sleep(Duration::from_secs(1)).await;
-    }
+    install_consumer(&log, &channel, &queue_config.name).await;
+
+    info!(log, "Consume from queue '{}'...", &queue_config.name);
+    let guard = Notify::new();
+    guard.notified().await;
 }
