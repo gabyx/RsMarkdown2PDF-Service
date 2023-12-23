@@ -17,13 +17,13 @@ start-docker-registry:
 # Deploying the components.
 ###############################################################################
 deploy *args:
-    @cd {{root_dir}}/manifests" && tilt "$@"
+    @cd "{{root_dir}}/manifests" && tilt "$@"
 
 deploy-up *args:
-    @cd {{root_dir}}/manifests" && tilt up "$@"
+    @cd "{{root_dir}}/manifests" && tilt up "$@"
 
 deploy-down *args:
-    @cd {{root_dir}}/manifests" && tilt down "$@"
+    @cd "{{root_dir}}/manifests" && tilt down "$@"
     # In case anything keeps hanging.
     @kubectl delete all --all --namespace md2pdf
 
