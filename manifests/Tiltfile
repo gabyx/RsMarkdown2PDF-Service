@@ -1,12 +1,8 @@
 allow_k8s_contexts(["default", "local-k3s"])
 
-load("ext://dotenv", "dotenv")
-env_file = os.path.join(config.main_dir, ".env")
-if os.path.exists(env_file):
-    direnv(fn=env_file)
-
-# Set global parameters.
-use_local_registry = os.getenv("USE_DOCKER_REGISTRY", "false") == "true"
+env_file = os.path.join(config.main_dir, ".env.yaml")
+settings = read_yaml(env_file, default={})
+use_local_registry = settings.get("use_local_registry", False) == True
 
 load(
     ".tilt/Tiltfile",
@@ -18,7 +14,7 @@ load(
 
 if use_local_registry:
     # Use local docker registry run in the cluster.
-    default_registry("docker-registry:5000")
+    default_registry("localhost:5001")
 else:
     # Use ephemeral image registry 'ttl.sh',
     default_registry("ttl.sh/markdown-api-aksjhfkajsdf832486748237")

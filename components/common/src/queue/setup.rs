@@ -39,6 +39,7 @@ pub struct JobQueue {
 }
 
 impl JobQueue {
+    /// Publish a job `job` such that it gets converted by a consumer.
     pub async fn publish(&self, job: &Job) -> Res<()> {
         let props = BasicProperties::default()
             .with_content_encoding("utf-8")
@@ -50,13 +51,15 @@ impl JobQueue {
 
         let data = serde_json::to_vec(&job).expect("Could not serialize ");
 
-        return match self.channel.basic_publish(props, data, args).await {
-            Ok(tag) => Ok(tag),
-            Err(e) => Err(Error::new(e.to_string())),
-        };
+        return self
+            .channel
+            .basic_publish(props, data, args)
+            .await
+            .map_err(|e| Error::new(e.to_string()));
     }
 
-    pub async fn subscribe<F, T>(&self, consumer_creator: F) -> Res<String>
+    /// Subscribes a consumer `consumer_creator(args)` to receive jobs.
+    pub async fn subscribe<F, T>(&self, consumer_creator: F) -> Res<()>
     where
         T: AsyncConsumer + Send + 'static,
         F: FnOnce(&BasicConsumeArguments) -> T,
@@ -67,10 +70,12 @@ impl JobQueue {
 
         let creator = consumer_creator(&args);
 
-        return match self.channel.basic_consume(creator, args).await {
-            Ok(tag) => Ok(tag),
-            Err(e) => Err(Error::new(e.to_string())),
-        };
+        return self
+            .channel
+            .basic_consume(creator, args)
+            .await
+            .map(|_| ())
+            .map_err(|e| Error::new(e.to_string()));
     }
 }
 

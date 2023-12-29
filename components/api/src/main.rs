@@ -35,15 +35,17 @@ async fn get_all_jobs(state: &State<AppState>) -> Json<Vec<Job>> {
 }
 
 #[rocket::post("/api/debug/publish-job")]
-async fn send_job(s: &State<AppState>) -> Json<Option<Job>> {
+async fn send_job(s: &State<AppState>) -> Result<Json<Job>, String> {
     info!(s.log, "Publishing debug job into queue.");
     let job = Job::new("new job");
 
     return match s.job_queue.publish(&job).await {
-        Ok(_) => Json(Some(job)),
-        Err(e) => {
-            panic!("Could not publish job: {}", e);
-        }
+        Ok(_) => Ok(Json(job)),
+        Err(e) => Err(std::format!(
+            "Could not publish job id '{}', error: \n'{}'.",
+            job.id,
+            e
+        )),
     };
 }
 

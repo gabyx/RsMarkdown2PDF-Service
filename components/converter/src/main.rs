@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use amqprs::channel::{BasicConsumeArguments, Channel};
 use common::{
     log::{create_logger, info},
     queue::{get_job_queue_config, setup_job_queue, JobQueue},

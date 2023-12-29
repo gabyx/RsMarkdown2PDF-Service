@@ -23,25 +23,25 @@ This is a demo project to showcase a small microservice architecture by exposing
 ## Requirements
 
 - Either use the `flake.nix` by doing `nix develop --command zsh` which setups a
-  development shell with all tools installed
+  development shell with all tools installed,
 - Or you need to have the following installed:
   - `rust` with `rustup toolchain install nightly`
   - `libpq` must be installed. Comes with `postgres`.
-  - `tilt`, `kustomize`, `httpie`, etc.
+  - `tilt`, `kustomize`, `httpie`, `docker`, `kind`
 
 ## Run Instructions
 
 The easiest way to run this is using `tilt` and on a working Kubernetes cluster,
-such as `k3s`. Start the `k3s` server with
+such as `kind`. Start the `kind-md2pdf` cluster with
 
 ```shell
-just start-server
+just create-cluster
 ```
 
-With `tilt` installed and a Kubernetes cluster running:
+With `tilt` installed and a Kubernetes cluster running, deploy all pods with:
 
 ```shell
-just deploy
+just deploy-up
 ```
 
 ## Local Development Loop for Fast Feedback
