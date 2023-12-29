@@ -1,5 +1,13 @@
 allow_k8s_contexts(["default", "local-k3s"])
 
+load("ext://dotenv", "dotenv")
+env_file = os.path.join(config.main_dir, ".env")
+if os.path.exists(env_file):
+    direnv(fn=env_file)
+
+# Set global parameters.
+use_local_registry = os.getenv("USE_DOCKER_REGISTRY", "false") == "true"
+
 load(
     ".tilt/Tiltfile",
     "root_dir",
@@ -8,7 +16,6 @@ load(
     "get_component_path",
 )
 
-use_local_registry = False
 if use_local_registry:
     # Use local docker registry run in the cluster.
     default_registry("docker-registry:5000")
