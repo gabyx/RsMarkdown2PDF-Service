@@ -9,6 +9,7 @@ edition = "2021"
 common = {path="../common"}
 dotenvy = "0.15"
 slog = "2.7.0"
+amqprs = "1.5.1"
 
 [dependencies.rocket]
 version = "=0.5.0-rc.3"
@@ -21,7 +22,6 @@ features = ['derive']
 [dependencies.diesel]
 version = "2.1.0"
 features = ["postgres"]
-
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.

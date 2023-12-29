@@ -32,6 +32,7 @@ deploy-down *args:
 build *args:
     cd {{root_dir}} && \
         "{{root_dir}}/tools/run-components-parallel.sh" {{parallel}} "{{default_regex}}" build "${@:1}"
+
 build-selection regex *args:
     cd {{root_dir}} && \
         "{{root_dir}}/tools/run-components-parallel.sh" {{parallel}} "{{regex}}" build "${@:2}"
@@ -42,6 +43,9 @@ build-image *args:
 build-image-selection regex *args:
     cd {{root_dir}} && \
         "{{root_dir}}/tools/run-components-parallel.sh" {{parallel}} "{{regex}}" build-image "${@:2}"
+
+watch:
+    cd "{{root_dir}}" && cargo watch -x 'build'
 
 # Component functionality.
 ###############################################################################
