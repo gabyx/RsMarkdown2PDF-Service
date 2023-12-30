@@ -62,6 +62,7 @@
           cargo-watch
 
           just
+          dasel
           parallel
           docker
           tilt

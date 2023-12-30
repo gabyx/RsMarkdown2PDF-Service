@@ -4,16 +4,21 @@ ARG ROOT_DIR="/build"
 ## Base Stage ##############################################################
 FROM rust:1.74 AS chef
 ARG ROOT_DIR
+RUN apt-get update && apt-get install -y jq python3 pipx
+RUN pipx install yq
+ENV PATH="/root/.local/bin:$PATH"
+
 RUN cargo install cargo-chef --locked
 WORKDIR "$ROOT_DIR"
 
 ## Planner Stage ##############################################################
 FROM chef as planner
+ARG COMPONENT
 COPY . .
-RUN rm -rf rust-toolchain.toml
+RUN tools/docker/set-workspace-for-component.sh "$COMPONENT"
 RUN cargo chef prepare --recipe-path recipe.json
 
-## Planner Stage ##############################################################
+## Builder Stage ##############################################################
 FROM chef AS builder
 ARG COMPONENT
 ARG ROOT_DIR
@@ -21,7 +26,7 @@ COPY --from=planner /$ROOT_DIR/recipe.json recipe.json
 # Build dependencies - this is the caching Docker layer!
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN rm -rf rust-toolchain.toml
+COPY --from=planner "$ROOT_DIR/Cargo.toml" ./
 RUN cargo build --release -p "$COMPONENT"
 
 ## Service Stage ##############################################################

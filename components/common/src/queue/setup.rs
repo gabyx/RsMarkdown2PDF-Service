@@ -1,17 +1,30 @@
 use amqprs::{
     callbacks::{DefaultChannelCallback, DefaultConnectionCallback},
-    channel::{Channel, ExchangeDeclareArguments, QueueBindArguments, QueueDeclareArguments},
+    channel::{
+        BasicConsumeArguments, BasicPublishArguments, ExchangeDeclareArguments, QueueBindArguments,
+        QueueDeclareArguments,
+    },
     connection::{Connection, OpenConnectionArguments},
+    consumer::AsyncConsumer,
+    BasicProperties,
 };
+
+use crate::{
+    job::Job,
+    result::{Error, Res},
+};
+use rocket::serde::json::serde_json;
 
 use crate::{config::get_env_var, log::info};
 
-pub struct RabbitMQCredentials {
+#[derive(Clone, Debug)]
+pub struct Credentials {
     pub host: String,
     pub password: String,
     pub username: String,
 }
 
+#[derive(Clone, Debug)]
 pub struct QueueConfig {
     pub name: String,
     pub durable: bool,
@@ -19,9 +32,56 @@ pub struct QueueConfig {
     pub exchange: String,
 }
 
-pub fn get_queue_config() -> (RabbitMQCredentials, QueueConfig) {
+pub struct JobQueue {
+    _connection: amqprs::connection::Connection,
+    channel: amqprs::channel::Channel,
+    pub config: QueueConfig,
+}
+
+impl JobQueue {
+    /// Publish a job `job` such that it gets converted by a consumer.
+    pub async fn publish(&self, job: &Job) -> Res<()> {
+        let props = BasicProperties::default()
+            .with_content_encoding("utf-8")
+            .with_persistence(true)
+            .with_content_type("application/json")
+            .finish();
+
+        let args = BasicPublishArguments::new(&self.config.exchange, &self.config.routing_key);
+
+        let data = serde_json::to_vec(&job).expect("Could not serialize ");
+
+        return self
+            .channel
+            .basic_publish(props, data, args)
+            .await
+            .map_err(|e| Error::new(e.to_string()));
+    }
+
+    /// Subscribes a consumer `consumer_creator(args)` to receive jobs.
+    pub async fn subscribe<F, T>(&self, consumer_creator: F) -> Res<()>
+    where
+        T: AsyncConsumer + Send + 'static,
+        F: FnOnce(&BasicConsumeArguments) -> T,
+    {
+        let args = BasicConsumeArguments::new(&self.config.name, "job-consumer")
+            .manual_ack(true)
+            .finish();
+
+        let creator = consumer_creator(&args);
+
+        return self
+            .channel
+            .basic_consume(creator, args)
+            .await
+            .map(|_| ())
+            .map_err(|e| Error::new(e.to_string()));
+    }
+}
+
+pub fn get_job_queue_config() -> (Credentials, QueueConfig) {
     return (
-        RabbitMQCredentials {
+        Credentials {
             host: get_env_var("RABBITMQ_HOST").take(),
             username: get_env_var("RABBITMQ_USERNAME").take(),
             password: get_env_var("RABBITMQ_PASSWORD").take(),
@@ -35,11 +95,11 @@ pub fn get_queue_config() -> (RabbitMQCredentials, QueueConfig) {
     );
 }
 
-pub async fn setup_queue_connection(
+pub async fn setup_job_queue(
     log: &slog::Logger,
-    credentials: &RabbitMQCredentials,
-    config: &QueueConfig,
-) -> (Connection, Channel) {
+    credentials: Credentials,
+    config: QueueConfig,
+) -> JobQueue {
     let connection = Connection::open(&OpenConnectionArguments::new(
         &credentials.host,
         5672,
@@ -73,11 +133,12 @@ pub async fn setup_queue_connection(
     let (_, msg_count, consumer_count) = channel
         .queue_declare(queue_args)
         .await
-        .expect(&std::format!(
-            "Could not create a '{}' queue [durable: {}].",
-            &config.name,
-            &config.durable
-        ))
+        .unwrap_or_else(|_| {
+            panic!(
+                "Could not create a '{}' queue [durable: {}].",
+                &config.name, &config.durable
+            )
+        })
         .unwrap();
 
     info!(
@@ -91,10 +152,7 @@ pub async fn setup_queue_connection(
     channel
         .exchange_declare(ExchangeDeclareArguments::new(&config.exchange, "direct"))
         .await
-        .expect(&std::format!(
-            "Could not declare direct exchange '{}'.",
-            &config.exchange,
-        ));
+        .unwrap_or_else(|_| panic!("Could not declare direct exchange '{}'.", &config.exchange,));
 
     info!(log, "Declared direct exchange '{}'.", &config.exchange);
 
@@ -108,16 +166,24 @@ pub async fn setup_queue_connection(
             &config.routing_key,
         ))
         .await
-        .expect(&std::format!(
-            "Could not bind queue '{}' to exchange '{}'.",
-            &config.name,
-            &config.exchange
-        ));
+        .unwrap_or_else(|_| {
+            panic!(
+                "Could not bind queue '{}' to exchange '{}'.",
+                &config.name, &config.exchange
+            )
+        });
 
     info!(
         log,
-        "Bound queue '{}' to exchange '{}'", &config.name, &config.exchange
+        "Bound queue '{}' to exchange '{}' with routing key '{}'.",
+        &config.name,
+        &config.exchange,
+        &config.routing_key
     );
 
-    return (connection, channel);
+    return JobQueue {
+        _connection: connection,
+        channel,
+        config,
+    };
 }

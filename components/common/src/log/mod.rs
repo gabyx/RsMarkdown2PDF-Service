@@ -1,13 +1,8 @@
 use slog::{o, Drain};
 use slog_async;
-use std::io;
+use std::sync::Arc;
 
-#[allow(dead_code)]
-fn no_out(_io: &mut dyn io::Write) -> io::Result<()> {
-    return Ok(());
-}
-
-pub fn create_logger() -> slog::Logger {
+pub fn create_logger() -> Arc<slog::Logger> {
     let decorator = slog_term::TermDecorator::new().build();
     let drain = slog_term::FullFormat::new(decorator)
         //.use_custom_timestamp(no_out)
@@ -19,7 +14,7 @@ pub fn create_logger() -> slog::Logger {
         .build()
         .fuse();
 
-    return slog::Logger::root(drain, o!());
+    return Arc::new(slog::Logger::root(drain, o!()));
 }
 
 pub type Logger = slog::Logger;

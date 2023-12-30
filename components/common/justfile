@@ -10,7 +10,7 @@ build-image *args:
     @echo "Nothing to build for this component"
 
 watch:
-    cd "{{comp_dir}}" && cargo watch -x 'run'
+    cd "{{comp_dir}}" && cargo watch -x 'build'
 
 format:
     cd "{{comp_dir}}" && \

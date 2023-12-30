@@ -53,6 +53,7 @@ dependencies = [
 name = "api"
 version = "0.1.0"
 dependencies = [
+ "amqprs",
  "common",
  "diesel",
  "dotenvy",
@@ -369,10 +370,14 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "amqprs",
+ "async-trait",
  "rocket",
+ "serde",
+ "simple-error",
  "slog",
  "slog-async",
  "slog-term",
+ "uuid",
 ]
 
 [[package]]
@@ -390,6 +395,7 @@ version = "0.1.0"
 dependencies = [
  "amqprs",
  "async-std",
+ "async-trait",
  "common",
  "dotenv",
  "slog",
@@ -1610,6 +1616,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple-error"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8542b68b8800c3cda649d2c72d688b6907b30f1580043135d61669d4aad1c175"
+
+[[package]]
 name = "slab"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1992,6 +2004,29 @@ name = "unicode-xid"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
+
+[[package]]
+name = "uuid"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e395fcf16a7a3d8127ec99782007af141946b4795001f876d54fb0d55978560"
+dependencies = [
+ "getrandom",
+ "rand",
+ "serde",
+ "uuid-macro-internal",
+]
+
+[[package]]
+name = "uuid-macro-internal"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f49e7f3f3db8040a100710a11932239fd30697115e2ba4107080d8252939845e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "valuable"

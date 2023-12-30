@@ -1,9 +1,15 @@
-**/target
-**/manifest
+# Ignore everything, and only include stuff we need.
+**
 
-**/.gitlab
-**/.githooks
-**/.nvim
+!tools/docker/**
 
+!Cargo.toml
+!Cargo.lock
 
+!components/api/**/Cargo.toml
+!components/api/**/Cargo.lock
+!components/api/**/*.rs
 
+!components/common/**/*.toml
+!components/common/**/*.lock
+!components/common/**/*.rs
