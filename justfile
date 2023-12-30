@@ -6,13 +6,14 @@ default_regex := ".*"
 
 # Administrative stuff.
 ###############################################################################
-start-server:
-    sudo k3s server
+create-cluster:
+    @cd "{{root_dir}}" && ./tools/create-kind-cluster.sh md2pdf
 
-# Start a docker registry locally which can be used with
-# tils to upload images for k3s.
-start-docker-registry:
-    docker run -d -p 5000:5000 --name registry registry:latest
+delete-cluster:
+    @cd "{{root_dir}}" && ./tools/delete-kind-cluster.sh md2pdf
+
+start-gitlab-runner token="":
+    @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh "{{token}}"
 
 # Deploying the components.
 ###############################################################################
@@ -32,6 +33,7 @@ deploy-down *args:
 build *args:
     cd {{root_dir}} && \
         "{{root_dir}}/tools/run-components-parallel.sh" {{parallel}} "{{default_regex}}" build "${@:1}"
+
 build-selection regex *args:
     cd {{root_dir}} && \
         "{{root_dir}}/tools/run-components-parallel.sh" {{parallel}} "{{regex}}" build "${@:2}"
@@ -42,6 +44,9 @@ build-image *args:
 build-image-selection regex *args:
     cd {{root_dir}} && \
         "{{root_dir}}/tools/run-components-parallel.sh" {{parallel}} "{{regex}}" build-image "${@:2}"
+
+watch:
+    cd "{{root_dir}}" && cargo watch -x 'build'
 
 # Component functionality.
 ###############################################################################

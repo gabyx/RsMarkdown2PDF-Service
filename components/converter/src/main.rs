@@ -1,43 +1,36 @@
-use amqprs::{
-    channel::{BasicConsumeArguments, Channel},
-    consumer::DefaultConsumer,
-};
+use std::sync::Arc;
+
 use common::{
     log::{create_logger, info},
-    queue::{get_queue_config, setup_queue_connection},
+    queue::{get_job_queue_config, setup_job_queue, JobQueue},
 };
-
+use converter::consumer::DefaultConsumer;
 use dotenv::dotenv;
-use std::sync::Arc;
 use tokio::sync::Notify;
 
-async fn install_consumer(log: &slog::Logger, channel: &Channel, queue_name: &str) {
+async fn install_consumer(log: &Arc<slog::Logger>, job_queue: &JobQueue) {
     info!(log, "Installing consumer on the queue");
 
-    let args = BasicConsumeArguments::new(&queue_name, "converter")
-        .manual_ack(true)
-        .finish();
-
-    channel
-        .basic_consume(DefaultConsumer::new(args.no_ack), args)
+    job_queue
+        .subscribe(|args| DefaultConsumer::new(log.clone(), args.no_ack))
         .await
-        .unwrap();
+        .expect("Could not install consumer.");
 }
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 1)]
 async fn main() {
-    let log = Arc::new(create_logger());
+    let log = create_logger();
     info!(log, "Configuring 'converter' service.");
 
     info!(log, "Loading environment variables.");
     dotenv().ok();
 
-    let (creds, queue_config) = get_queue_config();
-    let (_connection, channel) = setup_queue_connection(&log, &creds, &queue_config).await;
+    let (creds, queue_config) = get_job_queue_config();
 
-    install_consumer(&log, &channel, &queue_config.name).await;
+    let job_queue = setup_job_queue(&log, creds, queue_config).await;
+    install_consumer(&log, &job_queue).await;
 
-    info!(log, "Consume from queue '{}'...", &queue_config.name);
+    info!(log, "Consume from queue '{}'...", &job_queue.config.name);
     let guard = Notify::new();
     guard.notified().await;
 }
