@@ -76,13 +76,13 @@ far as possible.
 To start the loop run:
 
 ```shell
-just deploy up
+just deploy-up
 ```
 
 and to remove all resources from the development cluster use:
 
 ```shell
-just deploy down
+just deploy-down
 ```
 
 You can inspect continuously the state of the cluster with `k9s` and also watch
