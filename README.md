@@ -1,5 +1,3 @@
-# Markdown to PDF Service.
-
 <!--toc:start-->
 
 - [Markdown to PDF Service.](#markdown-to-pdf-service)
@@ -122,3 +120,18 @@ running hooks use either
 - `git commit --no-verify ...` or
 - `git hooks uninstall` to completely remove the hook run wrappers from
   `.git/hooks`.
+
+### CI/CD
+
+#### Gitlab
+
+Either use the free Gitlab credits or start your own runner with `docker` by
+running:
+
+```shell
+just start-gitlab-runner <token>
+```
+
+where the `<token>` is the Gitlab runner token obtained from setting up a
+project specific runner in Gitlab. After starting the runner, the config mount
+will be inside `.gitlab/local`.
