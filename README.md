@@ -27,6 +27,22 @@ This is a demo project to showcase a small microservice architecture by exposing
   - `libpq` must be installed. Comes with `postgres`.
   - `tilt`, `kustomize`, `httpie`, `docker`, `kind`
 
+## Project Structure
+
+- [`components`](components): All components making up this project.
+  - [`api`](components/api): The `api` service receiving converter jobs from the
+    `web` UI.
+  - [`converter`](components/converter): The converter service which converts
+    jobs taken out from the RabbitMQ queue `md2pdf.jobs`.
+  - [`web`](components/web): The simple web service which presents the UI to the
+    user to upload `markdown` files.
+- [`manifests`](manifests): All kubernetes (`k8s`) manifests
+- [`tools`](tools): Tools and scripts are located here.
+  - [`.nvim`](.nvim): Nvim setup when entering this project. Needs plugin
+    [`klen/nvim-config-local`](https://github.com/klen/nvim-config-local).
+  - [`.githooks`](.githooks): Githooks setup, which also runs inside the CI.
+  - [`.gitlab`](.gitlab): CI setup with Gitlab.
+
 ## Run Instructions
 
 The easiest way to run this is using `tilt` and on a working Kubernetes cluster,
@@ -60,9 +76,6 @@ just component <component> build`
 ```
 
 inside the repository root.
-
-The [`.env`](components/api/.env) files configures the tools to connect to the
-services running in the Kubernetes cluster.
 
 ## Development Loop using `tilt` (Kubernetes)
 
