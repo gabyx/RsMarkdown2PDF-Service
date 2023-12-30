@@ -1,11 +1,6 @@
 use slog::{o, Drain};
 use slog_async;
-use std::{io, sync::Arc};
-
-#[allow(dead_code)]
-fn no_out(_io: &mut dyn io::Write) -> io::Result<()> {
-    return Ok(());
-}
+use std::sync::Arc;
 
 pub fn create_logger() -> Arc<slog::Logger> {
     let decorator = slog_term::TermDecorator::new().build();
