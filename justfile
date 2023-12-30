@@ -13,7 +13,7 @@ delete-cluster:
     @cd "{{root_dir}}" && ./tools/delete-kind-cluster.sh md2pdf
 
 start-gitlab-runner token="":
-    @cd "{{root_dir}}" && ./tools/create-gitlab-runner.sh "{{token}}"
+    @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh "{{token}}"
 
 # Deploying the components.
 ###############################################################################

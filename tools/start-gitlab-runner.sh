@@ -13,6 +13,7 @@ ROOT=$(git rev-parse --show-toplevel)
 force="false"
 config_dir="$ROOT/.gitlab/local/config"
 runner_name="gitlab-runner"
+cores=$(grep "^cpu\\scores" /proc/cpuinfo | uniq | cut -d ' ' -f 3)
 
 function create() {
     local token="${1:?First argument must be the runner token.}"
@@ -21,6 +22,7 @@ function create() {
     mkdir -p "$config_dir"
 
     docker run -d \
+        --cpus "$cores" \
         --name "$runner_name" \
         --restart always \
         -v /var/run/docker.sock:/var/run/docker.sock \
