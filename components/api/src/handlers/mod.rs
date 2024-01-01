@@ -50,8 +50,9 @@ async fn submit_job(
     return json::success!(SubmittedJob { id: Uuid::new_v4() });
 }
 
+/// Install all handlers for this application.
 pub fn install_handlers(r: Rocket<Build>) -> Rocket<Build> {
-    let r = r.mount("/", routes![get_all_jobs, submit_job]);
+    let r = r.mount("/", routes![get_job, get_all_jobs, submit_job]);
     return install_debug_handlers(r);
 }
 
