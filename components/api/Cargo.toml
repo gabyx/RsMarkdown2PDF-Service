@@ -10,6 +10,7 @@ common = {path="../common"}
 dotenvy = "0.15"
 slog = "2.7.0"
 amqprs = "1.5.1"
+uuid = "1.6.1"
 
 [dependencies.rocket]
 version = "=0.5.0-rc.3"
@@ -26,3 +27,7 @@ features = ["postgres"]
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
 opt-level = "z"  # Optimize for size.
+
+[features]
+default = ["debug-handlers"]
+debug-handlers = []
