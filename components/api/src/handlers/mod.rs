@@ -14,7 +14,7 @@ use uuid::Uuid;
 async fn get_all_jobs(s: &State<AppState>) -> json::JsonResponse<Vec<Job>> {
     info!(s.log, "Getting all jobs.");
 
-    let result = vec![Job::new("new job")];
+    let result = vec![Job::new("my-doc")];
     return json::success!(result);
 }
 
@@ -69,7 +69,7 @@ fn install_debug_handlers(r: Rocket<Build>) -> Rocket<Build> {
 async fn submit_job_debug(s: &State<AppState>) -> json::JsonResponse<Job> {
     info!(s.log, "Publishing debug job into queue.");
 
-    let job = Job::new("new job");
+    let job = Job::new("my-doc");
 
     return match s.job_queue.publish(&job).await {
         Ok(_) => json::success!(job),
