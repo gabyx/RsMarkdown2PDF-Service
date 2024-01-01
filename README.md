@@ -1,12 +1,18 @@
+# Markdown-to-PDF Service
+
+**Note: This is currently in development and not feature complete.**
+
 <!--toc:start-->
 
-- [Markdown to PDF Service.](#markdown-to-pdf-service)
-  - [Requirements](#requirements)
-  - [Run Instructions](#run-instructions)
-  - [Local Development Loop for Fast Feedback](#local-development-loop-for-fast-feedback)
-  - [Development Loop using `tilt` (Kubernetes)](#development-loop-using-tilt-kubernetes)
-  - [Development](#development) - [Debugging in Rust](#debugging-in-rust) -
-  [Githooks](#githooks)
+- [Requirements](#requirements)
+- [Project Structure](#project-structure)
+- [Run Instructions](#run-instructions)
+- [Local Development Loop for Fast Feedback](#local-development-loop-for-fast-feedback)
+- [Development Loop using `tilt` (Kubernetes)](#development-loop-using-tilt-kubernetes)
+- [Development](#development)
+  - [Debugging in Rust](#debugging-in-rust)
+  - [Githooks](#githooks)
+  - [CI/CD](#cicd) - [Gitlab](#gitlab)
   <!--toc:end-->
 
 This is a demo project to showcase a small microservice architecture by exposing
