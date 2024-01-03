@@ -7,7 +7,7 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: manual
+  storageClassName: standard
   capacity:
     storage: 200M
   accessModes:
@@ -22,7 +22,7 @@ metadata:
   name: blob-storage-claim
   namespace: md2pdf
 spec:
-  storageClassName: manual
+  storageClassName: standard
   accessModes:
     - ReadWriteMany
   resources:

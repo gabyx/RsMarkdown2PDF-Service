@@ -12,6 +12,7 @@ pub trait BlobStorage: Sync + Send {
     /// TODO: If the file is an archive it will be expanded into the folder.
     async fn store_blob(
         &self,
+        log: &slog::Logger,
         src: &Path,
         content_type: &str,
     ) -> Result<(String, Digest), io::Error>;

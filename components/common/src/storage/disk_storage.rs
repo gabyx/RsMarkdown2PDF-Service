@@ -1,4 +1,7 @@
-use crate::storage::{digest::get_digest, BlobStorage, Digest};
+use crate::{
+    log::info,
+    storage::{digest::get_digest, BlobStorage, Digest},
+};
 use rocket::{
     self, tokio,
     tokio::{fs::File, io::BufReader, sync},
@@ -34,12 +37,14 @@ impl DiskStorage {
 impl BlobStorage for DiskStorage {
     async fn store_blob(
         &self,
+        log: &slog::Logger,
         src: &Path,
         content_type: &str,
     ) -> Result<(String, Digest), io::Error> {
         let f = File::open(src).await?;
         let buf = BufReader::new(f);
 
+        info!(log, "Compute digest ...");
         let digest = get_digest(buf).await?;
         let dest = self.get_blob_path(&digest);
 
@@ -55,6 +60,8 @@ impl BlobStorage for DiskStorage {
 
         if !dest.exists() {
             let _l = self.lock.try_lock();
+
+            info!(log, "Store into storage from {:?} -> {:?}.", src, dest);
 
             tokio::fs::create_dir_all(&dest).await?;
             tokio::fs::rename(src, &dest).await?;
