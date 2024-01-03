@@ -6,3 +6,6 @@ metadata:
   labels:
     app: api
 data:
+  # TODO: Use a correct volume claim for blob storage path
+  # shared between api and converter.
+  BLOB_STORAGE_PATH: /data/blob-storage

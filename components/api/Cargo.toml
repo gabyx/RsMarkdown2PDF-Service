@@ -11,6 +11,7 @@ dotenvy = "0.15"
 slog = "2.7.0"
 amqprs = "1.5.1"
 uuid = "1.6.1"
+tempfile = "3.9.0"
 
 [dependencies.rocket]
 version = "=0.5.0-rc.3"
