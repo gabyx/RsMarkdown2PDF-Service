@@ -6,7 +6,7 @@ mod state;
 
 use common::{
     config::get_env_var,
-    log::{create_logger, info, Level},
+    log::{create_logger, info},
     queue::{get_job_queue_config, setup_job_queue},
     storage::get_storage,
 };
@@ -20,7 +20,7 @@ use rocket::config::{Config, LogLevel};
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
-    let log = create_logger(Level::Debug);
+    let log = create_logger();
     info!(log, "Configuring 'API' service.");
 
     info!(log, "Load environment variables.");

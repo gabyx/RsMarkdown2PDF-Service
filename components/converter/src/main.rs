@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use common::{
-    log::{self, create_logger, info, Level, Logger},
+    log::{create_logger, info, Logger},
     queue::{get_job_queue_config, setup_job_queue, JobQueue},
     storage::get_storage,
 };
@@ -20,7 +20,7 @@ async fn install_consumer(log: &Arc<Logger>, job_queue: &JobQueue) {
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 1)]
 async fn main() {
-    let log = create_logger(Level::Debug);
+    let log = create_logger();
     info!(log, "Configuring 'converter' service.");
 
     info!(log, "Loading environment variables.");

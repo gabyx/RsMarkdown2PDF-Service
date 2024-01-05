@@ -1,4 +1,8 @@
-use common::{job::JobBundle, log::info, response::json};
+use common::{
+    job::JobBundle,
+    log::{error, info},
+    response::json,
+};
 use rocket::{form::Form, http::Status, routes, Build, Rocket, State};
 
 use crate::{
@@ -38,7 +42,10 @@ async fn submit_job(
 
     match job_bundle {
         Ok(bundle) => json::success!(SubmittedJob { id: bundle.id }),
-        Err(e) => json::failure!(Status::InternalServerError, "Failed to create job: {}.", e),
+        Err(e) => {
+            error!(&s.log, "Failed to create job '{}'.", e);
+            json::failure!(Status::InternalServerError, "Failed to create job.")
+        }
     }
 }
 

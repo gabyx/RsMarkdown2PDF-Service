@@ -1,7 +1,6 @@
 use common::{log::Logger, queue::JobQueue, storage::BlobStorage};
 use diesel::pg::PgConnection;
 use rocket::tokio::sync::Mutex;
-use slog;
 use std::sync::Arc;
 
 pub struct AppState {

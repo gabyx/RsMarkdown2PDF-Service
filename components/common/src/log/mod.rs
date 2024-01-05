@@ -1,41 +1,25 @@
-use slog::{self, o, Drain, LevelFilter};
+use slog::{self, o, Drain};
 use slog_async;
 use std::sync::Arc;
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
-pub enum Level {
-    Critical,
-    Error,
-    Warning,
-    Info,
-    Debug,
-    Trace,
-}
-
 /// Wrapping our internal type to the outside.
-/// TODO: Wrap it better, is a struct with private member possible?.
+/// TODO: Wrap it better, is a struct with private member possible?
 pub type Logger = slog::Logger;
 
-pub fn create_logger(level: Level) -> Arc<Logger> {
+pub fn create_logger() -> Arc<Logger> {
     let decorator = slog_term::TermDecorator::new().build();
+
     let drain = slog_term::FullFormat::new(decorator)
         //.use_custom_timestamp(no_out)
         .build()
         .fuse();
 
-    let drain = slog_async::Async::new(drain).chan_size(5_000_000).build();
+    let drain = slog_async::Async::new(drain)
+        .chan_size(5_000_000)
+        .build()
+        .fuse();
 
-    let lev = match level {
-        Level::Trace => slog::Level::Trace,
-        Level::Debug => slog::Level::Debug,
-        Level::Info => slog::Level::Info,
-        Level::Warning => slog::Level::Warning,
-        Level::Error => slog::Level::Error,
-        Level::Critical => slog::Level::Critical,
-    };
-    let filtered_drain = LevelFilter::new(drain, lev).fuse();
-
-    return Arc::new(slog::Logger::root(filtered_drain, o!()));
+    return Arc::new(slog::Logger::root(drain, o!()));
 }
 
 /// Log trace level record

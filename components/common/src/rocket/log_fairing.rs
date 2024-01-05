@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::log::{self, Logger};
 use rocket::{
     fairing::{Fairing, Info, Kind},
+    http::Status,
     Build, Data, Orbit, Request, Response, Rocket,
 };
 
@@ -45,10 +46,8 @@ impl Fairing for LogFairing {
     async fn on_liftoff(&self, _: &Rocket<Orbit>) {}
 
     async fn on_request(&self, r: &mut Request<'_>, _: &mut Data<'_>) {
-        log::debug!(&self.0, "Got request: '{}'", r)
+        log::debug!(&self.0, "Request: '{}'", r)
     }
 
-    async fn on_response<'r>(&self, _: &'r Request<'_>, r: &mut Response<'r>) {
-        log::debug!(&self.0, "Response: {:?}", r);
-    }
+    async fn on_response<'r>(&self, _: &'r Request<'_>, _: &mut Response<'r>) {}
 }
