@@ -39,14 +39,14 @@ impl Fairing for LogFairing {
     }
 
     async fn on_ignite(&self, rocket: Rocket<Build>) -> Result<Rocket<Build>, Rocket<Build>> {
-        log::debug!(&self.0, "Starting up rocket...");
+        log::info!(&self.0, "Starting up rocket...");
         Ok(rocket.manage(self.clone()))
     }
 
     async fn on_liftoff(&self, _: &Rocket<Orbit>) {}
 
     async fn on_request(&self, r: &mut Request<'_>, _: &mut Data<'_>) {
-        log::debug!(&self.0, "Request: '{}'", r)
+        log::info!(&self.0, "Handling Request: '{}'", r)
     }
 
     async fn on_response<'r>(&self, _: &'r Request<'_>, _: &mut Response<'r>) {}
