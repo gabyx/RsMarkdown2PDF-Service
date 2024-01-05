@@ -46,6 +46,7 @@ async fn main() -> Result<(), rocket::Error> {
 
     let r = rocket::custom(config)
         .attach(common::rocket::LogFairing(log))
+        .attach(common::rocket::GuardInternalErrors())
         .manage(app_state);
 
     install_handlers(r).launch().await?;

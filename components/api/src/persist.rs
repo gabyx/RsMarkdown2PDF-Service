@@ -1,10 +1,12 @@
 use common::{
     job::JobBundle,
     log::{self, info},
+    response,
+    response::Error,
     storage::BlobStorage,
 };
-use rocket::fs::TempFile;
-use std::{env, io, path::Path, sync::Arc};
+use rocket::{fs::TempFile, http::Status};
+use std::{env, path::Path, sync::Arc};
 use uuid::Uuid;
 
 pub async fn create_job_bundle(
@@ -12,7 +14,7 @@ pub async fn create_job_bundle(
     file: &mut TempFile<'_>,
     name: &str,
     storage: Arc<dyn BlobStorage>,
-) -> Result<JobBundle, io::Error> {
+) -> Result<JobBundle, response::Error> {
     let tmp_file = Path::join(&env::temp_dir(), Uuid::new_v4().to_string());
 
     info!(log, "Persist upload to temporary file '{:?}'.", tmp_file);
@@ -21,28 +23,27 @@ pub async fn create_job_bundle(
     let content_type = match file.content_type() {
         Some(c) => c.to_string(),
         None => {
-            return Err(io::Error::new(
-                io::ErrorKind::Unsupported,
-                format!("No content type given."),
-            ));
+            return Err(response::error!(
+                Status::BadRequest,
+                "No content type given.",
+            ))
         }
     };
 
     match content_type.as_str() {
         "text/markdown" => (),
         "application/x-zip" | "application/x-tar" => {
-            return Err(io::Error::new(
-                io::ErrorKind::Unsupported,
-                format!(
-                    "Content type '{}' files are not yet supported.",
-                    content_type
-                ),
+            return Err(response::error!(
+                Status::BadRequest,
+                "Content type '{}' files are not yet supported.",
+                content_type
             ));
         }
         _ => {
-            return Err(io::Error::new(
-                io::ErrorKind::Unsupported,
-                format!("Content type '{}' is not supported.", content_type),
+            return Err(response::error!(
+                Status::BadRequest,
+                "Content type '{}' files are not supported.",
+                content_type
             ));
         }
     };

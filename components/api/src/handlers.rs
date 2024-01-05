@@ -36,17 +36,11 @@ async fn submit_job(
 
     let name = job.metadata.name.clone();
     let job_bundle =
-        persist::create_job_bundle(&s.log, &mut job.file, &name, s.storage.clone()).await;
+        persist::create_job_bundle(&s.log, &mut job.file, &name, s.storage.clone()).await?;
 
     // TODO: store that shit into the db and send it to the queue.
 
-    match job_bundle {
-        Ok(bundle) => json::success!(SubmittedJob { id: bundle.id }),
-        Err(e) => {
-            error!(&s.log, "Failed to create job '{}'.", e);
-            json::failure!(Status::InternalServerError, "Failed to create job.")
-        }
-    }
+    json::success!(SubmittedJob { id: job_bundle.id })
 }
 
 /// Install all handlers for this application.
@@ -74,6 +68,7 @@ async fn submit_job_debug(s: &State<AppState>) -> json::JsonResponse<JobBundle> 
     return match s.job_queue.publish(&job).await {
         Ok(_) => json::success!(job),
         Err(e) => json::failure!(
+            &s.log,
             Status::InternalServerError,
             "Could not publish job id '{}', error: \n'{}'.",
             job.id,

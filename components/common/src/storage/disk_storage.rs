@@ -59,7 +59,7 @@ impl BlobStorage for DiskStorage {
         }
 
         if !dest.exists() {
-            let _l = self.lock.try_lock();
+            let _l = self.lock.lock();
 
             info!(log, "Store into storage from {:?} -> {:?}.", src, dest);
 

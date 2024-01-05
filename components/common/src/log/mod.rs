@@ -87,6 +87,18 @@ macro_rules! log_error(
 
 pub use log_error as error;
 
+#[macro_export]
+macro_rules! log_critical(
+    ($log:expr, #$tag:expr, $($args:tt)+) => {
+        slog::log!($log, slog::Level::Critical, $tag, $($args)+)
+    };
+    ($log:expr, $($args:tt)+) => {
+        slog::log!($log, slog::Level::Critical, "", $($args)+)
+    };
+);
+
+pub use log_critical as critical;
+
 /// Log panic level record
 #[macro_export]
 macro_rules! log_panic(

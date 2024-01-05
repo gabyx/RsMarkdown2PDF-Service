@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{io, sync::Arc};
 
 use crate::log::{self, Logger};
 use rocket::{
@@ -34,7 +34,7 @@ impl Fairing for LogFairing {
     fn info(&self) -> Info {
         Info {
             name: "Slog Fairing",
-            kind: Kind::Ignite | Kind::Liftoff | Kind::Request | Kind::Response,
+            kind: Kind::Liftoff | Kind::Request | Kind::Response,
         }
     }
 
@@ -43,11 +43,19 @@ impl Fairing for LogFairing {
         Ok(rocket.manage(self.clone()))
     }
 
-    async fn on_liftoff(&self, _: &Rocket<Orbit>) {}
-
     async fn on_request(&self, r: &mut Request<'_>, _: &mut Data<'_>) {
         log::info!(&self.0, "Handling Request: '{}'", r)
     }
 
-    async fn on_response<'r>(&self, _: &'r Request<'_>, _: &mut Response<'r>) {}
+    async fn on_response<'r>(&self, _: &'r Request<'_>, r: &mut Response<'r>) {
+        if r.status().class().is_server_error() {
+            let s = r
+                .body_mut()
+                .to_string()
+                .await
+                .expect("Could not read body to log internal error.");
+
+            log::critical!(&self.0, "Internal server error response occured: {}", s);
+        }
+    }
 }
