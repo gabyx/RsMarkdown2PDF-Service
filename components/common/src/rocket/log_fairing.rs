@@ -1,17 +1,17 @@
 use std::sync::Arc;
 
-use crate::log;
+use crate::log::{self, Logger};
 use rocket::{
     fairing::{Fairing, Info, Kind},
     Build, Data, Orbit, Request, Response, Rocket,
 };
 
-/// Newtype struct wrapper around the passed-in slog::Logger
+/// Newtype struct wrapper around the passed-in `Logger`.
 #[derive(Debug, Clone)]
-pub struct LogFairing(pub Arc<log::Logger>);
+pub struct LogFairing(pub Arc<Logger>);
 
 impl LogFairing {
-    pub fn new(logger: Arc<log::Logger>) -> LogFairing {
+    pub fn new(logger: Arc<Logger>) -> LogFairing {
         return LogFairing(logger);
     }
 
@@ -48,5 +48,7 @@ impl Fairing for LogFairing {
         log::debug!(&self.0, "Got request: '{}'", r)
     }
 
-    async fn on_response<'r>(&self, _: &'r Request<'_>, _: &mut Response<'r>) {}
+    async fn on_response<'r>(&self, _: &'r Request<'_>, r: &mut Response<'r>) {
+        log::debug!(&self.0, "Response: {:?}", r);
+    }
 }

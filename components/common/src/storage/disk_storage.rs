@@ -1,5 +1,5 @@
 use crate::{
-    log::info,
+    log::{info, Logger},
     storage::{digest::get_digest, BlobStorage, Digest},
 };
 use rocket::{
@@ -37,7 +37,7 @@ impl DiskStorage {
 impl BlobStorage for DiskStorage {
     async fn store_blob(
         &self,
-        log: &slog::Logger,
+        log: &Logger,
         src: &Path,
         content_type: &str,
     ) -> Result<(String, Digest), io::Error> {

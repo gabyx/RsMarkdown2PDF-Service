@@ -11,6 +11,7 @@ use amqprs::{
 
 use crate::{
     job::JobBundle,
+    log::Logger,
     result::{Error, Res},
 };
 use rocket::serde::json::serde_json;
@@ -96,7 +97,7 @@ pub fn get_job_queue_config() -> (Credentials, QueueConfig) {
 }
 
 pub async fn setup_job_queue(
-    log: &slog::Logger,
+    log: &Logger,
     credentials: Credentials,
     config: QueueConfig,
 ) -> JobQueue {

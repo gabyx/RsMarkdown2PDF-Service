@@ -38,7 +38,7 @@ async fn submit_job(
 
     match job_bundle {
         Ok(bundle) => json::success!(SubmittedJob { id: bundle.id }),
-        Err(e) => json::failure!(Status::BadRequest, "Failed to creat job: {}.", e),
+        Err(e) => json::failure!(Status::InternalServerError, "Failed to create job: {}.", e),
     }
 }
 
