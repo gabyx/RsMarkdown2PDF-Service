@@ -1,6 +1,6 @@
 use core::fmt;
-
 use rocket::{http::Status, response::status::Custom};
+use std::backtrace;
 
 #[derive(Debug)]
 pub struct Error {
@@ -31,9 +31,16 @@ macro_rules! _error {
 
 pub use _error as error;
 
+/// TODO: This is better handled probably with something similar to
+/// anyhow::Error where we do not implicitly convert an `io::Error`
+/// to a `response::Error`, for now its a solution.
 impl From<std::io::Error> for Error {
     fn from(value: std::io::Error) -> Self {
-        return error!(Status::InternalServerError, "IO Error: {}", value);
+        let b = backtrace::Backtrace::capture();
+        return error!(
+            Status::InternalServerError,
+            "IO Error: {}, backtrace:\n{}", value, b
+        );
     }
 }
 

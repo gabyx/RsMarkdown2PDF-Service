@@ -1,6 +1,7 @@
 ARG COMPONENT="converter"
 ARG ROOT_DIR="/build"
 ARG BUILD_TYPE="release"
+ARG ENABLE_BACKTRACE="0"
 
 ## Base Stage ##############################################################
 FROM rust:1.74 AS chef
@@ -40,12 +41,14 @@ FROM ubuntu:latest
 ARG COMPONENT
 ARG ROOT_DIR
 ARG BUILD_TYPE
+ARG ENABLE_BACKTRACE
 
 ARG APP=/usr/src/app
 EXPOSE 8000
 
 ENV TZ=Etc/UTC \
-    APP_USER=appuser
+    APP_USER=appuser \
+    RUST_BACKTRACE=$ENABLE_BACKTRACE
 
 RUN groupadd "$APP_USER" \
     && useradd -g "$APP_USER" "$APP_USER" \

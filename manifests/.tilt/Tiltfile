@@ -58,5 +58,10 @@ def get_component_config(tiltfile=None, name=None):
 def load_settings():
     env_file = os.path.join(config.main_dir, ".env.yaml")
     return read_yaml(
-        env_file, default={"use-local-registry": False, "build-type": "release"}
+        env_file,
+        default={
+            "use-local-registry": False,
+            "build-type": "release",
+            "enable-backtrace": "0",
+        },
     )
