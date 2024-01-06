@@ -1,18 +1,17 @@
 allow_k8s_contexts(["default", "local-k3s"])
 
-env_file = os.path.join(config.main_dir, ".env.yaml")
-settings = read_yaml(env_file, default={})
-use_local_registry = settings.get("use_local_registry", False) == True
-
 load(
     ".tilt/Tiltfile",
     "root_dir",
     "component_dirs",
     "get_component_config",
     "get_component_path",
+    "load_settings",
 )
 
-if use_local_registry:
+settings = load_settings()
+
+if settings["use-local-registry"]:
     # Use local docker registry run in the cluster.
     default_registry("localhost:5001")
 else:

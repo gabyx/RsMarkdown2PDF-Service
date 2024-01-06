@@ -1,8 +1,31 @@
+root_dir = str(local(["git", "rev-parse", "--show-toplevel"])).strip()
+
+
 def get_component_path(name=None, *args):
     if name:
         return os.path.join(root_dir, "components", name, *args)
     else:
         return os.path.join(root_dir, "components")
+
+
+component_dirs = (
+    str(
+        local(
+            [
+                "find",
+                get_component_path(),
+                "-mindepth",
+                "1",
+                "-maxdepth",
+                "1",
+                "-type",
+                "d",
+            ]
+        )
+    )
+    .strip()
+    .split()
+)
 
 
 def get_manifest_path(name, *args):
@@ -32,22 +55,13 @@ def get_component_config(tiltfile=None, name=None):
     }
 
 
-root_dir = str(local(["git", "rev-parse", "--show-toplevel"])).strip()
-component_dirs = (
-    str(
-        local(
-            [
-                "find",
-                get_component_path(),
-                "-mindepth",
-                "1",
-                "-maxdepth",
-                "1",
-                "-type",
-                "d",
-            ]
-        )
+def load_settings():
+    env_file = os.path.join(config.main_dir, ".env.yaml")
+    return read_yaml(
+        env_file,
+        default={
+            "use-local-registry": False,
+            "build-type": "release",
+            "enable-backtrace": "0",
+        },
     )
-    .strip()
-    .split()
-)

@@ -1,17 +1,17 @@
-use std::sync::Arc;
+use std::{backtrace, sync::Arc};
 
-use crate::log;
+use crate::log::{self, Logger};
 use rocket::{
     fairing::{Fairing, Info, Kind},
-    Build, Data, Orbit, Request, Response, Rocket,
+    Build, Data, Request, Response, Rocket,
 };
 
-/// Newtype struct wrapper around the passed-in slog::Logger
+/// Newtype struct wrapper around the passed-in `Logger`.
 #[derive(Debug, Clone)]
-pub struct LogFairing(pub Arc<log::Logger>);
+pub struct LogFairing(pub Arc<Logger>);
 
 impl LogFairing {
-    pub fn new(logger: Arc<log::Logger>) -> LogFairing {
+    pub fn new(logger: Arc<Logger>) -> LogFairing {
         return LogFairing(logger);
     }
 
@@ -33,20 +33,34 @@ impl Fairing for LogFairing {
     fn info(&self) -> Info {
         Info {
             name: "Slog Fairing",
-            kind: Kind::Ignite | Kind::Liftoff | Kind::Request | Kind::Response,
+            kind: Kind::Liftoff | Kind::Request | Kind::Response,
         }
     }
 
     async fn on_ignite(&self, rocket: Rocket<Build>) -> Result<Rocket<Build>, Rocket<Build>> {
-        log::debug!(&self.0, "Starting up rocket...");
+        log::info!(&self.0, "Starting up rocket...");
         Ok(rocket.manage(self.clone()))
     }
 
-    async fn on_liftoff(&self, _: &Rocket<Orbit>) {}
-
     async fn on_request(&self, r: &mut Request<'_>, _: &mut Data<'_>) {
-        log::debug!(&self.0, "Got request: '{}'", r)
+        log::info!(&self.0, "Handling Request: '{}'", r)
     }
 
-    async fn on_response<'r>(&self, _: &'r Request<'_>, _: &mut Response<'r>) {}
+    async fn on_response<'r>(&self, _: &'r Request<'_>, r: &mut Response<'r>) {
+        if r.status().class().is_server_error() {
+            let s = r
+                .body_mut()
+                .to_string()
+                .await
+                .expect("Could not read body to log internal error.");
+
+            let b = backtrace::Backtrace::capture();
+            log::critical!(
+                &self.0,
+                "Internal server error response occured: {}\nBacktrace:\n{}",
+                s,
+                b
+            );
+        }
+    }
 }

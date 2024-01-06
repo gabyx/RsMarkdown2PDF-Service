@@ -1,5 +1,7 @@
 ARG COMPONENT="api"
 ARG ROOT_DIR="/build"
+ARG BUILD_TYPE="release"
+ARG ENABLE_BACKTRACE="0"
 
 ## Base Stage ##############################################################
 FROM rust:1.74 AS chef
@@ -22,23 +24,32 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM chef AS builder
 ARG COMPONENT
 ARG ROOT_DIR
+ARG BUILD_TYPE
+
 COPY --from=planner /$ROOT_DIR/recipe.json recipe.json
+COPY tools/docker ./tools/docker
+
 # Build dependencies - this is the caching Docker layer!
-RUN cargo chef cook --release --recipe-path recipe.json
+RUN ./tools/docker/run-cargo-deps.sh "$BUILD_TYPE"
 COPY . .
+
 COPY --from=planner "$ROOT_DIR/Cargo.toml" ./
-RUN cargo build --release -p "$COMPONENT"
+RUN ./tools/docker/run-cargo.sh "$BUILD_TYPE"
+
 
 ## Service Stage ##############################################################
 FROM ubuntu:latest
 ARG COMPONENT
 ARG ROOT_DIR
+ARG BUILD_TYPE
+ARG ENABLE_BACKTRACE
 
 ARG APP=/usr/src/app
 EXPOSE 8000
 
 ENV TZ=Etc/UTC \
-    APP_USER=appuser
+    APP_USER=appuser \
+    RUST_BACKTRACE=$ENABLE_BACKTRACE
 
 RUN groupadd "$APP_USER" \
     && useradd -g "$APP_USER" "$APP_USER" \
@@ -49,7 +60,7 @@ RUN apt update && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
-COPY --from=builder "$ROOT_DIR/target/release/$COMPONENT" "${APP}/app"
+COPY --from=builder "$ROOT_DIR/target/$BUILD_TYPE/$COMPONENT" "${APP}/app"
 RUN chown -R "$APP_USER:$APP_USER" "${APP}"
 
 USER $APP_USER

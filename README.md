@@ -98,7 +98,13 @@ To start the loop run:
 just deploy-up
 ```
 
-and to remove all resources from the development cluster use:
+which loads an optional user-defined settings file
+[`manifests/.env.yaml`](manifests/.env.yaml.tmpl). You can use the local
+registry for uploading the container images or `ttl.sh` and also configure if
+you want to build a `debug` release for more log output on `trace` and `debug`
+levels.
+
+To remove all resources from the development cluster use:
 
 ```shell
 just deploy-down

@@ -1,14 +1,15 @@
 use std::sync::Arc;
 
 use common::{
-    log::{create_logger, info},
+    log::{create_logger, info, Logger},
     queue::{get_job_queue_config, setup_job_queue, JobQueue},
+    storage::get_storage,
 };
 use converter::consumer::DefaultConsumer;
 use dotenv::dotenv;
 use tokio::sync::Notify;
 
-async fn install_consumer(log: &Arc<slog::Logger>, job_queue: &JobQueue) {
+async fn install_consumer(log: &Arc<Logger>, job_queue: &JobQueue) {
     info!(log, "Installing consumer on the queue");
 
     job_queue
@@ -24,6 +25,9 @@ async fn main() {
 
     info!(log, "Loading environment variables.");
     dotenv().ok();
+
+    info!(log, "Initialize blob storage.");
+    let _storage = get_storage();
 
     let (creds, queue_config) = get_job_queue_config();
 

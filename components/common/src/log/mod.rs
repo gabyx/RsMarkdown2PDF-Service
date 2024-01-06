@@ -1,9 +1,14 @@
-use slog::{o, Drain};
+use slog::{self, o, Drain};
 use slog_async;
 use std::sync::Arc;
 
-pub fn create_logger() -> Arc<slog::Logger> {
+/// Wrapping our internal type to the outside.
+/// TODO: Wrap it better, is a struct with private member possible?
+pub type Logger = slog::Logger;
+
+pub fn create_logger() -> Arc<Logger> {
     let decorator = slog_term::TermDecorator::new().build();
+
     let drain = slog_term::FullFormat::new(decorator)
         //.use_custom_timestamp(no_out)
         .build()
@@ -16,8 +21,6 @@ pub fn create_logger() -> Arc<slog::Logger> {
 
     return Arc::new(slog::Logger::root(drain, o!()));
 }
-
-pub type Logger = slog::Logger;
 
 /// Log trace level record
 #[macro_export]
@@ -83,6 +86,18 @@ macro_rules! log_error(
 );
 
 pub use log_error as error;
+
+#[macro_export]
+macro_rules! log_critical(
+    ($log:expr, #$tag:expr, $($args:tt)+) => {
+        slog::log!($log, slog::Level::Critical, $tag, $($args)+)
+    };
+    ($log:expr, $($args:tt)+) => {
+        slog::log!($log, slog::Level::Critical, "", $($args)+)
+    };
+);
+
+pub use log_critical as critical;
 
 /// Log panic level record
 #[macro_export]

@@ -6,14 +6,14 @@ use amqprs::{
     BasicProperties, Deliver,
 };
 use async_trait::async_trait;
-use common::log::info;
+use common::log::{self, info, Logger};
 use std::str;
 
 /// Default type implements the [`AsyncConsumer`].
 ///
 /// It is used for demo and debugging purposes only.
 pub struct DefaultConsumer {
-    log: Arc<slog::Logger>,
+    log: Arc<Logger>,
     no_ack: bool,
 }
 
@@ -25,7 +25,7 @@ impl DefaultConsumer {
     /// no_ack = [`true`] means automatic ack and should NOT send ACK to server.
     ///
     /// no_ack = [`false`] means manual ack, and should send ACK message to server.
-    pub fn new(log: Arc<slog::Logger>, no_ack: bool) -> Self {
+    pub fn new(log: Arc<Logger>, no_ack: bool) -> Self {
         Self { log, no_ack }
     }
 }

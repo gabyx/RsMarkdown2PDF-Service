@@ -25,3 +25,12 @@ spec:
                 name: queue-config
             - configMapRef:
                 name: converter-config
+
+          volumeMounts:
+            - mountPath: /data/blob-storage
+              name: blob-storage
+
+      volumes:
+        - name: blob-storage
+          persistentVolumeClaim:
+            claimName: blob-storage-claim

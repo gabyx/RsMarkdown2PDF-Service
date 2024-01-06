@@ -25,3 +25,12 @@ spec:
                 name: queue-config
             - configMapRef:
                 name: api-config
+          volumeMounts:
+            - mountPath: /data/blob-storage
+              name: blob-storage
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: blob-storage
+          persistentVolumeClaim:
+            claimName: blob-storage-claim
