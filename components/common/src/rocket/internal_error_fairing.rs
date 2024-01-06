@@ -27,7 +27,7 @@ impl Fairing for GuardInternalErrors {
 
             let s = "Internal error occured, see the logs, maybe plant a tree\n\
                      or go shopping for the greater good of humanity or maybe\n\
-                     just maybe discuss the countity of gender.";
+                     just maybe discuss the quantity of gender.";
 
             r.set_sized_body(s.len(), io::Cursor::new(s));
         }
