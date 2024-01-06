@@ -1,6 +1,5 @@
 use core::fmt;
 use rocket::{http::Status, response::status::Custom};
-use std::backtrace;
 
 #[derive(Debug)]
 pub struct Error {
