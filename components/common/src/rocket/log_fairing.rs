@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{backtrace, sync::Arc};
 
 use crate::log::{self, Logger};
 use rocket::{
@@ -54,7 +54,13 @@ impl Fairing for LogFairing {
                 .await
                 .expect("Could not read body to log internal error.");
 
-            log::critical!(&self.0, "Internal server error response occured: {}", s);
+            let b = backtrace::Backtrace::capture();
+            log::critical!(
+                &self.0,
+                "Internal server error response occured: {}\nBacktrace:\n{}",
+                s,
+                b
+            );
         }
     }
 }

@@ -38,11 +38,7 @@ pub use _error as error;
 /// to a `response::Error`, for now its a solution.
 impl From<std::io::Error> for Error {
     fn from(value: std::io::Error) -> Self {
-        let b = backtrace::Backtrace::capture();
-        return error!(
-            Status::InternalServerError,
-            "IO Error: {}, backtrace:\n{}", value, b
-        );
+        return error!(Status::InternalServerError, "IO Error: {}", value);
     }
 }
 
