@@ -1,10 +1,9 @@
-use std::{io, sync::Arc};
+use std::sync::Arc;
 
 use crate::log::{self, Logger};
 use rocket::{
     fairing::{Fairing, Info, Kind},
-    http::Status,
-    Build, Data, Orbit, Request, Response, Rocket,
+    Build, Data, Request, Response, Rocket,
 };
 
 /// Newtype struct wrapper around the passed-in `Logger`.

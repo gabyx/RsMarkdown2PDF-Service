@@ -1,8 +1,4 @@
-use common::{
-    job::JobBundle,
-    log::{error, info},
-    response::json,
-};
+use common::{job::JobBundle, log::info, response::json};
 use rocket::{form::Form, http::Status, routes, Build, Rocket, State};
 
 use crate::{
