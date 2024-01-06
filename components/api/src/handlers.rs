@@ -35,6 +35,7 @@ async fn submit_job(
     info!(s.log, "Submit job {:?}", job);
 
     let name = job.metadata.name.clone();
+
     let job_bundle =
         persist::create_job_bundle(&s.log, &mut job.file, &name, s.storage.clone()).await?;
 

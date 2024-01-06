@@ -7,6 +7,8 @@ pub struct Error {
     inner: Custom<String>,
 }
 
+/// We wrap the Custom error with our own Error to better denote what it is.
+/// Type alias behave shitty with Ctors...
 impl Error {
     pub fn new(status: Status, msg: String) -> Error {
         return Error {
@@ -25,7 +27,7 @@ impl fmt::Display for Error {
 #[macro_export]
 macro_rules! _error {
     ($status:expr, $($args:tt)+) => {
-        Error::new($status, format!($($args)+))
+        $crate::response::error::Error::new($status, format!($($args)+))
     };
 }
 
