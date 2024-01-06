@@ -10,7 +10,8 @@ use amqprs::{
 };
 
 use crate::{
-    job::Job,
+    job::JobBundle,
+    log::Logger,
     result::{Error, Res},
 };
 use rocket::serde::json::serde_json;
@@ -40,7 +41,7 @@ pub struct JobQueue {
 
 impl JobQueue {
     /// Publish a job `job` such that it gets converted by a consumer.
-    pub async fn publish(&self, job: &Job) -> Res<()> {
+    pub async fn publish(&self, job: &JobBundle) -> Res<()> {
         let props = BasicProperties::default()
             .with_content_encoding("utf-8")
             .with_persistence(true)
@@ -96,7 +97,7 @@ pub fn get_job_queue_config() -> (Credentials, QueueConfig) {
 }
 
 pub async fn setup_job_queue(
-    log: &slog::Logger,
+    log: &Logger,
     credentials: Credentials,
     config: QueueConfig,
 ) -> JobQueue {

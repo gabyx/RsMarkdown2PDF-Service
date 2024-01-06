@@ -1,11 +1,19 @@
 cm = load_dynamic(os.path.join(config.main_dir, ".tilt/Tiltfile"))
 get_component_config = cm["get_component_config"]
+load_settings = cm["load_settings"]
 
+settings = load_settings()
 config = get_component_config(__file__)
 print("Configuring component:", config["name"])
 
 docker_build(
-    ref=config["name"], context=cm["root_dir"], dockerfile=config["dockerfile"]
+    ref=config["name"],
+    context=cm["root_dir"],
+    dockerfile=config["dockerfile"],
+    build_args={
+        "BUILD_TYPE": settings["build-type"],
+        "ENABLE_BACKTRACE": "1" if settings["enable-backtrace"] else "0",
+    },
 )
 
 k8s_yaml(kustomize(config["manifest-dir"]))
