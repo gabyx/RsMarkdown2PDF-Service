@@ -9,6 +9,7 @@ use uuid::Uuid;
 #[derive(Debug, Serialize)]
 pub struct SubmittedJob {
     pub id: Uuid,
+    pub digest: String,
 }
 
 #[derive(FromForm, Deserialize, Debug)]
