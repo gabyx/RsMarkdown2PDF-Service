@@ -54,13 +54,7 @@ impl Fairing for LogFairing {
                 .await
                 .expect("Could not read body to log internal error.");
 
-            let b = backtrace::Backtrace::capture();
-            log::critical!(
-                &self.0,
-                "Internal server error response occured: {}\nBacktrace:\n{}",
-                s,
-                b
-            );
+            log::critical!(&self.0, "Internal server error response occured:\n{}", s);
         }
     }
 }
