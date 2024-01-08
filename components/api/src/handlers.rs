@@ -37,7 +37,10 @@ async fn submit_job(
 
     // TODO: store that shit into the db and send it to the queue.
 
-    json::success!(SubmittedJob { id: job_bundle.id })
+    json::success!(SubmittedJob {
+        id: job_bundle.id,
+        digest: job_bundle.digest
+    })
 }
 
 /// Install all handlers for this application.
