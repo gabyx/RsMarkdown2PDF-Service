@@ -9,7 +9,10 @@ use converter::consumer::DefaultConsumer;
 use dotenv::dotenv;
 use tokio::sync::Notify;
 
-async fn install_consumer(log: &Arc<Logger>, job_queue: &JobQueue) {
+async fn install_consumer(
+    log: &Arc<Logger>,
+    job_queue: &JobQueue,
+) {
     info!(log, "Installing consumer on the queue");
 
     job_queue

@@ -10,7 +10,10 @@ pub struct JobBundle {
 }
 
 impl JobBundle {
-    pub fn new(name: &str, digest: &str) -> Self {
+    pub fn new(
+        name: &str,
+        digest: &str,
+    ) -> Self {
         return JobBundle {
             id: uuid::Uuid::new_v4(),
             name: name.to_owned(),

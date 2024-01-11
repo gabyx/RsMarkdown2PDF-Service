@@ -16,7 +16,10 @@ async fn get_all_jobs(s: &State<AppState>) -> json::JsonResponse<Vec<JobBundle>>
 }
 
 #[rocket::get("/api/job/<uuid>")]
-async fn get_job(s: &State<AppState>, uuid: &str) -> json::JsonResponse<JobBundle> {
+async fn get_job(
+    s: &State<AppState>,
+    uuid: &str,
+) -> json::JsonResponse<JobBundle> {
     info!(s.log, "Getting job id: '{}'.", uuid);
 
     let job = JobBundle::new("new job", "no-digest");

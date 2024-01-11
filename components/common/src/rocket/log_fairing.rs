@@ -37,16 +37,27 @@ impl Fairing for LogFairing {
         }
     }
 
-    async fn on_ignite(&self, rocket: Rocket<Build>) -> Result<Rocket<Build>, Rocket<Build>> {
+    async fn on_ignite(
+        &self,
+        rocket: Rocket<Build>,
+    ) -> Result<Rocket<Build>, Rocket<Build>> {
         log::info!(&self.0, "Starting up rocket...");
         Ok(rocket.manage(self.clone()))
     }
 
-    async fn on_request(&self, r: &mut Request<'_>, _: &mut Data<'_>) {
+    async fn on_request(
+        &self,
+        r: &mut Request<'_>,
+        _: &mut Data<'_>,
+    ) {
         log::info!(&self.0, "Handling Request: '{}'", r)
     }
 
-    async fn on_response<'r>(&self, _: &'r Request<'_>, r: &mut Response<'r>) {
+    async fn on_response<'r>(
+        &self,
+        _: &'r Request<'_>,
+        r: &mut Response<'r>,
+    ) {
         if r.status().class().is_server_error() {
             let s = r
                 .body_mut()

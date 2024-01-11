@@ -28,7 +28,10 @@ impl DiskStorage {
         };
     }
 
-    fn get_blob_path(&self, sha256: &str) -> PathBuf {
+    fn get_blob_path(
+        &self,
+        sha256: &str,
+    ) -> PathBuf {
         return Path::join(&self.path, sha256);
     }
 }
@@ -70,7 +73,10 @@ impl BlobStorage for DiskStorage {
         return Ok((dest.to_string_lossy().to_string(), digest));
     }
 
-    fn get_blob(&self, digest: &str) -> Result<String, io::Error> {
+    fn get_blob(
+        &self,
+        digest: &str,
+    ) -> Result<String, io::Error> {
         let p = self.get_blob_path(digest);
 
         return match p.exists() {

@@ -17,7 +17,10 @@ pub fn new_success<R>(r: R) -> JsonResponse<R> {
 }
 
 /// Easily create a JSON failure response.
-pub fn new_failure<R>(status: Status, msg: String) -> JsonResponse<R> {
+pub fn new_failure<R>(
+    status: Status,
+    msg: String,
+) -> JsonResponse<R> {
     assert!(
         status.class() == StatusClass::ClientError || status.class() == StatusClass::ServerError
     );

@@ -10,7 +10,10 @@ pub struct Error {
 /// We wrap the Custom error with our own Error to better denote what it is.
 /// Type alias behave shitty with Ctors...
 impl Error {
-    pub fn new(status: Status, msg: String) -> Error {
+    pub fn new(
+        status: Status,
+        msg: String,
+    ) -> Error {
         return Error {
             inner: Custom(status, msg),
         };
@@ -18,7 +21,10 @@ impl Error {
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> fmt::Result {
         // Customize so only `x` and `y` are denoted.
         return write!(f, "{}", self.inner.1);
     }

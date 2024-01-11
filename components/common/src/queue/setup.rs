@@ -41,7 +41,10 @@ pub struct JobQueue {
 
 impl JobQueue {
     /// Publish a job `job` such that it gets converted by a consumer.
-    pub async fn publish(&self, job: &JobBundle) -> Res<()> {
+    pub async fn publish(
+        &self,
+        job: &JobBundle,
+    ) -> Res<()> {
         let props = BasicProperties::default()
             .with_content_encoding("utf-8")
             .with_persistence(true)
@@ -60,7 +63,10 @@ impl JobQueue {
     }
 
     /// Subscribes a consumer `consumer_creator(args)` to receive jobs.
-    pub async fn subscribe<F, T>(&self, consumer_creator: F) -> Res<()>
+    pub async fn subscribe<F, T>(
+        &self,
+        consumer_creator: F,
+    ) -> Res<()>
     where
         T: AsyncConsumer + Send + 'static,
         F: FnOnce(&BasicConsumeArguments) -> T,

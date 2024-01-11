@@ -20,5 +20,8 @@ pub trait BlobStorage: Sync + Send {
     ) -> Result<(String, Digest), io::Error>;
 
     /// Get the URL of blob with SHA256 `digest`.
-    fn get_blob(&self, digest: &str) -> Result<String, io::Error>;
+    fn get_blob(
+        &self,
+        digest: &str,
+    ) -> Result<String, io::Error>;
 }

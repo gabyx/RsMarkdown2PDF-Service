@@ -25,7 +25,10 @@ impl DefaultConsumer {
     /// no_ack = [`true`] means automatic ack and should NOT send ACK to server.
     ///
     /// no_ack = [`false`] means manual ack, and should send ACK message to server.
-    pub fn new(log: Arc<Logger>, no_ack: bool) -> Self {
+    pub fn new(
+        log: Arc<Logger>,
+        no_ack: bool,
+    ) -> Self {
         Self { log, no_ack }
     }
 }
