@@ -4,17 +4,19 @@
 set -e
 set -u
 
-build_type="$1"
+component="$1"
+target="$2"
+build_type="$3"
 
 if [ "$build_type" = "debug" ]; then
 
     echo "WARNING: Building debug build ...!" >&2
-    cargo build -p "$COMPONENT"
+    cargo build -p "$component" --bin "$target"
     echo "WARNING: Built debug configuration!" >&2
 
 elif [ "$build_type" = "release" ]; then
 
-    cargo build --release -p "$COMPONENT"
+    cargo build --release -p "$component" --bin "$target"
 
 else
     echo "Build type not supported: '$build_type'" >&2

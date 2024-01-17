@@ -19,7 +19,7 @@ else:
     default_registry("ttl.sh/markdown-api-aksjhfkajsdf832486748237")
 
 # Load common components.
-config = get_component_config(name="common")
+config = get_component_config(name="general")
 k8s_yaml(kustomize(config["manifest-dir"]))
 
 # Load all other components.

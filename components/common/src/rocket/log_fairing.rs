@@ -1,4 +1,4 @@
-use std::{backtrace, sync::Arc};
+use std::sync::Arc;
 
 use crate::log::{self, Logger};
 use rocket::{

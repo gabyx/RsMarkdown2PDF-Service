@@ -4,11 +4,13 @@ mod messages;
 mod persist;
 mod state;
 
+use std::sync::Arc;
+
 use common::{
     config::get_env_var,
-    log::{create_logger, info},
+    log::{create_logger, info, log_panic},
     queue::{get_job_queue_config, setup_job_queue},
-    storage::get_storage,
+    storage::{get_storage, BlobStorage},
 };
 
 use handlers::install_handlers;
@@ -29,11 +31,12 @@ async fn main() -> Result<(), rocket::Error> {
     let database_url = &get_env_var("DATABASE_URL").take();
 
     info!(log, "Establish connection with database.");
-    let db_conn = PgConnection::establish(database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+    let db_conn = PgConnection::establish(database_url).unwrap_or_else(|_| {
+        log_panic!(log, "Error connecting to {}", database_url);
+    });
 
     info!(log, "Initialize blob storage.");
-    let storage = get_storage();
+    let storage: Arc<dyn BlobStorage> = get_storage();
 
     let (creds, config) = get_job_queue_config();
     let job_queue = setup_job_queue(&log, creds, config).await;

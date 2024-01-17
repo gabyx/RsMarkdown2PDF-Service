@@ -1,0 +1,5 @@
+CREATE TABLE jobs (
+  id VARCHAR PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  blob_digest VARCHAR NOT NULL
+)

@@ -6,7 +6,7 @@ use amqprs::{
     BasicProperties, Deliver,
 };
 use async_trait::async_trait;
-use common::log::{self, info, Logger};
+use common::log::{info, Logger};
 use std::str;
 
 /// Default type implements the [`AsyncConsumer`].

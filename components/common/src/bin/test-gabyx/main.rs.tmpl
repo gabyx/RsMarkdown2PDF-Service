@@ -1,0 +1,38 @@
+#![feature(trait_alias)]
+
+/// My test file to compile shit together.
+/// Use https://www.rustexplorer.com
+/// to share examples.
+///
+/*
+[dependencies]
+futures = "0.3.30"
+
+[dependencies.rocket]
+version = "=0.5.0"
+features = ['json']
+*/
+use core::future::Future;
+use rocket::{self, form::Form, fs::TempFile, http::Status, routes};
+use std::{
+    io,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
+
+#[derive(rocket::FromForm, Debug)]
+struct JobUpload<'r> {
+    file: TempFile<'r>,
+}
+
+#[rocket::put("/api/job", data = "<job>")]
+async fn submit_job(mut job: Form<JobUpload<'_>>) -> rocket::http::Status {
+    Status::Continue
+}
+
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
+    let r = rocket::build().mount("/", rocket::routes![submit_job]);
+    r.launch().await;
+    Ok(())
+}
