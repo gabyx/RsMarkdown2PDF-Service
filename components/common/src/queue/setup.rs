@@ -11,7 +11,7 @@ use amqprs::{
 
 use crate::{
     job::JobBundle,
-    log::Logger,
+    log::{log_panic, Logger},
     result::{Error, Res},
 };
 use rocket::serde::json::serde_json;
@@ -135,10 +135,12 @@ pub async fn setup_job_queue(
         .queue_declare(queue_args)
         .await
         .unwrap_or_else(|_| {
-            panic!(
+            log_panic!(
+                log,
                 "Could not create a '{}' queue [durable: {}].",
-                &config.name, &config.durable
-            )
+                &config.name,
+                &config.durable
+            );
         })
         .unwrap();
 

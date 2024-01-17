@@ -6,15 +6,19 @@ settings = load_settings()
 config = get_component_config(__file__)
 print("Configuring component:", config["name"])
 
-docker_build(
-    ref=config["name"],
-    context=cm["root_dir"],
-    dockerfile=config["dockerfile"],
-    build_args={
-        "BUILD_TYPE": settings["build-type"],
-        "ENABLE_BACKTRACE": "1" if settings["enable-backtrace"] else "0",
-    },
-)
+for image_type, img_settings in config["images"].items():
+    if img_settings == None:
+        continue
+
+    docker_build(
+        ref=img_settings["ref"],
+        context=cm["root_dir"],
+        dockerfile=img_settings["dockerfile"],
+        build_args={
+            "BUILD_TYPE": settings["build-type"],
+            "ENABLE_BACKTRACE": "1" if settings["enable-backtrace"] else "0",
+        }.update(img_settings["build-args"]),
+    )
 
 k8s_yaml(kustomize(config["manifest-dir"]))
 k8s_resource(workload=config["name"])

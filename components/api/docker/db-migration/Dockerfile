@@ -1,5 +1,5 @@
-ARG COMPONENT="converter"
-ARG IMAGE_TYPE="service"
+ARG COMPONENT="api"
+ARG IMAGE_TYPE="db-migration"
 ARG TARGET="$COMPONENT-$IMAGE_TYPE"
 
 ARG ROOT_DIR="/build"
@@ -26,17 +26,17 @@ RUN cargo chef prepare --recipe-path recipe.json
 ## Builder Stage ##############################################################
 FROM chef AS builder
 ARG COMPONENT
-ARG TARGET
 ARG ROOT_DIR
 ARG BUILD_TYPE
+ARG TARGET
 
 COPY --from=planner /$ROOT_DIR/recipe.json recipe.json
 COPY tools/docker ./tools/docker
 
 # Build dependencies - this is the caching Docker layer!
 RUN tools/docker/run-cargo-deps.sh "$BUILD_TYPE"
-
 COPY . .
+
 COPY --from=planner "$ROOT_DIR/Cargo.toml" ./
 RUN tools/docker/run-cargo.sh "$COMPONENT" "$TARGET" "$BUILD_TYPE"
 
@@ -44,6 +44,7 @@ RUN tools/docker/run-cargo.sh "$COMPONENT" "$TARGET" "$BUILD_TYPE"
 FROM ubuntu:latest
 ARG COMPONENT
 ARG TARGET
+ARG IMAGE_TYPE
 ARG ROOT_DIR
 ARG BUILD_TYPE
 ARG ENABLE_BACKTRACE

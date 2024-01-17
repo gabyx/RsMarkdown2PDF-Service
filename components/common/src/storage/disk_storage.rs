@@ -3,9 +3,10 @@ use crate::{
     storage::{digest::get_digest, BlobStorage, Digest},
 };
 use rocket::{
-    self, tokio,
-    tokio::{fs::File, io::BufReader, sync},
+    self,
+    tokio::{self, fs::File, io::BufReader, runtime, sync, task},
 };
+use scopeguard;
 use std::{
     io,
     path::{Path, PathBuf},
@@ -14,6 +15,8 @@ use std::{
 /// Simple disk storage.
 /// Sharing a persistent volume between api and converter is
 /// not really safe, but its a simple solution.
+use super::{ExistingFilePath, NonExistingFilePath};
+
 pub struct DiskStorage {
     pub path: PathBuf,
 
@@ -23,62 +26,79 @@ pub struct DiskStorage {
 impl DiskStorage {
     pub fn new(path: &str) -> DiskStorage {
         return DiskStorage {
-            path: PathBuf::from(&path),
             lock: sync::Mutex::new(()),
+            path: PathBuf::from(&path),
         };
     }
 
+    /// Gets the blobs storage path (directory).
     fn get_blob_path(&self, sha256: &str) -> PathBuf {
         return Path::join(&self.path, sha256);
     }
 }
 
+fn delete_path(path: &ExistingFilePath) {
+    task::block_in_place(|| {
+        runtime::Handle::current()
+            .block_on(async { path.delete().await })
+            .expect("File should have been deleted.");
+    });
+}
+
 #[rocket::async_trait]
 impl BlobStorage for DiskStorage {
-    async fn store_blob(
-        &self,
-        log: &Logger,
-        src: &Path,
-        content_type: &str,
-    ) -> Result<(String, Digest), io::Error> {
-        let f = File::open(src).await?;
-        let buf = BufReader::new(f);
-
-        info!(log, "Compute digest ...");
-        let digest = get_digest(buf).await?;
-        let dest = self.get_blob_path(&digest);
-
-        if content_type == "application/x-zip" || content_type == "application/x-tar" {
-            return Err(io::Error::new(
-                io::ErrorKind::Unsupported,
-                format!(
-                    "Content type '{}' files are not yet supported.",
-                    content_type
-                ),
-            ));
-        }
-
-        if !dest.exists() {
-            let _l = self.lock.lock();
-
-            info!(log, "Store into storage from {:?} -> {:?}.", src, dest);
-
-            tokio::fs::create_dir_all(&dest).await?;
-            tokio::fs::rename(src, &dest).await?;
-        }
-
-        return Ok((dest.to_string_lossy().to_string(), digest));
+    fn pre_store(&self) -> NonExistingFilePath {
+        return NonExistingFilePath::new(&self.get_blob_path(&uuid::Uuid::new_v4().to_string()));
     }
 
-    fn get_blob(&self, digest: &str) -> Result<String, io::Error> {
+    async fn store(&self, log: &Logger, path: ExistingFilePath) -> Result<String, io::Error> {
+        scopeguard::defer!(delete_path(&path));
+
+        let _l = self.lock.lock().await;
+
+        let digest = {
+            let f = File::open(&path).await?;
+            let buf = BufReader::new(f);
+
+            info!(log, "Compute digest ...");
+            get_digest(buf).await?
+        };
+
+        let dest = self.get_blob_path(&digest);
+
+        if !dest.exists() {
+            info!(log, "Store into storage from {:?} -> {:?}.", path, dest);
+            tokio::fs::copy(&path, &dest).await?;
+        } else {
+            info!(log, "Blob with digest '{}' already exists.", digest);
+        }
+
+        return Ok(digest);
+    }
+
+    async fn delete(&self, log: &Logger, digest: Digest) -> Result<bool, io::Error> {
+        info!(log, "Deleting blob with digest '{}'.", digest);
+        let p = self.get_blob_path(&digest);
+
+        let _l = self.lock.lock().await;
+        if !p.exists() {
+            return Ok(false);
+        }
+
+        tokio::fs::remove_file(p).await?;
+        return Ok(true);
+    }
+
+    async fn get_url(&self, digest: &str) -> Option<String> {
         let p = self.get_blob_path(digest);
 
-        return match p.exists() {
-            true => Ok(p.to_string_lossy().to_string()),
-            false => Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                format!("Blob {} not found.", digest),
-            )),
-        };
+        if !p.exists() {
+            return None;
+        }
+
+        return Some(format!(
+            "file://{}",
+            p.join("file").to_str().expect("Should be valid path.")
+        ));
     }
 }

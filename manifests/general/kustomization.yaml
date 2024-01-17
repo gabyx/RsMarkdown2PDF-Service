@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - db
   - queue
-  - blob-storage
+  - blob-storage-disk

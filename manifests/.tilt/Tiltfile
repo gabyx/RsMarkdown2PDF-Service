@@ -28,8 +28,47 @@ component_dirs = (
 )
 
 
-def get_manifest_path(name, *args):
-    return os.path.join(root_dir, "manifests", name, *args)
+def get_component_image_settings(name):
+    # Every component can build multiple docker images.
+    # So far supported images are:
+    # - `service`: The actual service image (either in docker/ or in `docker/service`).
+    # - `db-migration`: The optional db-migration image in `docker/db-migration`
+
+    def create_img_settings(dockerfile, comp_name, image_type):
+        executable_name = "%s-%s" % (comp_name, image_type)
+        return {
+            "dockerfile": dockerfile,
+            "ref": executable_name,
+            "image_type": image_type,
+            "executable_name": executable_name,
+            "build-args": {
+                "COMPONENT": comp_name,
+                "IMAGE_TYPE": image_type,
+                "TARGET": executable_name,
+            },
+        }
+
+    image_types = ["service", "db-migration"]
+    dockerfiles = {t: None for t in image_types}
+
+    p = get_component_path(name, "docker", "Dockerfile")
+    if os.path.exists(p):
+        dockerfiles["service"] = create_img_settings(p, name, "service")
+
+        for t in image_types:
+            if os.path.exists(get_component_path(name, "docker", t)):
+                fail("Not conforming to docker image structure.")
+    else:
+        for image_type in image_types:
+            p = get_component_path(name, "docker", image_type, "Dockerfile")
+            if os.path.exists(p):
+                dockerfiles[image_type] = create_img_settings(p, name, image_type)
+
+    return dockerfiles
+
+
+def get_manifest_path(comp_name, *args):
+    return os.path.join(root_dir, "manifests", comp_name, *args)
 
 
 def get_component_config(tiltfile=None, name=None):
@@ -41,17 +80,14 @@ def get_component_config(tiltfile=None, name=None):
     elif not name:
         fail("Name not given")
 
-    comp_dir = get_component_path()
     dir = get_component_path(name)
     manifest_dir = get_manifest_path(name)
-    dockerfile = get_component_path(name, "docker", "Dockerfile")
 
     return {
-        "comp-dir": comp_dir,
         "name": name,
         "dir": dir,
         "manifest-dir": manifest_dir,
-        "dockerfile": dockerfile if os.path.exists(dockerfile) else None,
+        "images": get_component_image_settings(name),
     }
 
 

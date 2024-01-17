@@ -4,6 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "api-service"
+path = "src/service/main.rs"
+
+[[bin]]
+name = "api-db-migration"
+path = "src/db-migration/main.rs"
 
 [dependencies]
 common = {path="../common"}
@@ -12,6 +19,7 @@ slog = { version = "2.7.0", features = ["max_level_trace", "release_max_level_in
 amqprs = "1.5.1"
 uuid = "1.6.1"
 tempfile = "3.9.0"
+diesel_migrations = "2.1.0"
 
 [dependencies.rocket]
 version = "=0.5.0-rc.3"

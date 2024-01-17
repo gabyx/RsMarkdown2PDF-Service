@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blob-storage-disk-permissions
+  namespace: md2pdf
+data:
+  set-permissions.sh: |
+    #!/bin/sh
+    # Fix permissions in this blob-storage.
+
+    set -u
+    set -e
+
+    mount="$1"
+    user_id=1000
+
+    curr_user_id=$(stat -c '%u' "$mount")
+
+    if [ "$curr_user_id" != "$user_id" ]; then
+      echo "Changing permissions on '$mount' from '$curr_user_id' -> '$user_id'..."
+      chown -R "$user_id:$user_id" "$mount"
+    fi

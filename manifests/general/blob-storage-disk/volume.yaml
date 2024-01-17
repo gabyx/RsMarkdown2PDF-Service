@@ -2,7 +2,7 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: blob-storage
+  name: blob-storage-disk
   namespace: md2pdf
   labels:
     type: local
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: blob-storage-claim
+  name: blob-storage-disk-claim
   namespace: md2pdf
 spec:
   storageClassName: local-path

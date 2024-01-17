@@ -67,6 +67,10 @@
           docker
           tilt
           kustomize
+          dbeaver
+
+          python311Packages.isort
+          python311Packages.black
         ];
 
         # Things needed only at compile-time.

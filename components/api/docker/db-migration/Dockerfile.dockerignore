@@ -1,0 +1,18 @@
+# Ignore everything, and only include stuff we need.
+**
+
+!tools/docker/**
+
+!Cargo.toml
+!Cargo.lock
+
+!components/api/**/Cargo.toml
+!components/api/**/Cargo.lock
+!components/api/**/*.rs
+
+!components/common/**/Cargo.toml
+!components/common/**/Cargo.lock
+!components/common/**/*.rs
+
+# DB migrations
+!components/api/src/db-migration/migrations/**/*

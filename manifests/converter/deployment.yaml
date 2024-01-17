@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: converter
-          image: converter:latest
+          image: converter-service:latest
           # ports:
           #   - containerPort: 8000
           envFrom:
@@ -33,4 +33,4 @@ spec:
       volumes:
         - name: blob-storage
           persistentVolumeClaim:
-            claimName: blob-storage-claim
+            claimName: blob-storage-disk-claim

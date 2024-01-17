@@ -7,7 +7,7 @@ build *args:
     cd "{{comp_dir}}" && cargo build "${@:1}"
 
 build-image *args:
-    docker build --progress plain "${@:1}" -t "md2pdf-converter:test" -f docker/Dockerfile "{{root_dir}}"
+    docker build --progress plain "${@:1}" -t "md2pdf-converter-service:test" -f docker/Dockerfile "{{root_dir}}"
 
 watch:
     cd "{{comp_dir}}" && cargo watch -x 'build'

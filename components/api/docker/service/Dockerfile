@@ -1,4 +1,7 @@
 ARG COMPONENT="api"
+ARG IMAGE_TYPE="service"
+ARG TARGET="$COMPONENT-$IMAGE_TYPE"
+
 ARG ROOT_DIR="/build"
 ARG BUILD_TYPE="release"
 ARG ENABLE_BACKTRACE="0"
@@ -23,6 +26,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 ## Builder Stage ##############################################################
 FROM chef AS builder
 ARG COMPONENT
+ARG TARGET
 ARG ROOT_DIR
 ARG BUILD_TYPE
 
@@ -30,16 +34,16 @@ COPY --from=planner /$ROOT_DIR/recipe.json recipe.json
 COPY tools/docker ./tools/docker
 
 # Build dependencies - this is the caching Docker layer!
-RUN ./tools/docker/run-cargo-deps.sh "$BUILD_TYPE"
+RUN tools/docker/run-cargo-deps.sh "$BUILD_TYPE"
 COPY . .
 
 COPY --from=planner "$ROOT_DIR/Cargo.toml" ./
-RUN ./tools/docker/run-cargo.sh "$BUILD_TYPE"
-
+RUN tools/docker/run-cargo.sh "$COMPONENT" "$TARGET" "$BUILD_TYPE"
 
 ## Service Stage ##############################################################
 FROM ubuntu:latest
 ARG COMPONENT
+ARG TARGET
 ARG ROOT_DIR
 ARG BUILD_TYPE
 ARG ENABLE_BACKTRACE
@@ -53,17 +57,17 @@ ENV TZ=Etc/UTC \
 
 RUN groupadd "$APP_USER" \
     && useradd -g "$APP_USER" "$APP_USER" \
-    && mkdir -p "${APP}"
+    && mkdir -p "$APP"
 
 RUN apt update && \
     apt-get install -y libpq5 && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
-COPY --from=builder "$ROOT_DIR/target/$BUILD_TYPE/$COMPONENT" "${APP}/app"
-RUN chown -R "$APP_USER:$APP_USER" "${APP}"
+COPY --from=builder "$ROOT_DIR/target/$BUILD_TYPE/$TARGET" "$APP/app"
+RUN chown -R "$APP_USER:$APP_USER" "$APP"
 
 USER $APP_USER
-WORKDIR ${APP}
+WORKDIR "$APP"
 
 CMD ["./app"]

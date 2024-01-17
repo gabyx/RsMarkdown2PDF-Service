@@ -49,22 +49,34 @@ This is a demo project to showcase a small microservice architecture by exposing
   - [`.githooks`](.githooks): Githooks setup, which also runs inside the CI.
   - [`.gitlab`](.gitlab): CI setup with Gitlab.
 
-## Run Instructions
+## Quick Instructions
 
-The easiest way to run this is using `tilt` and on a working Kubernetes cluster,
-such as `kind`. Start the `kind-md2pdf` cluster with
+The easiest way to run this is using `tilt` on a local Kubernetes cluster, such
+as `kind`. Start the `kind-md2pdf` cluster with
 
 ```shell
 just create-cluster
 ```
 
-With `tilt` installed and a Kubernetes cluster running, deploy all pods with:
+With `tilt` installed and the `kind` Kubernetes cluster running, deploy all pods
+with:
 
 ```shell
 just deploy-up
 ```
 
-## Local Development Loop for Fast Feedback
+Open the `tilt` web browser [`http://localhost:10350`](http://localhost:10350)
+to see the log of all running components.
+
+Killing the cluster is as simple as:
+
+```shell
+just delete-cluster
+```
+
+which will kill all resources and pods.
+
+## Locally Building Components
 
 All components can be build with e.g.
 
@@ -81,9 +93,10 @@ to build a single component `<component>` either run `just build` inside the
 just component <component> build`
 ```
 
-inside the repository root.
+inside the repository root. All binaries are in the `target` directory inside
+the repository root.
 
-## Development Loop using `tilt` (Kubernetes)
+## Deploying Components to the Cluster (Kubernetes)
 
 The tool `tilt` will run all services and build all docker containers to the
 `ttl.sh` registry (ephemeral images).
@@ -92,7 +105,7 @@ It will watch for changes to any files (including the
 [service manifests](manifests) and redeploy the services, configuration maps as
 far as possible.
 
-To start the loop run:
+To start the loop run (after `just create-cluster`) do:
 
 ```shell
 just deploy-up
@@ -126,6 +139,11 @@ You can inspect continuously the state of the cluster with `k9s` and also watch
   start the debugger (see plugin
   [`nvim-dap`](https://github.com/mfussenegger/nvim-dap)) it will prompt you
   which executable you want to debug.
+
+### Database Inspection
+
+Run `just start-db-tool` and make a connection with the `DATABASE_URL` in your
+configured [components/api/.env](/components/api/.env.tmpl).
 
 ### Githooks
 

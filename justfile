@@ -15,6 +15,9 @@ delete-cluster:
 start-gitlab-runner token="":
     @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh "{{token}}"
 
+start-db-tool:
+    @cd "{{root_dir}}" && dbeaver
+
 # Deploying the components.
 ###############################################################################
 deploy *args:

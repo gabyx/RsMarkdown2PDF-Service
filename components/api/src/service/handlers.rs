@@ -1,3 +1,5 @@
+#![allow(unused_imports)] // Rocket generates pub functions which cause these warnings.
+
 use common::{job::JobBundle, log::info, response::json};
 use rocket::{form::Form, http::Status, routes, Build, Rocket, State};
 
@@ -11,7 +13,7 @@ use crate::{
 async fn get_all_jobs(s: &State<AppState>) -> json::JsonResponse<Vec<JobBundle>> {
     info!(s.log, "Getting all jobs.");
 
-    let result = vec![JobBundle::new("my-doc", "no-digest")];
+    let result = vec![JobBundle::new("my-doc", "no-digest", "text/markdown")];
     return json::success!(result);
 }
 
@@ -19,7 +21,7 @@ async fn get_all_jobs(s: &State<AppState>) -> json::JsonResponse<Vec<JobBundle>>
 async fn get_job(s: &State<AppState>, uuid: &str) -> json::JsonResponse<JobBundle> {
     info!(s.log, "Getting job id: '{}'.", uuid);
 
-    let job = JobBundle::new("new job", "no-digest");
+    let job = JobBundle::new("new job", "no-digest", "text/markdown");
     return json::success!(job);
 }
 
@@ -39,8 +41,26 @@ async fn submit_job(
 
     json::success!(SubmittedJob {
         id: job_bundle.id,
-        digest: job_bundle.digest
+        digest: job_bundle.blob_digest
     })
+}
+
+#[rocket::post("/api/debug/job")]
+async fn submit_job_debug(s: &State<AppState>) -> json::JsonResponse<JobBundle> {
+    info!(s.log, "Publishing debug job into queue.");
+
+    let job = JobBundle::new("my-doc", "no-digest", "text/markdown");
+
+    return match s.job_queue.publish(&job).await {
+        Ok(_) => json::success!(job),
+        Err(e) => json::failure!(
+            &s.log,
+            Status::InternalServerError,
+            "Could not publish job id '{}', error: \n'{}'.",
+            job.id,
+            e
+        ),
+    };
 }
 
 /// Install all handlers for this application.
@@ -57,22 +77,4 @@ fn install_debug_handlers(r: Rocket<Build>) -> Rocket<Build> {
 #[cfg(feature = "debug-handlers")]
 fn install_debug_handlers(r: Rocket<Build>) -> Rocket<Build> {
     return r.mount("/", routes![submit_job_debug]);
-}
-
-#[rocket::post("/api/debug/job")]
-async fn submit_job_debug(s: &State<AppState>) -> json::JsonResponse<JobBundle> {
-    info!(s.log, "Publishing debug job into queue.");
-
-    let job = JobBundle::new("my-doc", "no-digest");
-
-    return match s.job_queue.publish(&job).await {
-        Ok(_) => json::success!(job),
-        Err(e) => json::failure!(
-            &s.log,
-            Status::InternalServerError,
-            "Could not publish job id '{}', error: \n'{}'.",
-            job.id,
-            e
-        ),
-    };
 }
