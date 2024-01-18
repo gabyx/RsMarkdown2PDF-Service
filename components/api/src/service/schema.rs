@@ -18,8 +18,8 @@ diesel::table! {
     jobs (id) {
         id -> Varchar,
         name -> Varchar,
-        blob_digest -> Varchar,
         status -> StatusT,
+        blob_digest -> Varchar,
         converter_result -> Nullable<ResultT>,
         converter_log -> Nullable<Text>,
     }
