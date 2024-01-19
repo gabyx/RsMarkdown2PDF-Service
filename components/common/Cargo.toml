@@ -16,6 +16,10 @@ data-encoding = "2.5.0"
 futures = "0.3.30"
 scopeguard = "1.2.0"
 
+[dependencies.snafu]
+version = "0.8.0"
+features = ['std', 'backtrace']
+
 [dependencies.rocket]
 version = "=0.5.0-rc.3"
 features = ['json']
@@ -27,3 +31,11 @@ features = ['derive']
 [dependencies.uuid]
 version = "1.6.1"
 features = ["v4", "fast-rng", "macro-diagnostics", "serde"]
+
+[dependencies.diesel]
+version = "2.1.0"
+features = ["postgres", "uuid"]
+
+[dependencies.diesel-derive-enum]
+version = "2.1.0"
+features =  ["postgres"]
