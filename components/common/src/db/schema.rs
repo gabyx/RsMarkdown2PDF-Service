@@ -16,11 +16,11 @@ diesel::table! {
     use super::sql_types::ResultT;
 
     jobs (id) {
-        id -> Varchar,
-        name -> Varchar,
+        id -> Uuid,
         status -> StatusT,
         blob_digest -> Varchar,
-        converter_result -> Nullable<ResultT>,
-        converter_log -> Nullable<Text>,
+        name -> Varchar,
+        converter_result -> ResultT,
+        converter_log -> Text,
     }
 }

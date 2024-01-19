@@ -8,15 +8,16 @@ use amqprs::{
     consumer::AsyncConsumer,
     BasicProperties,
 };
+use snafu::ResultExt;
 
 use crate::{
+    config::get_env_var,
     job::JobBundle,
-    log::{log_panic, Logger},
-    result::{Error, Res},
+    log::{info, log_panic, Logger},
+    result,
+    result::QueueErrorCtx,
 };
 use rocket::serde::json::serde_json;
-
-use crate::{config::get_env_var, log::info};
 
 #[derive(Clone, Debug)]
 pub struct Credentials {
@@ -41,7 +42,7 @@ pub struct JobQueue {
 
 impl JobQueue {
     /// Publish a job `job` such that it gets converted by a consumer.
-    pub async fn publish(&self, job: &JobBundle) -> Res<()> {
+    pub async fn publish(&self, job: &JobBundle) -> Result<(), result::Error> {
         let props = BasicProperties::default()
             .with_content_encoding("utf-8")
             .with_persistence(true)
@@ -51,16 +52,18 @@ impl JobQueue {
         let args = BasicPublishArguments::new(&self.config.exchange, &self.config.routing_key);
 
         let data = serde_json::to_vec(&job).expect("Could not serialize ");
-
-        return self
-            .channel
+        self.channel
             .basic_publish(props, data, args)
             .await
-            .map_err(|e| Error::new(e.to_string()));
+            .context(QueueErrorCtx {
+                message: format!("Could not publish job id '{}'.", job.id),
+            })?;
+
+        return Ok(());
     }
 
     /// Subscribes a consumer `consumer_creator(args)` to receive jobs.
-    pub async fn subscribe<F, T>(&self, consumer_creator: F) -> Res<()>
+    pub async fn subscribe<F, T>(&self, consumer_creator: F) -> Result<(), result::Error>
     where
         T: AsyncConsumer + Send + 'static,
         F: FnOnce(&BasicConsumeArguments) -> T,
@@ -71,12 +74,15 @@ impl JobQueue {
 
         let creator = consumer_creator(&args);
 
-        return self
-            .channel
+        self.channel
             .basic_consume(creator, args)
             .await
-            .map(|_| ())
-            .map_err(|e| Error::new(e.to_string()));
+            .context(QueueErrorCtx {
+                message: "Subscribe failed.",
+            })
+            .map(|_| ())?;
+
+        return Ok(());
     }
 }
 

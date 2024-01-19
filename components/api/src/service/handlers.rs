@@ -1,7 +1,17 @@
 #![allow(unused_imports)] // Rocket generates pub functions which cause these warnings.
 
-use common::{job::JobBundle, log::info, response::json};
-use rocket::{form::Form, http::Status, routes, Build, Rocket, State};
+use std::ops::DerefMut;
+
+use common::{
+    db,
+    job::JobBundle,
+    log::info,
+    response,
+    response::{json, Status},
+    result::ResultExt,
+};
+use rocket::{form::Form, routes, Build, Rocket, State};
+use snafu::prelude::*;
 
 use crate::{
     messages::{JobUpload, SubmittedJob},
@@ -37,30 +47,19 @@ async fn submit_job(
     let job_bundle =
         persist::create_job_bundle(&s.log, &mut job.file, &name, s.storage.clone()).await?;
 
-    // TODO: store that shit into the db and send it to the queue.
+    {
+        info!(s.log, "Insert job meta '{}' into database.", job_bundle.id);
+        let mut d = s.db.lock().await;
+        db::transactions::insert_job(d.deref_mut(), &job_bundle).log(&s.log)?
+    }
+
+    info!(s.log, "Submit job '{}' to queue.", job_bundle.id);
+    s.job_queue.publish(&job_bundle).await.log(&s.log)?;
 
     json::success!(SubmittedJob {
         id: job_bundle.id,
         digest: job_bundle.blob_digest
     })
-}
-
-#[rocket::post("/api/debug/job")]
-async fn submit_job_debug(s: &State<AppState>) -> json::JsonResponse<JobBundle> {
-    info!(s.log, "Publishing debug job into queue.");
-
-    let job = JobBundle::new("my-doc", "no-digest", "text/markdown");
-
-    return match s.job_queue.publish(&job).await {
-        Ok(_) => json::success!(job),
-        Err(e) => json::failure!(
-            &s.log,
-            Status::InternalServerError,
-            "Could not publish job id '{}', error: \n'{}'.",
-            job.id,
-            e
-        ),
-    };
 }
 
 /// Install all handlers for this application.
@@ -76,5 +75,6 @@ fn install_debug_handlers(r: Rocket<Build>) -> Rocket<Build> {
 
 #[cfg(feature = "debug-handlers")]
 fn install_debug_handlers(r: Rocket<Build>) -> Rocket<Build> {
-    return r.mount("/", routes![submit_job_debug]);
+    // return r.mount("/", routes![submit_job_debug]);
+    return r;
 }

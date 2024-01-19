@@ -21,6 +21,10 @@ uuid = "1.6.1"
 tempfile = "3.9.0"
 diesel_migrations = "2.1.0"
 
+[dependencies.snafu]
+version = "0.8.0"
+features = ['std', 'backtrace']
+
 [dependencies.rocket]
 version = "=0.5.0-rc.3"
 features = ['json']
