@@ -8,7 +8,12 @@ data:
   RABBITMQ_USERNAME: guest
   RABBITMQ_PASSWORD: guest
 
-  CONVERTER_QUEUE: md2pdf.jobs
-  CONVERTER_QUEUE_DURABLE: "false"
-  CONVERTER_QUEUE_ROUTING_KEY: md2pdf.job
-  CONVERTER_EXCHANGE: md2pdf.job-exchange
+  QUEUE_JOBS: md2pdf.jobs
+  QUEUE_JOBS_DURABLE: "false"
+  QUEUE_JOBS_ROUTING_KEY: md2pdf.job
+
+  QUEUE_STATUS: md2pdf.status
+  QUEUE_STATUS_DURABLE: "false"
+  QUEUE_STATUS_ROUTING_KEY: md2pdf.status
+
+  EXCHANGE_NAME: md2pdf.exchange

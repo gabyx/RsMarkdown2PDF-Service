@@ -16,6 +16,10 @@ data-encoding = "2.5.0"
 futures = "0.3.30"
 scopeguard = "1.2.0"
 
+[dependencies.chrono]
+version = "0.4.32"
+features = ['serde', 'clock']
+
 [dependencies.snafu]
 version = "0.8.0"
 features = ['std', 'backtrace']

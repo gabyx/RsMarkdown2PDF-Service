@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::log::{self, Logger};
 use rocket::{
     fairing::{Fairing, Info, Kind},
-    Build, Data, Request, Response, Rocket,
+    Build, Data, Orbit, Request, Response, Rocket,
 };
 
 /// Newtype struct wrapper around the passed-in `Logger`.
@@ -33,7 +33,7 @@ impl Fairing for LogFairing {
     fn info(&self) -> Info {
         Info {
             name: "Slog Fairing",
-            kind: Kind::Liftoff | Kind::Request | Kind::Response,
+            kind: Kind::Liftoff | Kind::Request | Kind::Response | Kind::Shutdown,
         }
     }
 
@@ -56,5 +56,9 @@ impl Fairing for LogFairing {
 
             log::critical!(&self.0, "Internal server error response occured:\n{}", s);
         }
+    }
+
+    async fn on_shutdown(&self, _r: &Rocket<Orbit>) {
+        log::info!(&self.0, "Shutting down rocket.");
     }
 }

@@ -49,6 +49,10 @@ This is a demo project to showcase a small microservice architecture by exposing
   - [`.githooks`](.githooks): Githooks setup, which also runs inside the CI.
   - [`.gitlab`](.gitlab): CI setup with Gitlab.
 
+## Architecture
+
+The architecture is described [in more details here](/docs/architecture.md).
+
 ## Quick Instructions
 
 The easiest way to run this is using `tilt` on a local Kubernetes cluster, such
@@ -178,3 +182,8 @@ just start-gitlab-runner <token>
 where the `<token>` is the Gitlab runner token obtained from setting up a
 project specific runner in Gitlab. After starting the runner, the config mount
 will be inside `.gitlab/local`.
+
+### Testing API Calls
+
+There is a simple `just test manual` command which tests some simple API calls
+for manual debugging and investigations.

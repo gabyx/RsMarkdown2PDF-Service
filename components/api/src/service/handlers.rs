@@ -10,7 +10,7 @@ use common::{
     response::{json, Status},
     result::ResultExt,
 };
-use rocket::{form::Form, routes, Build, Rocket, State};
+use rocket::{form::Form, routes, Build, Rocket, Shutdown, State};
 use snafu::prelude::*;
 
 use crate::{
@@ -55,11 +55,15 @@ async fn submit_job(
 
     info!(s.log, "Submit job '{}' to queue.", job_bundle.id);
     s.job_queue.publish(&job_bundle).await.log(&s.log)?;
-
     json::success!(SubmittedJob {
         id: job_bundle.id,
         digest: job_bundle.blob_digest
     })
+}
+
+#[rocket::get("/api/shutdown")]
+fn shutdown(shutdown: Shutdown) {
+    shutdown.notify();
 }
 
 /// Install all handlers for this application.
@@ -75,6 +79,5 @@ fn install_debug_handlers(r: Rocket<Build>) -> Rocket<Build> {
 
 #[cfg(feature = "debug-handlers")]
 fn install_debug_handlers(r: Rocket<Build>) -> Rocket<Build> {
-    // return r.mount("/", routes![submit_job_debug]);
-    return r;
+    return r.mount("/", routes![shutdown]);
 }

@@ -31,7 +31,7 @@ for p in component_dirs:
 # All other needed stuff such as database and the rabbitmq queue.
 config = get_component_config(name="rabbitmq")
 k8s_yaml(kustomize(config["manifest-dir"]))
-k8s_resource(workload=config["name"], port_forwards=15672)
+k8s_resource(workload=config["name"], port_forwards=[15672, 5672])
 
 config = get_component_config(name="mongodb")
 k8s_yaml(kustomize(config["manifest-dir"]))
