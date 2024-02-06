@@ -60,6 +60,12 @@ list-components regex=".*":
     @cd "{{root_dir}}" && find ./components -mindepth 1 -maxdepth 1 \
         -type d -regextype "posix-extended" -regex "./components/{{regex}}"
 
+# Testing functionality.
+###############################################################################
+test what="manual":
+    @cd "{{root_dir}}/tests/{{what}}" && \
+        just run
+
 # Formatting.
 ###############################################################################
 format regex=".*":

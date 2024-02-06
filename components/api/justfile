@@ -1,5 +1,7 @@
 set positional-arguments
+set fallback := true
 set shell := ["bash", "-cue"]
+
 comp_dir := justfile_directory()
 root_dir := `git rev-parse --show-toplevel`
 
@@ -17,6 +19,11 @@ db-migration:
     cd "{{comp_dir}}" && \
         source .env && \
         diesel migration run --config-file diesel.toml
+
+db-migration-redo:
+    cd "{{comp_dir}}" && \
+        source .env && \
+        diesel migration redo --all --config-file diesel.toml
 
 format:
     cd "{{comp_dir}}" && \

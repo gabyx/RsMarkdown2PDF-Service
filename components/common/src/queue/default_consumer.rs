@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
+use crate::log::{info, Logger};
 use amqprs::{
     channel::{BasicAckArguments, Channel},
     consumer::AsyncConsumer,
     BasicProperties, Deliver,
 };
 use async_trait::async_trait;
-use common::log::{info, Logger};
 use std::str;
 
 /// Default type implements the [`AsyncConsumer`].

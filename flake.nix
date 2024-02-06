@@ -1,5 +1,5 @@
 {
-  description = "Homepage Dev";
+  description = "Md2PDF-Service";
 
   nixConfig = {
     substituters = [
@@ -16,20 +16,18 @@
   };
 
   inputs = {
-    # Nixpkgs
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # Nixpkgs (take the systems nixpkgs version)
+    nixpkgs.url = "nixpkgs";
 
     # You can access packages and modules from different nixpkgs revs
     # at the same time. Here's an working example:
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-23.11";
     # Also see the 'stable-packages' overlay at 'overlays/default.nix'.
 
-    flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
       };
     };
   };
@@ -38,15 +36,25 @@
     self,
     nixpkgs,
     nixpkgsStable,
-    flake-utils,
     rust-overlay,
     ...
-  } @ inputs:
-    flake-utils.lib.eachDefaultSystem
-    # Creates an attribute map `{ devShells.<system>.default = ...}`
-    # by calling this function:
-    (
-      system: let
+  } @ inputs: let
+    # Supported systems for your flake packages, shell, etc.
+    systems = [
+      "x86_64-linux"
+      "aarch64-darwin"
+    ];
+
+    # This is a function that generates an attribute by calling a function you
+    # pass to it, with the correct `system` and `pkgs` as arguments.
+    forAllSystems = func: nixpkgs.lib.genAttrs systems (system: func system nixpkgs.legacyPackages.${system});
+  in {
+    # Formatter for your nix files, available through 'nix fmt'
+    # Other options beside 'alejandra' include 'nixpkgs-fmt'
+    formatter = forAllSystems (system: pkgs: pkgs.alejandra);
+
+    devShells = forAllSystems (
+      system: legacyPkgs: let
         overlays = [(import rust-overlay)];
 
         # Import nixpkgs and load it into pkgs.
@@ -68,6 +76,7 @@
           tilt
           kustomize
           dbeaver
+          sqlfluff # Linter
 
           python311Packages.isort
           python311Packages.black
@@ -81,19 +90,17 @@
 
         # Things needed at runtime.
         buildInputs = with pkgs; [postgresql];
-      in
-        with pkgs; {
-          devShells = {
-            default = mkShell {
-              inherit buildInputs;
-              nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev;
-            };
+      in {
+        default = pkgs.mkShell {
+          inherit buildInputs;
+          nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev;
+        };
 
-            ci = mkShell {
-              inherit buildInputs;
-              nativeBuildInputs = nativeBuildInputsBasic;
-            };
-          };
-        }
+        ci = pkgs.mkShell {
+          inherit buildInputs;
+          nativeBuildInputs = nativeBuildInputsBasic;
+        };
+      }
     );
+  };
 }

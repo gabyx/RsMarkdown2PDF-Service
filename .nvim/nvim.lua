@@ -1,5 +1,5 @@
 -- Load debug adapters in this project
-nvimdap = require("nvim-dap-projects")
+local nvimdap = require("nvim-dap-projects")
 nvimdap.search_project_config()
 
 -- Set make program to 'just'

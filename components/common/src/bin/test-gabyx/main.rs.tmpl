@@ -1,38 +1,77 @@
-#![feature(trait_alias)]
-
-/// My test file to compile shit together.
-/// Use https://www.rustexplorer.com
-/// to share examples.
-///
 /*
 [dependencies]
-futures = "0.3.30"
-
 [dependencies.rocket]
 version = "=0.5.0"
 features = ['json']
 */
-use core::future::Future;
-use rocket::{self, form::Form, fs::TempFile, http::Status, routes};
+
+use rocket::fairing::{Fairing, Info, Kind};
 use std::{
-    io,
-    path::{Path, PathBuf},
-    sync::Arc,
+    sync::{
+        mpsc::{self, Sender, TryRecvError},
+        Mutex,
+    },
+    thread::{self, JoinHandle},
+    time::Duration,
 };
 
-#[derive(rocket::FromForm, Debug)]
-struct JobUpload<'r> {
-    file: TempFile<'r>,
+enum Notification {
+    Cancel,
 }
 
-#[rocket::put("/api/job", data = "<job>")]
-async fn submit_job(mut job: Form<JobUpload<'_>>) -> rocket::http::Status {
-    Status::Continue
+struct StatusConsumerShutdown {
+    handle: Mutex<Option<JoinHandle<()>>>,
+    tx: Sender<Notification>,
 }
 
-#[rocket::main]
-async fn main() -> Result<(), rocket::Error> {
-    let r = rocket::build().mount("/", rocket::routes![submit_job]);
-    r.launch().await;
-    Ok(())
+#[rocket::async_trait]
+impl Fairing for StatusConsumerShutdown {
+    fn info(&self) -> Info {
+        Info {
+            name: "Status Consumer Shutdown Fairing",
+            kind: Kind::Shutdown,
+        }
+    }
+
+    /// Cannot change this trait to `self`......
+    async fn on_shutdown(&self, _rocket: &rocket::Rocket<rocket::Orbit>) {
+        if let Err(e) = self.tx.send(Notification::Cancel) {
+            println!("Could not send cancel notification: error:\n{}", e);
+        }
+
+        if let Some(handle) = self.handle.lock().unwrap().take() {
+            handle.join().unwrap();
+        }
+    }
+}
+
+pub fn spawn_status_consumer() -> impl Fairing {
+    let (tx, rx) = mpsc::channel::<Notification>();
+
+    let handle = thread::spawn(move || loop {
+        println!("Working...");
+        thread::sleep(Duration::from_millis(500));
+
+        match rx.try_recv() {
+            Ok(Notification::Cancel) => {
+                println!("Received cancelation -> Terminating.");
+                break;
+            }
+            Err(TryRecvError::Disconnected) => {
+                println!("Parent thread disconnected -> Terminating.");
+                break;
+            }
+            Err(TryRecvError::Empty) => {}
+        }
+    });
+
+    return StatusConsumerShutdown {
+        handle: Mutex::new(Some(handle)),
+        tx,
+    };
+}
+
+fn main() {
+    let shutdown_fairing = spawn_status_consumer();
+    rocket::build().attach(shutdown_fairing).launch();
 }

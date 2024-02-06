@@ -1,0 +1,14 @@
+set positional-arguments
+set fallback := true
+
+set shell := ["bash", "-cue"]
+root_dir := justfile_directory()
+
+api-job:
+    cd "{{root_dir}}" && \
+        http --form --multipart PUT \
+        http://localhost:8080/api/job \
+        metadata@'job-meta.json;type=application/json' \
+        file@'job.md;type=text/markdown'
+
+run: api-job

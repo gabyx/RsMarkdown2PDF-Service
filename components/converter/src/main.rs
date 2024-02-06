@@ -1,19 +1,20 @@
+mod consumer;
 use std::sync::Arc;
 
 use common::{
     log::{create_logger, info, Logger},
-    queue::{get_job_queue_config, setup_job_queue, JobQueue},
+    queue::{get_job_queue_config, setup_queues, JobQueue, StatusQueue},
     storage::get_storage,
 };
-use converter::consumer::DefaultConsumer;
+
 use dotenv::dotenv;
 use tokio::sync::Notify;
 
-async fn install_consumer(log: &Arc<Logger>, job_queue: &JobQueue) {
-    info!(log, "Installing consumer on the queue");
+async fn install_consumer(log: &Arc<Logger>, job_queue: &JobQueue, status_queue: StatusQueue) {
+    info!(log, "Installing consumer on the jobs queue.");
 
     job_queue
-        .subscribe(|args| DefaultConsumer::new(log.clone(), args.no_ack))
+        .subscribe(|args| consumer::DefaultConsumer::new(log.clone(), status_queue, args.no_ack))
         .await
         .expect("Could not install consumer.");
 }
@@ -31,8 +32,19 @@ async fn main() {
 
     let (creds, queue_config) = get_job_queue_config();
 
-    let job_queue = setup_job_queue(&log, creds, queue_config).await;
-    install_consumer(&log, &job_queue).await;
+    let (job_queue, _status_queue) = setup_queues(&log, creds, queue_config).await;
+
+    // for i in 0..10 {
+    //     _status_queue
+    //         .publish_completion(&status::create_log(
+    //             Uuid::new_v4(),
+    //             "WTF",
+    //             JobLogLevel::Info,
+    //         ))
+    //         .await;
+    // }
+
+    install_consumer(&log, &job_queue, _status_queue).await;
 
     info!(log, "Consume from queue '{}'...", &job_queue.config.name);
     let guard = Notify::new();

@@ -1,5 +1,7 @@
 set positional-arguments
+set fallback := true
 set shell := ["bash", "-cue"]
+
 comp_dir := justfile_directory()
 root_dir := `git rev-parse --show-toplevel`
 
