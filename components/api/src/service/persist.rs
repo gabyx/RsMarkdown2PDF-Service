@@ -46,10 +46,10 @@ pub async fn create_job_bundle(
         .context(result::IOErrorCtx)?;
 
     let digest = storage
-        .store(&log, path.finalize())
+        .store(log, path.finalize())
         .await
         .log(log)
         .context(result::IOErrorCtx)?;
 
-    return Ok(JobBundle::new(&name, &digest, &content_type));
+    return Ok(JobBundle::new(name, &digest, &content_type));
 }

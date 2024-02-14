@@ -39,6 +39,4 @@ fn main() {
     run_migrations(&mut db_conn).unwrap_or_else(|e| {
         log_panic!(log, "Could not run migration: error:\n{}", e);
     });
-
-    return;
 }

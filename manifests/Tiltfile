@@ -11,6 +11,10 @@ load(
 
 settings = load_settings()
 
+# Note: Tilt will always prefer the local registry
+# on the cluster (it autodetects it.)
+# To use the normal `ttl.sh` registry run a cluster without a registry,
+# and set a config value accordingly:
 if settings["use-local-registry"]:
     # Use local docker registry run in the cluster.
     default_registry("localhost:5001")

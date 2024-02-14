@@ -25,23 +25,14 @@ function ci_assert_no_diffs() {
     fi
 }
 
-function run_format_shared_hooks() {
+function run_lint_shared_hooks() {
     print_info "Run all formats scripts in shared hook repositories."
     git hooks exec --containerized \
-        ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
-
-    git hooks exec --containerized \
-        ns:githooks-configs/scripts/format-configs-all.yaml -- --force --dir "."
-
-    git hooks exec --containerized \
-        ns:githooks-docs/scripts/format-docs-all.yaml -- --force --dir "."
-
-    git hooks exec --containerized \
-        ns:githooks-python/scripts/format-python-all.yaml -- --force --dir "."
+        ns:githooks-shell/scripts/check-shell-all.yaml -- --force --dir "."
 }
 
-function run_format_general() {
-    "tools/run-components-parallel.sh" "$parallel" "$regex" format
+function run_lint_general() {
+    "tools/run-components-parallel.sh" "$parallel" "$regex" lint
 }
 
 parallel="$1"
@@ -52,5 +43,5 @@ if [ "${CI:-}" = "true" ]; then
     ci_assert_no_diffs
 fi
 
-run_format_general
-run_format_shared_hooks
+run_lint_general
+run_lint_shared_hooks

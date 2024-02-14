@@ -4,15 +4,18 @@
 
 <!--toc:start-->
 
-- [Requirements](#requirements)
-- [Project Structure](#project-structure)
-- [Run Instructions](#run-instructions)
-- [Local Development Loop for Fast Feedback](#local-development-loop-for-fast-feedback)
-- [Development Loop using `tilt` (Kubernetes)](#development-loop-using-tilt-kubernetes)
-- [Development](#development)
-  - [Debugging in Rust](#debugging-in-rust)
-  - [Githooks](#githooks)
-  - [CI/CD](#cicd) - [Gitlab](#gitlab)
+- [Markdown-to-PDF Service](#markdown-to-pdf-service)
+  - [Project Structure](#project-structure)
+  - [Architecture](#architecture)
+  - [Requirements](#requirements)
+  - [Quick Instructions](#quick-instructions)
+    - [Deploy](#deploy)
+    - [Shutdown](#shutdown)
+  - [Locally Building Components](#locally-building-components)
+  - [Deploying Components to the Cluster (Kubernetes)](#deploying-components-to-the-cluster-kubernetes)
+  - [Development](#development) - [Debugging in Rust](#debugging-in-rust) -
+  [Database Inspection](#database-inspection) - [Githooks](#githooks) -
+  [CI/CD](#cicd) - [Gitlab](#gitlab) - [Testing API Calls](#testing-api-calls)
   <!--toc:end-->
 
 This is a demo project to showcase a small microservice architecture by exposing
@@ -23,15 +26,6 @@ This is a demo project to showcase a small microservice architecture by exposing
   queue, such that
 - the [`converter` service](markdown-to-pdf/src/main.rs) eventually (when idle)
   pulls a job from the `rabbitmq` queue and stores the result in the database.
-
-## Requirements
-
-- Either use the `flake.nix` by doing `nix develop --command zsh` which setups a
-  development shell with all tools installed,
-- Or you need to have the following installed:
-  - `rust` with `rustup toolchain install nightly`
-  - `libpq` must be installed. Comes with `postgres`.
-  - `tilt`, `kustomize`, `httpie`, `docker`, `kind`
 
 ## Project Structure
 
@@ -53,24 +47,85 @@ This is a demo project to showcase a small microservice architecture by exposing
 
 The architecture is described [in more details here](/docs/architecture.md).
 
+## Requirements
+
+On `NixOS` use the `flake.nix` by doing `nix develop --command zsh` inside the
+root of the repo. This will setup an isolated development shell with all tools
+installed.
+
+On other systems you need the following essentials:
+
+- [`just`](https://github.com/casey/just): A better `make` alternative.
+- [`docker`](https://docs.docker.com/get-docker) or
+  [`podman`](https://podman.io/docs/installation): Manage containers for
+  virtualization and using the `kind` cluster.
+
+and either
+
+- using the [`.devcontainer`](.devcontainer) setup with VS Code or over the CLI
+  with `just start-devcontainer` or
+- you develop locally and have the following tools installed and on your `PATH`:
+
+  - [`cargo`](https://www.rust-lang.org/tools/install): Rust toolchain with
+    `rustup toolchain install nightly`.
+  - `libpq`: The PostgreSQL C library. Normally comes with packages such as
+    `postgres` on \*nix systems.
+  - [`tilt`](https://docs.tilt.dev/install.html): Auto-deploy changes directly
+    to a running Kubernetes cluster when working in the repository and get
+    instance feedback.
+  - [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start): A Kubernetes
+    cluster which runs in containers managed by `docker` or `podman`.
+  - [`kustomize`](https://kubectl.docs.kubernetes.io/installation/kustomize):
+    Rendering Kubernetes YAML manifests to specify
+    resources/provisioning/deployments in the Kubernetes cluster.
+  - [`httpie`](https://httpie.io/docs/cli/installation): A http client which is
+    easier/more intuitive to use than `curl` \[optional\].
+  - [`k9s`](https://k9scli.io/topics/install): A command-line tool to visualize
+    what is running in your Kubernetes cluster \[optional\].
+
 ## Quick Instructions
 
-The easiest way to run this is using `tilt` on a local Kubernetes cluster, such
-as `kind`. Start the `kind-md2pdf` cluster with
+The following walks you through starting up a local Kubernetes cluster with
+`kind`, inspecting the cluster and also shutting it down again.
+
+**Note**: All commands given in the following are safe to use (virtualized or
+locally scoped to the repository) to use and **will only** minimally fiddle with
+your system.
+
+### Deploy
+
+The easiest way to run the `api` and corresponding other deployments (database
+etc.) is using `tilt` on a local Kubernetes cluster, such as `kind`. The tool
+`kind` is only doing the following two simple isolated parts on source file
+changes:
+
+- Building docker images and pushing them to a registry.
+- Auto applying Kubernetes manifests in [`./manifests`](manifests).
+
+Start the `kind-kikist` cluster (context: `kind-kikist`, with a local image
+registry :partying_face:) with
 
 ```shell
 just create-cluster
 ```
 
-With `tilt` installed and the `kind` Kubernetes cluster running, deploy all pods
-with:
+**Note**: `kind` will write to your `kubectl` config file located in
+`~/.kube/config` or otherwise set by `KUBECONFIG` env. variable.
+
+You can now start `k9s` to inspect the state of the cluster. No `api` pods
+should be running yet.
+
+With `tilt` installed and the `kind` Kubernetes cluster running, deploy all the
+`api` etc. with:
 
 ```shell
 just deploy-up
 ```
 
 Open the `tilt` web browser [`http://localhost:10350`](http://localhost:10350)
-to see the log of all running components.
+to see the log & status of all running components, notably `api` and `postgres`.
+
+### Shutdown
 
 Killing the cluster is as simple as:
 

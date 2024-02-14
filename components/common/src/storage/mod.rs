@@ -1,7 +1,7 @@
 use std::{env, sync::Arc};
 
-pub mod storage;
-pub use storage::*;
+pub mod blob_storage;
+pub use blob_storage::*;
 
 pub mod disk_storage;
 pub use disk_storage::*;

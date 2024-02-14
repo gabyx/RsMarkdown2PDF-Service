@@ -62,7 +62,7 @@ async fn submit_job(
 }
 
 #[rocket::get("/api/shutdown")]
-fn shutdown(shutdown: Shutdown) {
+async fn shutdown(shutdown: Shutdown) {
     shutdown.notify();
 }
 

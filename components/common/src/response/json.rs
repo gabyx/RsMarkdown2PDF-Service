@@ -1,3 +1,4 @@
+use super::Error;
 use crate::result;
 use rocket::{
     http::{Status, StatusClass},
@@ -5,10 +6,10 @@ use rocket::{
     serde::json::Json,
 };
 
-/// A common JSON response which is a result containing either the `Ok` value
-/// `Json<R>`
-/// or the `Err` value
-/// as a failed response with `Custom<String>`.
+/// A common JSON response which is a
+/// - result containing either the `Ok` value as a JSON
+///   serializable type `Json<R>`
+/// - or the `Err` value as a simple string with `Custom<String>`.
 pub type JsonResponse<R> = std::result::Result<Json<R>, Custom<String>>;
 
 /// Easily create a succesfull JSON response.
@@ -49,39 +50,15 @@ macro_rules! _failure {
 }
 pub use _failure as failure;
 
-impl From<result::Error> for Custom<String> {
-    fn from(value: result::Error) -> Self {
-        return super::Error(value.into()).into();
-    }
-}
-
-impl From<super::Error> for Custom<String> {
+impl From<Error> for Custom<String> {
     fn from(value: super::Error) -> Self {
         return value.0;
     }
 }
 
-impl From<result::Error> for super::Error {
+impl From<result::Error> for Custom<String> {
     fn from(value: result::Error) -> Self {
-        return match value {
-            result::Error::IOError {
-                source: _,
-                backtrace: _,
-            } => super::error!(Status::InternalServerError, "IO Error."),
-            result::Error::QueueError {
-                message: _,
-                source: _,
-                backtrace: _,
-            } => super::error!(Status::InternalServerError, "Queue Error."),
-            result::Error::DBError {
-                message: _,
-                source: _,
-                backtrace: _,
-            } => super::error!(Status::InternalServerError, "Database Error."),
-            result::Error::GenericError {
-                message: _,
-                source: _,
-            } => super::error!(Status::InternalServerError, "GenericError"),
-        };
+        let e: super::Error = value.into();
+        return e.into();
     }
 }

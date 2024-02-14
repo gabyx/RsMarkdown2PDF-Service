@@ -11,6 +11,7 @@ ROOT=$(git rev-parse --show-toplevel)
 . "$ROOT/tools/general.sh"
 
 force="false"
+max_jobs=4
 config_dir="$ROOT/.gitlab/local/config"
 runner_name="gitlab-runner"
 cores=$(grep "^cpu\\scores" /proc/cpuinfo | uniq | cut -d ' ' -f 3)
@@ -37,6 +38,13 @@ function create() {
         --docker-image "docker:24" \
         --docker-privileged \
         --docker-volumes "/certs/client" || die "Could not start gitlab runner"
+
+    # Set concurrency.
+    docker exec -it "$runner_name" \
+        sed -i "s/concurrent =.*/concurrent = $max_jobs/" \
+        "/etc/gitlab-runner/config.toml" || die "Could not set concurrency."
+
+    docker exec -it "$runner_name" gitlab-runner start || die "Could not start runner."
 }
 
 function stop() {
@@ -64,6 +72,6 @@ fi
 if ! is_running; then
     create "$@"
 else
-    printInfo "Gitlab runner '$runner_name' is already running. Restart it."
+    print_info "Gitlab runner '$runner_name' is already running. Restart it."
     docker restart "$runner_name" || die "Could not restart gitlab runner"
 fi

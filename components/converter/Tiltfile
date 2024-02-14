@@ -10,14 +10,17 @@ for image_type, img_settings in config["images"].items():
     if img_settings == None:
         continue
 
+    build_args = {
+        "BUILD_TYPE": settings["build-type"],
+        "ENABLE_BACKTRACE": "1" if settings["enable-backtrace"] else "0",
+    }
+    build_args.update(img_settings["build-args"])
+
     docker_build(
         ref=img_settings["ref"],
         context=cm["root_dir"],
         dockerfile=img_settings["dockerfile"],
-        build_args={
-            "BUILD_TYPE": settings["build-type"],
-            "ENABLE_BACKTRACE": "1" if settings["enable-backtrace"] else "0",
-        }.update(img_settings["build-args"]),
+        build_args=build_args,
     )
 
 k8s_yaml(kustomize(config["manifest-dir"]))
