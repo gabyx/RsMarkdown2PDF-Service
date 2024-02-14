@@ -6,14 +6,14 @@ default_regex := ".*"
 
 # Administrative stuff.
 ###############################################################################
-create-cluster:
-    @cd "{{root_dir}}" && ./tools/create-kind-cluster.sh md2pdf
+create-cluster *args:
+    @cd "{{root_dir}}" && ./tools/create-kind-cluster.sh md2pdf {{args}}
 
-delete-cluster:
-    @cd "{{root_dir}}" && ./tools/delete-kind-cluster.sh md2pdf
+delete-cluster *args:
+    @cd "{{root_dir}}" && ./tools/delete-kind-cluster.sh md2pdf {{args}}
 
-start-gitlab-runner token="":
-    @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh "{{token}}"
+start-gitlab-runner token *args:
+    @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh {{args}} "{{token}}"
 
 start-db-tool:
     @cd "{{root_dir}}" && dbeaver
@@ -54,7 +54,10 @@ watch:
 # Component functionality.
 ###############################################################################
 component component task *args:
-    @"{{root_dir}}/tools/run-component-task.sh" "{{component}}" "{{task}}" "${@:3}"
+    @echo "Component '{{component}}': task: {{task}}" && \
+    echo -e "| =========================================" && \
+    "{{root_dir}}/tools/run-component-task.sh" "{{component}}" "{{task}}" "${@:3}" 2>&1 && \
+    echo -e "| =========================================\n\n"
 
 list-components regex=".*":
     @cd "{{root_dir}}" && find ./components -mindepth 1 -maxdepth 1 \
@@ -69,4 +72,17 @@ test what="manual":
 # Formatting.
 ###############################################################################
 format regex=".*":
+    cd "{{root_dir}}" && \
        tools/format.sh "{{parallel}}" "{{regex}}"
+
+# Linting.
+###############################################################################
+lint regex=".*":
+    cd "{{root_dir}}" && \
+        tools/lint.sh "{{parallel}}" "{{regex}}"
+
+# CI Stuff
+###############################################################################
+upload-ci-images:
+    cd "{{root_dir}}" && \
+        .gitlab/scripts/upload-images.sh

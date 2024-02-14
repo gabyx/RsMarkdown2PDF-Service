@@ -48,7 +48,7 @@ fn delete_path(path: &ExistingFilePath) {
 #[rocket::async_trait]
 impl BlobStorage for DiskStorage {
     fn pre_store(&self) -> NonExistingFilePath {
-        return NonExistingFilePath::new(&self.get_blob_path(&uuid::Uuid::new_v4().to_string()));
+        return NonExistingFilePath::new(self.get_blob_path(&uuid::Uuid::new_v4().to_string()));
     }
 
     async fn store(&self, log: &Logger, path: ExistingFilePath) -> Result<String, io::Error> {

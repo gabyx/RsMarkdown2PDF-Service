@@ -15,12 +15,13 @@ database.
 
 ## Database Tables
 
-The data base persists jobs in the `jobs` table and job logs (received on the
-`status`-queue) in the `job-logs` table.
+The data base persists jobs `job` in the `jobs` table and job logs `job-log`
+(received on the `status`-queue) in the `job-logs` table. The following entity
+relationship diagram holds:
 
 ```mermaid
 erDiagram
-    jobs {
+    job {
         uuid id PK "Job id."
 
         enum status "Job status: 'pending', 'queued', 'done'."
@@ -32,7 +33,7 @@ erDiagram
         enum converter_log "The converter full log (stdout/stderr)"
     }
 
-    job-logs {
+    job-log {
         uuid id PK "The log id."
         uuid job FK "The job id this message belongs to."
 
@@ -40,4 +41,7 @@ erDiagram
         text message "The status message."
         enum severity "The severity of the status message ('normal', 'error')."
     }
+
+    job ||--o{ job-log: "produces"
+
 ```

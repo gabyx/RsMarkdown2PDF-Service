@@ -14,9 +14,9 @@ cluster_name="$1"
 reg_name="kind-registry"
 reg_port='5001'
 
-printInfo "Creating local cluster '$cluster_name' with registry '$reg_name' -> 'localhost:$reg_port'."
+print_info "Creating local cluster '$cluster_name' with registry '$reg_name' -> 'localhost:$reg_port'."
 
-printInfo "Create registry."
+print_info "Create registry."
 if [ "$(docker inspect -f '{{.State.Running}}' "${reg_name}" 2>/dev/null || true)" != 'true' ]; then
     docker run \
         -d --restart=always -p "127.0.0.1:${reg_port}:5000" --network bridge --name "${reg_name}" \
@@ -31,7 +31,7 @@ fi
 # https://github.com/kubernetes-sigs/kind/issues/2875
 # https://github.com/containerd/containerd/blob/main/docs/cri/config.md#registry-configuration
 # See: https://github.com/containerd/containerd/blob/main/docs/hosts.md
-printInfo "Create cluster '$cluster_name'."
+print_info "Create cluster '$cluster_name'."
 cat <<EOF | kind create cluster --name "$cluster_name" --config=- || die "Could not do step 2."
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -49,7 +49,7 @@ EOF
 #
 # We want a consistent name that works from both ends, so we tell containerd to
 # alias localhost:${reg_port} to the registry container when pulling images
-printInfo "Alias 'localhost:$reg_port' to 'http://$reg_name:5000' inside all nodes."
+print_info "Alias 'localhost:$reg_port' to 'http://$reg_name:5000' inside all nodes."
 
 REGISTRY_DIR="/etc/containerd/certs.d/localhost:${reg_port}"
 for node in $(kind get nodes --name "$cluster_name"); do
@@ -61,14 +61,14 @@ done
 
 # 4. Connect the registry to the cluster network if not already connected
 # This allows kind to bootstrap the network but ensures they're on the same network
-printInfo "Connect registry to the cluster network."
+print_info "Connect registry to the cluster network."
 if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${reg_name}")" = 'null' ]; then
     docker network connect "kind" "${reg_name}" || die "Could not do step 4."
 fi
 
 # 5. Document the local registry
 # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
-printInfo "Document the local registry with ConfiMap."
+print_info "Document the local registry with ConfiMap."
 cat <<EOF | kubectl apply -f - || die "Could not do step 5."
 apiVersion: v1
 kind: ConfigMap

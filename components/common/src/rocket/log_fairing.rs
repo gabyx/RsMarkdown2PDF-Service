@@ -16,7 +16,7 @@ impl LogFairing {
     }
 
     pub fn get(&self) -> &log::Logger {
-        &*self.0
+        &self.0
     }
 }
 
@@ -24,7 +24,7 @@ impl std::ops::Deref for LogFairing {
     type Target = log::Logger;
 
     fn deref(&self) -> &log::Logger {
-        &*self.0
+        &self.0
     }
 }
 

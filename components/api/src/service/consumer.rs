@@ -2,7 +2,6 @@ use common::{
     log::{error, info, Logger},
     queue::{DefaultConsumer, StatusQueue},
 };
-use diesel::{pg::Pg, Connection};
 use rocket::{
     fairing::{Fairing, Info, Kind},
     tokio::{
@@ -14,7 +13,7 @@ use rocket::{
     },
     Shutdown,
 };
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
 
 use crate::database;
 
@@ -72,7 +71,7 @@ pub async fn spawn_status_consumer(
     wait_for_shutdown: WaitForShutdown,
 ) {
     let log = l.clone();
-    let db_conn = database::connect(&l, &database_url);
+    let _db_conn = database::connect(&l, database_url);
 
     info!(log, "Installing consumer on the status queue.");
     status_queue
@@ -81,20 +80,17 @@ pub async fn spawn_status_consumer(
         .expect("Could not install consumer.");
 
     tokio::task::spawn(async move {
-        loop {
-            select! {
-                _ = wait_for_shutdown.shutdown.clone() => {
-                    info!(log, "Rocket shutdown received.");
-                    break
-                },
-            }
+        select! {
+            _ = wait_for_shutdown.shutdown.clone() => {
+                info!(log, "Rocket shutdown received.");
+            },
         }
 
         info!(log, "Unsubscribe consumer.");
         status_queue.unsubscribe().await;
 
         // Notify that we finished.
-        if let Err(_) = wait_for_shutdown.tx_consumer_done.send(()) {
+        if wait_for_shutdown.tx_consumer_done.send(()).is_err() {
             error!(
                 log,
                 "Could not send consumer shutdown message, the receiver dropped."

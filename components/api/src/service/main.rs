@@ -31,7 +31,7 @@ async fn create_rocket(
     job_queue: JobQueue,
     storage: Arc<dyn BlobStorage>,
 ) -> Result<(Rocket<Ignite>, consumer::WaitForShutdown), rocket::Error> {
-    let db_conn = database::connect(&log, &database_url);
+    let db_conn = database::connect(&log, database_url);
     let app_state = AppState::new(log.clone(), db_conn, job_queue, storage);
 
     info!(log, "Start rocket.");

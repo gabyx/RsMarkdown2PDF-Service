@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 mod consumer;
 use std::sync::Arc;
 

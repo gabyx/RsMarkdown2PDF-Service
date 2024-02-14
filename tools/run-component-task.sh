@@ -31,7 +31,7 @@ function run {
         die "Path '$path' does not exist."
     }
 
-    printInfo "Start task '$task' inside directory '$path'."
+    print_info "Start task '$task' inside directory '$path'."
 
     cd "$path" && just --justfile justfile "$task" "$@"
 }

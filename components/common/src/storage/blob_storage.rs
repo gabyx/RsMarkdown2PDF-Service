@@ -96,7 +96,7 @@ impl Drop for ExistingFilePath {
         // If the path is still existing, remove it.
         if self.path.exists() {
             std::fs::remove_file(&self.path)
-                .expect(&format!("Could not delete file '{:?}'", &self.path));
+                .unwrap_or_else(|_| panic!("Could not delete file '{:?}'", &self.path));
         }
     }
 }

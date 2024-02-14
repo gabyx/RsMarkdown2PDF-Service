@@ -11,7 +11,7 @@ regex="$2"
 task="$3"
 shift 3
 
-printInfo "Run task '$task' in parallel over all components with:" "$@"
+print_info "Run task '$task' in parallel over all components with:" "$@"
 
 cd "$ROOT_DIR"
 

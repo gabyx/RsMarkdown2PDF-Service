@@ -28,16 +28,14 @@ where
         // moving out the value.
         // The memory replace here is similar to `std::move` in C++.
         // https://stackoverflow.com/a/31308299/293195
-        return std::mem::replace(&mut self.value, T::default());
+        return std::mem::take(&mut self.value);
     }
 }
 
 pub fn get_env_var(key: &'static str) -> KeyVal<String> {
     return KeyVal {
         key,
-        value: env::var(key).expect(&std::format!(
-            "Expect environment variable '{}' to be defined.",
-            key
-        )),
+        value: env::var(key).unwrap_or_else(|_| panic!("Expect environment variable '{}' to be defined.",
+            key)),
     };
 }

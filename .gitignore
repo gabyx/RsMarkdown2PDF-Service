@@ -1,3 +1,5 @@
 .direnv
 .env*
+!.envrc
+!*.tmpl
 target

@@ -88,6 +88,16 @@
           httpie
         ];
 
+        githooksBuildInput = with pkgs; [
+          git
+          curl
+          jq
+          bash
+          unzip
+          findutils
+          parallel
+        ];
+
         # Things needed at runtime.
         buildInputs = with pkgs; [postgresql];
       in {
@@ -98,7 +108,7 @@
 
         ci = pkgs.mkShell {
           inherit buildInputs;
-          nativeBuildInputs = nativeBuildInputsBasic;
+          nativeBuildInputs = nativeBuildInputsBasic ++ githooksBuildInput;
         };
       }
     );

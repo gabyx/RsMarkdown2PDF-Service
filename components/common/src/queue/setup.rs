@@ -61,7 +61,7 @@ where
     T: AsyncConsumer + Send + 'static,
     F: FnOnce(&BasicConsumeArguments) -> T,
 {
-    let args = BasicConsumeArguments::new(&queue, consumer_tag)
+    let args = BasicConsumeArguments::new(queue, consumer_tag)
         .manual_ack(true)
         .finish();
 
