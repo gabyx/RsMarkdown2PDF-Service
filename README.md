@@ -2,6 +2,8 @@
 
 **Note: This is currently in development and not feature complete.**
 
+[![pipeline status](https://gitlab.com/kungfoo1/markdown-to-pdf-service/badges/main/pipeline.svg)](https://gitlab.com/kungfoo1/markdown-to-pdf-service/-/commits/main)
+
 <!--toc:start-->
 
 - [Markdown-to-PDF Service](#markdown-to-pdf-service)
