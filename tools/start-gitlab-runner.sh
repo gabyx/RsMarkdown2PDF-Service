@@ -13,7 +13,7 @@ ROOT=$(git rev-parse --show-toplevel)
 force="false"
 max_jobs=4
 config_dir="$ROOT/.gitlab/local/config"
-runner_name="gitlab-runner"
+runner_name="gitlab-runner-md2pdf"
 cores=$(grep "^cpu\\scores" /proc/cpuinfo | uniq | cut -d ' ' -f 3)
 
 function create() {
