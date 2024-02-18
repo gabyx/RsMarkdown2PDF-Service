@@ -91,7 +91,41 @@ build:
     - *defaults-rules
   script:
     - nix develop .#ci --command just --set parallel true build
-#
+
+build-test-docker:
+  stage: package
+  needs: []
+  image: docker:24
+  rules:
+    - *defaults-rules
+  # variables:
+  #   - DOCKER_HOST: unix://var/run/docker.sock
+  script:
+    - docker run -it alpine:latest
+
+build-test-docker-2:
+  stage: package
+  needs: []
+  image: docker:24
+  rules:
+    - *defaults-rules
+  # variables:
+  #   - DOCKER_HOST: unix://var/run/docker.sock
+  script:
+    - docker run -it alpine:latest
+
+build-test:
+  stage: package
+  needs: []
+  image: quay.io/podman/stable:latest
+  rules:
+    - *defaults-rules
+  variables:
+    - DOCKER_HOST: unix://var/run/docker.sock
+  script:
+    - podman run -it alpine:latest
+    - podman build -t test:test .
+
 build-image:
   stage: package
   needs: []
@@ -99,5 +133,8 @@ build-image:
   rules:
     - *defaults-rules
   script:
+    - apk add openrc
+    - rc-update add cgroups && rc-service cgroups start
+    - modprobe tun
     - apk add podman
     - podman build -t test:test .
