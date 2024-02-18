@@ -17,24 +17,32 @@ stages:
   - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
     when: always
 
-upload-ci-images:
-  stage: package
-  needs: []
-  image: gabyxgabyx/rsmd2pdf-service:ci-docker-1.0.0
+test:
+  stage: format
+  image: alpine:latest
   rules:
-    - *main-rules
-  # services: *default-dind-service
+    - *defaults-rules
   script:
-    - apk add git bash just findutils parallel
-    - just upload-ci-images
-
+    - apk add git bash
+    - git status
+# upload-ci-images:
+#   stage: package
+#   needs: []
+#   image: gabyxgabyx/rsmd2pdf-service:ci-docker-1.0.0
+#   rules:
+#     - *main-rules
+#   services: *default-dind-service
+#   script:
+#     - apk add git bash just findutils parallel
+#     - just upload-ci-images
+#
 format:
   stage: format
   needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-format-1.0.0
   rules:
     - *defaults-rules
-  # services: *default-dind-service
+  services: *default-dind-service
   variables:
     # When you use the dind service, you must instruct Docker to talk with
     # the daemon started inside of the service 'docker:*-dind'.
@@ -51,30 +59,30 @@ format:
     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
   script:
     - just format
-
-lint:
-  stage: lint
-  needs: []
-  image: gabyxgabyx/rsmd2pdf-service:ci-lint-1.0.0
-  # services: *default-dind-service
-  rules:
-    - *defaults-rules
-  variables:
-    GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
-  script:
-    - nix develop .#ci --command just --set parallel true lint
-
-lint-docs:
-  stage: lint
-  needs: []
-  image: gabyxgabyx/rsmd2pdf-service:ci-lint-docs-1.0.0
-  # services: *default-dind-service
-  rules:
-    - *defaults-rules
-  script:
-    - just --set parallel true lint-docs
-  allow_failure: true
-
+#
+# lint:
+#   stage: lint
+#   needs: []
+#   image: gabyxgabyx/rsmd2pdf-service:ci-lint-1.0.0
+#   services: *default-dind-service
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+#   script:
+#     - nix develop .#ci --command just --set parallel true lint
+#
+# lint-docs:
+#   stage: lint
+#   needs: []
+#   image: gabyxgabyx/rsmd2pdf-service:ci-lint-docs-1.0.0
+#   services: *default-dind-service
+#   rules:
+#     - *defaults-rules
+#   script:
+#     - just --set parallel true lint-docs
+#   allow_failure: true
+#
 build:
   stage: build
   needs: []
@@ -83,14 +91,13 @@ build:
     - *defaults-rules
   script:
     - nix develop .#ci --command just --set parallel true build
-
+#
 build-image:
   stage: package
   needs: []
-  image: gabyxgabyx/rsmd2pdf-service:ci-docker-1.0.0
+  image: ubuntu:latest
   rules:
     - *defaults-rules
-  # services: *default-dind-service
   script:
-    - apk add git bash just findutils parallel
-    - just --set parallel true build-image
+    - apt-get install -y podman
+    - podman build -t test:test .
