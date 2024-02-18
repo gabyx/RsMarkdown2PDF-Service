@@ -93,6 +93,10 @@ function start_runner() {
         -v pipglr-cache:/cache \
         --systemd true --privileged \
         --device /dev/fuse "$image"
+
+    podman exec -it --user root "$runner_name" \
+        bash -c "mkdir -p /etc/containers;
+                 cp /usr/share/containers/seccomp.json /etc/containers/seccomp.json"
 }
 
 function create() {
