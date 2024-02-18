@@ -176,23 +176,24 @@ podman-remote-alpine-run&build2:
     #   wget -O /etc/containers/seccomp.json
     #   https://src.fedoraproject.org/rpms/containers-common/raw/rawhide/f/seccomp.json
     - cd tests && podman build --no-cache -t test:test -f Dockerfile2 .
-# podman-remote-alpine-run&build&format:
-#   stage: format
-#   needs: []
-#   image: alpine:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     CONTAINER_HOST: unix://var/run/docker.sock
-#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
-#   script:
-#     - apk add podman git
-#     - . ./tools/general.sh && ci_setup_nix
-#     - ln -s /usr/bin/podman /usr/bin/docker
-#     - docker info
-#     - docker run alpine:latest cat /etc/os-release
-#     - apk add jq curl bash just findutils parallel
-#     - . ./tools/general.sh && ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
+
+podman-remote-alpine-run&build&format:
+  stage: format
+  needs: []
+  image: alpine:latest
+  rules:
+    - *defaults-rules
+  variables:
+    CONTAINER_HOST: unix://var/run/docker.sock
+    GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+  script:
+    - apk add podman git
+    - . ./tools/general.sh && ci_setup_nix
+    - ln -s /usr/bin/podman /usr/bin/docker
+    - docker info
+    - docker run alpine:latest cat /etc/os-release
+    - apk add jq curl bash just findutils parallel
+    - . ./tools/general.sh && ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
 #
 # podman-remote-alpine-run&build&lint:
 #   stage: lint
