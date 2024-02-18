@@ -163,7 +163,7 @@ podman-remote-alpine-run&build:
 podman-remote-alpine-run&build2:
   stage: package
   needs: []
-  image: gabyxgabyx/rsmd2pdf-service:test
+  image: gabyxgabyx/rsmd2pdf-service:ci-test-1.0.0
   rules:
     - *defaults-rules
   variables:
@@ -174,7 +174,6 @@ podman-remote-alpine-run&build2:
     # - mkdir -p /etc/containers &&
     #   wget -O /etc/containers/seccomp.json
     #   https://src.fedoraproject.org/rpms/containers-common/raw/rawhide/f/seccomp.json
-    # - cat /etc/containers/seccomp.json || true
     - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test -f Dockerfile2 .
 # podman-remote-alpine-run&build&format:
 #   stage: format

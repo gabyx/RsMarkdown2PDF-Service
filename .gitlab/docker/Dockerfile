@@ -31,3 +31,16 @@ FROM ci-docker-nix as ci-lint
 
 # Build image.
 FROM ci-docker-nix as ci-build
+
+FROM alpine:latest as ci-test
+RUN apk add sudo
+ARG USER_NAME=ci
+ARG USER_UID=1000
+ARG USER_GID=1000
+RUN adduser "$USER_NAME" -D -u "$USER_UID" -g "$USER_GID" -h "/home/$USER_NAME" && \
+    mkdir -p /etc/sudoers.d && \
+    echo "$USER_NAME ALL=(root) NOPASSWD:ALL" > "/etc/sudoers.d/$USER_NAME" && \
+    chmod 0440 "/etc/sudoers.d/$USER_NAME" && \
+    chown -R "$USER_NAME:$USER_NAME" /home
+RUN apk add podman
+USER "$USER_NAME"
