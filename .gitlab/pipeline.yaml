@@ -99,5 +99,5 @@ build-image:
   rules:
     - *defaults-rules
   script:
-    - apt-get install -y podman
+    - apk add podman
     - podman build -t test:test .
