@@ -152,12 +152,13 @@ podman-remote-alpine-run&build:
     CONTAINER_HOST: unix://var/run/docker.sock
   script:
     - apk add podman containers-common wget
-    - mkdir -p /usr/share/containers; \
-      wget -O /usr/share/containers/seccomp.json
+    - cat /etc/containers/seccomp.json || true
+    - mkdir -p /etc/containers &&
+      wget -O /etc/containers/seccomp.json
       https://src.fedoraproject.org/rpms/containers-common/raw/rawhide/f/seccomp.json
     - podman info
     - podman run alpine:latest cat /etc/os-release
-    - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test .
+    - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test -f Dockerfile .
 
 podman-remote-alpine-run&build2:
   stage: package
@@ -171,7 +172,11 @@ podman-remote-alpine-run&build2:
     - apk add podman containers-common
     - podman info
     - podman run alpine:latest cat /etc/os-release
-    - cd tests && podman build --no-cache -t test:test -f Dockerfile2 .
+    - mkdir -p /etc/containers &&
+      wget -O /etc/containers/seccomp.json
+      https://src.fedoraproject.org/rpms/containers-common/raw/rawhide/f/seccomp.json
+    - cat /etc/containers/seccomp.json || true
+    - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test -f Dockerfile2 .
 # podman-remote-alpine-run&build&format:
 #   stage: format
 #   needs: []
