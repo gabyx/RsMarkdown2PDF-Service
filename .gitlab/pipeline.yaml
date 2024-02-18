@@ -151,7 +151,7 @@ podman-remote-alpine-run&build:
   variables:
     CONTAINER_HOST: unix://var/run/docker.sock
   script:
-    - apk add podman
+    - apk add podman containers-common
     - podman info
     - podman run alpine:latest cat /etc/os-release
     - cd tests && podman build -t test:test .
