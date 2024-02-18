@@ -163,13 +163,12 @@ podman-remote-alpine-run&build:
 podman-remote-alpine-run&build2:
   stage: package
   needs: []
-  image: alpine:latest
+  image: gabyxgabyx/rsmd2pdf-service:test
   rules:
     - *defaults-rules
   variables:
     CONTAINER_HOST: unix://var/run/docker.sock
   script:
-    - apk add podman containers-common
     - podman info
     - podman run alpine:latest cat /etc/os-release
     # - mkdir -p /etc/containers &&
