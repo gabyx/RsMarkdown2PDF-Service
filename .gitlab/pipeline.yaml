@@ -129,18 +129,18 @@ stages:
 #     - podman info
 #     - podman run alpine:latest cat /etc/os-release
 #
-# podman-remote-run&build:
-#   stage: package
-#   needs: []
-#   image: quay.io/podman/stable:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     CONTAINER_HOST: unix://var/run/docker.sock
-#   script:
-#     - podman info
-#     - podman run alpine:latest cat /etc/os-release
-#     - cd tests && podman build -t test:test .
+podman-remote-run&build:
+  stage: package
+  needs: []
+  image: quay.io/podman/stable:latest
+  rules:
+    - *defaults-rules
+  variables:
+    CONTAINER_HOST: unix://var/run/docker.sock
+  script:
+    - podman info
+    - podman run alpine:latest cat /etc/os-release
+    - cd tests && podman build -t test:test -f Dockerfile2 .
 
 podman-remote-alpine-run&build:
   stage: package
@@ -151,10 +151,13 @@ podman-remote-alpine-run&build:
   variables:
     CONTAINER_HOST: unix://var/run/docker.sock
   script:
-    - apk add podman containers-common
+    - apk add podman containers-common wget
+    - mkdir -p /usr/share/containers; \
+      wget -O /usr/share/containers/seccomp.json
+      https://src.fedoraproject.org/rpms/containers-common/raw/rawhide/f/seccomp.json
     - podman info
     - podman run alpine:latest cat /etc/os-release
-    - cd tests && podman build -t test:test .
+    - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test .
 
 podman-remote-alpine-run&build2:
   stage: package
@@ -168,7 +171,7 @@ podman-remote-alpine-run&build2:
     - apk add podman containers-common
     - podman info
     - podman run alpine:latest cat /etc/os-release
-    - cd tests && podman build -t test:test -f Dockerfile2 .
+    - cd tests && podman build --no-cache -t test:test -f Dockerfile2 .
 # podman-remote-alpine-run&build&format:
 #   stage: format
 #   needs: []

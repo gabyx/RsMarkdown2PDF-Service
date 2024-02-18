@@ -2,7 +2,17 @@
 FROM alpine:3.18 as githooks-docs-base
 LABEL name=githooks-docs
 
-RUN apk add git tar curl xz bash coreutils findutils grep sed parallel
+RUN apk add git
+RUN apk add tar
+RUN apk add curl
+RUN apk add xz
+RUN apk add bash
+RUN apk add coreutils
+RUN apk add findutils
+RUN apk add grep
+RUN apk add sed
+RUN apk add parallel
+
 # RUN apk add npm
 # RUN npm install -g prettier@3.1.0 @mixer/parallel-prettier@2.0.3
 #
