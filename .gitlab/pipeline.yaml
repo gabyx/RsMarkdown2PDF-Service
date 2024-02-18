@@ -155,6 +155,20 @@ podman-remote-alpine-run&build:
     - podman info
     - podman run alpine:latest cat /etc/os-release
     - cd tests && podman build -t test:test .
+
+podman-remote-alpine-run&build2:
+  stage: package
+  needs: []
+  image: alpine:latest
+  rules:
+    - *defaults-rules
+  variables:
+    CONTAINER_HOST: unix://var/run/docker.sock
+  script:
+    - apk add podman containers-common
+    - podman info
+    - podman run alpine:latest cat /etc/os-release
+    - cd tests && podman build -t test:test -f Dockerfile2 .
 # podman-remote-alpine-run&build&format:
 #   stage: format
 #   needs: []
@@ -171,7 +185,7 @@ podman-remote-alpine-run&build:
 #     - docker info
 #     - docker run alpine:latest cat /etc/os-release
 #     - apk add jq curl bash just findutils parallel
-#     - just format
+#     - . ./tools/general.sh && ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
 #
 # podman-remote-alpine-run&build&lint:
 #   stage: lint
