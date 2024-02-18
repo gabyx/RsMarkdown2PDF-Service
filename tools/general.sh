@@ -93,6 +93,7 @@ function ci_docker_login() {
     local user="$1"
     local token="$2"
 
+    [ -n "$token" ] || die "Docker login token is empty"
     echo "$token" |
         docker login --password-stdin --username "$user" ||
         die "Could not log into docker."

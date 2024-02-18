@@ -1,0 +1,7 @@
+set fallback := true
+set shell := ["bash", "-cue"]
+comp_dir := justfile_directory()
+root_dir := `git rev-parse --show-toplevel`
+
+lint:
+    cd "{{comp_dir}}" && tools/lint-docs.sh

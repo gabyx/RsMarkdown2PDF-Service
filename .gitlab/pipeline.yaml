@@ -1,5 +1,12 @@
 stages:
-  - check
+  - lint
+  - format
+  - build
+  - package
+
+.default_dind_service: &default-dind-service
+  - name: gabyxgabyx/rsmd2pdf-service:ci-docker-dind-1.0.0
+    alias: docker
 
 .defaults-rules: &defaults-rules
   - if: "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature|bugfix/ ||
@@ -11,25 +18,23 @@ stages:
     when: always
 
 upload-ci-images:
-  stage: check
+  stage: package
+  needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-docker-1.0.0
   rules:
     - *main-rules
-  services:
-    - name: gabyxgabyx/rsmd2pdf-service:ci-docker-dind-1.0.0
-      alias: docker
+  services: *default-dind-service
   script:
     - apk add git bash just findutils parallel
     - just upload-ci-images
 
 format:
-  stage: check
+  stage: format
+  needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-format-1.0.0
   rules:
     - *defaults-rules
-  services:
-    - name: gabyxgabyx/rsmd2pdf-service:ci-docker-dind-1.0.0
-      alias: docker
+  services: *default-dind-service
   variables:
     # When you use the dind service, you must instruct Docker to talk with
     # the daemon started inside of the service 'docker:*-dind'.
@@ -48,11 +53,10 @@ format:
     - just format
 
 lint:
-  stage: check
+  stage: lint
+  needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-lint-1.0.0
-  services:
-    - name: gabyxgabyx/rsmd2pdf-service:ci-docker-dind-1.0.0
-      alias: docker
+  services: *default-dind-service
   rules:
     - *defaults-rules
   variables:
@@ -60,8 +64,20 @@ lint:
   script:
     - nix develop .#ci --command just --set parallel true lint
 
+lint-docs:
+  stage: lint
+  needs: []
+  image: gabyxgabyx/rsmd2pdf-service:ci-lint-docs-1.0.0
+  services: *default-dind-service
+  rules:
+    - *defaults-rules
+  script:
+    - just --set parallel true lint-docs
+  allow_failure: true
+
 build:
-  stage: check
+  stage: build
+  needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-build-1.0.0
   rules:
     - *defaults-rules
@@ -69,13 +85,12 @@ build:
     - nix develop .#ci --command just --set parallel true build
 
 build-image:
-  stage: check
+  stage: package
+  needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-docker-1.0.0
   rules:
     - *defaults-rules
-  services:
-    - name: gabyxgabyx/rsmd2pdf-service:ci-docker-dind-1.0.0
-      alias: docker
+  services: *default-dind-service
   script:
     - apk add git bash just findutils parallel
     - just --set parallel true build-image
