@@ -23,7 +23,7 @@ upload-ci-images:
   image: gabyxgabyx/rsmd2pdf-service:ci-docker-1.0.0
   rules:
     - *main-rules
-  services: *default-dind-service
+  # services: *default-dind-service
   script:
     - apk add git bash just findutils parallel
     - just upload-ci-images
@@ -34,7 +34,7 @@ format:
   image: gabyxgabyx/rsmd2pdf-service:ci-format-1.0.0
   rules:
     - *defaults-rules
-  services: *default-dind-service
+  # services: *default-dind-service
   variables:
     # When you use the dind service, you must instruct Docker to talk with
     # the daemon started inside of the service 'docker:*-dind'.
@@ -56,7 +56,7 @@ lint:
   stage: lint
   needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-lint-1.0.0
-  services: *default-dind-service
+  # services: *default-dind-service
   rules:
     - *defaults-rules
   variables:
@@ -68,7 +68,7 @@ lint-docs:
   stage: lint
   needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-lint-docs-1.0.0
-  services: *default-dind-service
+  # services: *default-dind-service
   rules:
     - *defaults-rules
   script:
@@ -90,7 +90,7 @@ build-image:
   image: gabyxgabyx/rsmd2pdf-service:ci-docker-1.0.0
   rules:
     - *defaults-rules
-  services: *default-dind-service
+  # services: *default-dind-service
   script:
     - apk add git bash just findutils parallel
     - just --set parallel true build-image
