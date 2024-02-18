@@ -17,14 +17,6 @@ stages:
   - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
     when: always
 
-test:
-  stage: format
-  image: alpine:latest
-  rules:
-    - *defaults-rules
-  script:
-    - apk add git bash
-    - git status
 # upload-ci-images:
 #   stage: package
 #   needs: []
@@ -36,29 +28,29 @@ test:
 #     - apk add git bash just findutils parallel
 #     - just upload-ci-images
 #
-format:
-  stage: format
-  needs: []
-  image: gabyxgabyx/rsmd2pdf-service:ci-format-1.0.0
-  rules:
-    - *defaults-rules
-  services: *default-dind-service
-  variables:
-    # When you use the dind service, you must instruct Docker to talk with
-    # the daemon started inside of the service 'docker:*-dind'.
-    # The daemon is available with a network connection instead of the default
-    # /var/run/docker.sock socket.
-    # Docker does this automatically by setting the DOCKER_HOST in
-    # https://github.com/docker-library/docker/blob/master/docker-entrypoint.sh#L30
-    # The 'docker' hostname is the alias of the service container as described
-    # at https://docs.gitlab.com/ee/ci/services/#accessing-the-services.
-    # which is `docker` and then DOCKER_HOST=tcp://docker:2376
-    #
-    # We need to install Githooks into the build directory which allows
-    # Githooks to mount it to its docker runs, apparently.
-    GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
-  script:
-    - just format
+# format:
+#   stage: format
+#   needs: []
+#   image: gabyxgabyx/rsmd2pdf-service:ci-format-1.0.0
+#   rules:
+#     - *defaults-rules
+#   services: *default-dind-service
+#   variables:
+#     # When you use the dind service, you must instruct Docker to talk with
+#     # the daemon started inside of the service 'docker:*-dind'.
+#     # The daemon is available with a network connection instead of the default
+#     # /var/run/docker.sock socket.
+#     # Docker does this automatically by setting the DOCKER_HOST in
+#     # https://github.com/docker-library/docker/blob/master/docker-entrypoint.sh#L30
+#     # The 'docker' hostname is the alias of the service container as described
+#     # at https://docs.gitlab.com/ee/ci/services/#accessing-the-services.
+#     # which is `docker` and then DOCKER_HOST=tcp://docker:2376
+#     #
+#     # We need to install Githooks into the build directory which allows
+#     # Githooks to mount it to its docker runs, apparently.
+#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+#   script:
+#     - just format
 #
 # lint:
 #   stage: lint
@@ -92,49 +84,108 @@ build:
   script:
     - nix develop .#ci --command just --set parallel true build
 
-build-test-docker:
+docker-run:
   stage: package
   needs: []
   image: docker:24
   rules:
     - *defaults-rules
-  # variables:
-  #   - DOCKER_HOST: unix://var/run/docker.sock
   script:
-    - docker run -it alpine:latest
+    - docker info
+    - docker run alpine:latest cat /etc/os-release
 
-build-test-docker-2:
+docker-remote-info:
   stage: package
   needs: []
   image: docker:24
   rules:
     - *defaults-rules
-  # variables:
-  #   - DOCKER_HOST: unix://var/run/docker.sock
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
   script:
-    - docker run -it alpine:latest
+    - docker info
 
-build-test:
+docker-remote-run&build:
+  stage: package
+  needs: []
+  image: docker:24
+  rules:
+    - *defaults-rules
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
+  script:
+    - docker info
+    - docker run alpine:latest cat /etc/os-release
+
+podman-remote-run:
   stage: package
   needs: []
   image: quay.io/podman/stable:latest
   rules:
     - *defaults-rules
   variables:
-    - DOCKER_HOST: unix://var/run/docker.sock
+    CONTAINER_HOST: unix:///var/run/docker.sock
   script:
-    - podman run -it alpine:latest
-    - podman build -t test:test .
+    - podman info
+    - podman run alpine:latest cat /etc/os-release
 
-build-image:
+podman-remote-run&build:
+  stage: package
+  needs: []
+  image: quay.io/podman/stable:latest
+  rules:
+    - *defaults-rules
+  variables:
+    CONTAINER_HOST: unix://var/run/docker.sock
+  script:
+    - podman info
+    - podman run alpine:latest cat /etc/os-release
+    - cd tests && podman build -t test:test .
+
+podman-remote-alpine-run&build:
   stage: package
   needs: []
   image: alpine:latest
   rules:
     - *defaults-rules
+  variables:
+    CONTAINER_HOST: unix://var/run/docker.sock
   script:
-    - apk add openrc
-    - rc-update add cgroups && rc-service cgroups start
-    - modprobe tun
     - apk add podman
-    - podman build -t test:test .
+    - podman info
+    - podman run alpine:latest cat /etc/os-release
+    - cd tests && podman build -t test:test .
+# podman-remote-alpine-run&build&format:
+#   stage: format
+#   needs: []
+#   image: alpine:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     CONTAINER_HOST: unix://var/run/docker.sock
+#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+#   script:
+#     - apk add podman git
+#     - . ./tools/general.sh && ci_setup_nix
+#     - ln -s /usr/bin/podman /usr/bin/docker
+#     - docker info
+#     - docker run alpine:latest cat /etc/os-release
+#     - apk add jq curl bash just findutils parallel
+#     - just format
+#
+# podman-remote-alpine-run&build&lint:
+#   stage: lint
+#   needs: []
+#   image: alpine:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     CONTAINER_HOST: unix://var/run/docker.sock
+#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+#   script:
+#     - apk add podman git
+#     - . ./tools/general.sh && ci_setup_nix
+#     - ln -s /usr/bin/podman /usr/bin/docker
+#     - docker info
+#     - docker run alpine:latest cat /etc/os-release
+#     - nix develop .#ci --command just --set parallel true lint

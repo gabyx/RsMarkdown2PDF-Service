@@ -72,10 +72,8 @@
           just
           dasel
           parallel
-          podman
           tilt
           kustomize
-          dbeaver
           sqlfluff # Linter
 
           python311Packages.isort
@@ -86,6 +84,8 @@
         nativeBuildInputsDev = with pkgs; [
           k3s
           httpie
+          podman
+          dbeaver
         ];
 
         githooksBuildInput = with pkgs; [
