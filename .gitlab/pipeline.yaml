@@ -75,72 +75,72 @@ stages:
 #     - just --set parallel true lint-docs
 #   allow_failure: true
 #
-build:
-  stage: build
-  needs: []
-  image: gabyxgabyx/rsmd2pdf-service:ci-build-1.0.0
-  rules:
-    - *defaults-rules
-  script:
-    - nix develop .#ci --command just --set parallel true build
-
-docker-run:
-  stage: package
-  needs: []
-  image: docker:24
-  rules:
-    - *defaults-rules
-  script:
-    - docker info
-    - docker run alpine:latest cat /etc/os-release
-
-docker-remote-info:
-  stage: package
-  needs: []
-  image: docker:24
-  rules:
-    - *defaults-rules
-  variables:
-    DOCKER_HOST: unix:///var/run/docker.sock
-  script:
-    - docker info
-
-docker-remote-run&build:
-  stage: package
-  needs: []
-  image: docker:24
-  rules:
-    - *defaults-rules
-  variables:
-    DOCKER_HOST: unix:///var/run/docker.sock
-  script:
-    - docker info
-    - docker run alpine:latest cat /etc/os-release
-
-podman-remote-run:
-  stage: package
-  needs: []
-  image: quay.io/podman/stable:latest
-  rules:
-    - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix:///var/run/docker.sock
-  script:
-    - podman info
-    - podman run alpine:latest cat /etc/os-release
-
-podman-remote-run&build:
-  stage: package
-  needs: []
-  image: quay.io/podman/stable:latest
-  rules:
-    - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix://var/run/docker.sock
-  script:
-    - podman info
-    - podman run alpine:latest cat /etc/os-release
-    - cd tests && podman build -t test:test .
+# build:
+#   stage: build
+#   needs: []
+#   image: gabyxgabyx/rsmd2pdf-service:ci-build-1.0.0
+#   rules:
+#     - *defaults-rules
+#   script:
+#     - nix develop .#ci --command just --set parallel true build
+#
+# docker-run:
+#   stage: package
+#   needs: []
+#   image: docker:24
+#   rules:
+#     - *defaults-rules
+#   script:
+#     - docker info
+#     - docker run alpine:latest cat /etc/os-release
+#
+# docker-remote-info:
+#   stage: package
+#   needs: []
+#   image: docker:24
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     DOCKER_HOST: unix:///var/run/docker.sock
+#   script:
+#     - docker info
+#
+# docker-remote-run&build:
+#   stage: package
+#   needs: []
+#   image: docker:24
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     DOCKER_HOST: unix:///var/run/docker.sock
+#   script:
+#     - docker info
+#     - docker run alpine:latest cat /etc/os-release
+#
+# podman-remote-run:
+#   stage: package
+#   needs: []
+#   image: quay.io/podman/stable:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     CONTAINER_HOST: unix:///var/run/docker.sock
+#   script:
+#     - podman info
+#     - podman run alpine:latest cat /etc/os-release
+#
+# podman-remote-run&build:
+#   stage: package
+#   needs: []
+#   image: quay.io/podman/stable:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     CONTAINER_HOST: unix://var/run/docker.sock
+#   script:
+#     - podman info
+#     - podman run alpine:latest cat /etc/os-release
+#     - cd tests && podman build -t test:test .
 
 podman-remote-alpine-run&build:
   stage: package

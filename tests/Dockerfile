@@ -7,8 +7,8 @@ LABEL name=githooks-shell
 ARG SHELLCHECK_VERSION=0.9.0
 ARG SHFMT_VERSION=3.7.0
 
-RUN apk add git tar curl xz bash coreutils findutils grep sed parallel && \
-    curl -fsSL https://github.com/koalaman/shellcheck/releases/download/v$SHELLCHECK_VERSION/shellcheck-v$SHELLCHECK_VERSION.linux.x86_64.tar.xz | tar -xJf - && \
+RUN apk add git tar curl xz bash coreutils findutils grep sed parallel
+RUN curl -fsSL https://github.com/koalaman/shellcheck/releases/download/v$SHELLCHECK_VERSION/shellcheck-v$SHELLCHECK_VERSION.linux.x86_64.tar.xz | tar -xJf - && \
     cp shellcheck-v$SHELLCHECK_VERSION/shellcheck /usr/local/bin && \
     rm -rf shellcheck-v$SHELLCHECK_VERSION && \
     curl -fsSL "https://github.com/mvdan/sh/releases/download/v$SHFMT_VERSION/shfmt_v${SHFMT_VERSION}_linux_amd64" -o /usr/local/bin/shfmt && \
