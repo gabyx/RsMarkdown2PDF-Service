@@ -72,7 +72,7 @@
           just
           dasel
           parallel
-          docker
+          podman
           tilt
           kustomize
           dbeaver
