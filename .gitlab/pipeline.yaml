@@ -95,7 +95,7 @@ build:
 build-image:
   stage: package
   needs: []
-  image: ubuntu:latest
+  image: alpine:latest
   rules:
     - *defaults-rules
   script:
