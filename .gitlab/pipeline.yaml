@@ -193,7 +193,8 @@ podman-remote-alpine-run&build&format:
     - docker info
     - docker run alpine:latest cat /etc/os-release
     - apk add jq curl bash just findutils parallel
-    - . ./tools/general.sh && ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
+    # - . ./tools/general.sh && ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
+    - just format
 #
 # podman-remote-alpine-run&build&lint:
 #   stage: lint
