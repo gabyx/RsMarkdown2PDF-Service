@@ -48,6 +48,7 @@ parallel="$1"
 regex="$2"
 
 if [ "${CI:-}" = "true" ]; then
+    ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
     ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
     ci_assert_no_diffs
 fi

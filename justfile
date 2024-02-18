@@ -81,6 +81,10 @@ lint regex=".*":
     cd "{{root_dir}}" && \
         tools/lint.sh "{{parallel}}" "{{regex}}"
 
+lint-docs regex=".*":
+    cd "{{root_dir}}/docs" && \
+        just lint
+
 # CI Stuff
 ###############################################################################
 upload-ci-images:

@@ -29,7 +29,7 @@ repository="${1:-gabyxgabyx/rsmd2pdf-service}"
 tag="${2:-1.0.0}"
 
 if [ "${CI:-}" = "true" ]; then
-    ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_TOKEN"
+    ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
 fi
 
 build_ci_image "ci-docker" "$repository" "$tag"
@@ -37,4 +37,5 @@ build_ci_image "ci-docker-dind" "$repository" "$tag"
 
 build_ci_image "ci-format" "$repository" "$tag"
 build_ci_image "ci-lint" "$repository" "$tag"
+build_ci_image "ci-lint-docs" "$repository" "$tag"
 build_ci_image "ci-build" "$repository" "$tag"

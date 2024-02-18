@@ -27,16 +27,16 @@ pub use _error as error;
 impl From<result::Error> for Error {
     fn from(value: result::Error) -> Self {
         return match value {
-            result::Error::IOError { .. } => {
+            result::Error::IO { .. } => {
                 error!(Status::InternalServerError, "IO Error.")
             }
-            result::Error::DBError { .. } => {
+            result::Error::DB { .. } => {
                 error!(Status::InternalServerError, "Database Error.")
             }
-            result::Error::QueueError { .. } => {
+            result::Error::Queue { .. } => {
                 error!(Status::InternalServerError, "Queue Error.")
             }
-            result::Error::GenericError { .. } => {
+            result::Error::Generic { .. } => {
                 error!(Status::InternalServerError, "GenericError")
             }
         };
