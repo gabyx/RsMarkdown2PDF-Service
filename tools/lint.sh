@@ -38,11 +38,14 @@ function run_lint_general() {
 parallel="$1"
 regex="$2"
 
-if [ "${CI:-}" = "true" ]; then
+if ci_is_running; then
     ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
     ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
-    ci_assert_no_diffs
 fi
 
 run_lint_general
 run_lint_shared_hooks
+
+if ci_is_running; then
+    ci_assert_no_diffs
+fi

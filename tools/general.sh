@@ -45,6 +45,14 @@ function die() {
     exit 1
 }
 
+function ci_is_running() {
+    if [ "${CI:-}" = "true" ]; then
+        return 0
+    fi
+
+    return 1
+}
+
 function ci_setup_githooks() {
     print_info "Install Githooks."
     local installPrefix="$1"
