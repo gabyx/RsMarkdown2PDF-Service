@@ -117,65 +117,59 @@ stages:
 #     - docker info
 #     - docker run alpine:latest cat /etc/os-release
 #
-# podman-remote-run:
+podman-remote-run:
+  stage: package
+  needs: []
+  image: quay.io/podman/stable:latest
+  rules:
+    - *defaults-rules
+  # variables:
+  #   CONTAINER_HOST: unix:///var/run/docker.sock
+  script:
+    - podman info
+    - podman run alpine:latest cat /etc/os-release
+#
+# podman-remote-run&build:
 #   stage: package
 #   needs: []
 #   image: quay.io/podman/stable:latest
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     CONTAINER_HOST: unix:///var/run/docker.sock
+#     CONTAINER_HOST: unix://var/run/docker.sock
 #   script:
 #     - podman info
 #     - podman run alpine:latest cat /etc/os-release
+#     - cd tests && podman build -t test:test -f Dockerfile2 .
 #
-podman-remote-run&build:
-  stage: package
-  needs: []
-  image: quay.io/podman/stable:latest
-  rules:
-    - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix://var/run/docker.sock
-  script:
-    - podman info
-    - podman run alpine:latest cat /etc/os-release
-    - cd tests && podman build -t test:test -f Dockerfile2 .
-
-podman-remote-alpine-run&build:
-  stage: package
-  needs: []
-  image: alpine:latest
-  rules:
-    - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix://var/run/docker.sock
-  script:
-    - apk add podman containers-common wget
-    - cat /etc/containers/seccomp.json || true
-    - mkdir -p /etc/containers &&
-      wget -O /etc/containers/seccomp.json
-      https://src.fedoraproject.org/rpms/containers-common/raw/rawhide/f/seccomp.json
-    - podman info
-    - podman run alpine:latest cat /etc/os-release
-    - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test -f Dockerfile .
-
-podman-remote-alpine-run&build2:
-  stage: package
-  needs: []
-  image: alpine:latest
-  rules:
-    - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix://var/run/docker.sock
-  script:
-    - apk add podman containers-common
-    - podman info
-    - podman run alpine:latest cat /etc/os-release
-    # - mkdir -p /etc/containers &&
-    #   wget -O /etc/containers/seccomp.json
-    #   https://src.fedoraproject.org/rpms/containers-common/raw/rawhide/f/seccomp.json
-    - cd tests && podman build --no-cache -t test:test -f Dockerfile2 .
+# podman-remote-alpine-run&build:
+#   stage: package
+#   needs: []
+#   image: alpine:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     CONTAINER_HOST: unix://var/run/docker.sock
+#   script:
+#     - apk add podman containers-common wget
+#     - cat /etc/containers/seccomp.json || true
+#     - podman info
+#     - podman run alpine:latest cat /etc/os-release
+#     - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test -f Dockerfile .
+#
+# podman-remote-alpine-run&build2:
+#   stage: package
+#   needs: []
+#   image: alpine:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     CONTAINER_HOST: unix://var/run/docker.sock
+#   script:
+#     - apk add podman containers-common
+#     - podman info
+#     - podman run alpine:latest cat /etc/os-release
+#     - cd tests && podman build --no-cache -t test:test -f Dockerfile2 .
 
 podman-remote-alpine-run&build&format:
   stage: format
@@ -192,9 +186,7 @@ podman-remote-alpine-run&build&format:
     - ln -s /usr/bin/podman /usr/bin/docker
     - docker info
     - docker run alpine:latest cat /etc/os-release
-    - apk add jq curl bash just findutils parallel
-    # - . ./tools/general.sh && ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
-    - just format
+    # Cannot mount $CI_BUILDS_DIR because its not on nthe host.
 #
 # podman-remote-alpine-run&build&lint:
 #   stage: lint
