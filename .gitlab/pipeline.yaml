@@ -213,5 +213,5 @@ test-volume-mount-docker:
   rules:
     - *defaults-rules
   script:
-    - ls /image-cache
-    - echo "asdf" > /image-cache/A.txt
+    - ls /mycache
+    - echo "asdf" > /mycache/A.txt

@@ -72,7 +72,7 @@ max_jobs=4
 config_dir="$ROOT/.gitlab/local/config"
 runner_name="gitlab-runner-md2pdf-podman"
 cores=$(grep "^cpu\\scores" /proc/cpuinfo | uniq | cut -d ' ' -f 3)
-image="registry.gitlab.com/qontainers/pipglr:latest@sha256:ca3093e580bd617d5f92b67a5b6ec9411e2d8fbff36d8edd1070fccba9d241d2"
+image="registry.gitlab.com/qontainers/pipglr:latest"
 
 function clean_up() {
     if [ -f "$config_dir/config.toml" ]; then
@@ -119,6 +119,9 @@ function register_runner() {
         '["always", "if-not-present"]'
     modify_config ".runners.first().docker.volumes.append()" \
         "/home/runner/podman.sock:/var/run/docker.sock:rw" string
+
+    modify_config ".runners.first().docker.volumes.append()" \
+        "mycache:/mycache" string
 
     podman secret rm config.toml &>/dev/null || true
     podman secret create config.toml "$config_dir/config.toml" ||

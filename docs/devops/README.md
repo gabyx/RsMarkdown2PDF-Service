@@ -99,7 +99,7 @@ is interpreted however on the Docker engine which is in this case the
 `docker:24-dind` which works because the Gitlab runner started the two job
 containers with the same mount for `$CI_BUILD_DIR=/builds`.
 
-The setup works is however not very secure as the Docker engine on the host is
+The setup works, is however not very secure as the Docker engine on the host is
 used and privilege escalation can be from inside the job containers (because
 they are run privileged because we use `docker run`).
 
