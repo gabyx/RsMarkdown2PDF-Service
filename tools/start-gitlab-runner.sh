@@ -28,7 +28,7 @@ function create() {
         --restart always \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$config_dir":/etc/gitlab-runner \
-        gitlab/gitlab-runner:latest || die "Could not create gitlab-runner"
+        docker.io/gitlab/gitlab-runner:latest || die "Could not create gitlab-runner"
 
     docker exec -it "$runner_name" gitlab-runner register \
         --non-interactive \
@@ -37,7 +37,8 @@ function create() {
         --description "md2pdf-ci-$USER" \
         --docker-image "docker:24" \
         --docker-privileged \
-        --docker-volumes "/certs/client" || die "Could not start gitlab runner"
+        --docker-volumes "/certs/client" \
+        --docker-volumes "image-cache:/image-cache" || die "Could not start gitlab runner"
 
     # Set concurrency.
     docker exec -it "$runner_name" \

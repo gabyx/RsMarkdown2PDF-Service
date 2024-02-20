@@ -55,3 +55,59 @@ job for simplicity.
     docker run -v "$(pwd):/workspace" -w "/workspace" --rm lint-docs:1.0.0
     assert_no_diffs
    ```
+
+   _Optional:_ Also the container engine should have their images cached and
+   probably shared with other CI runs or jobs. The granularity is not so
+   important but the higher up the cache may be the less secure things might
+   get.
+
+The requirements point towards containerized CI solution where the jobs somehow
+have full control over a container engine. We explore the solutions with the
+Gitlab CI provider and its runner `gitlab-runner` which can be installed and can
+execute and launch CI jobs.
+
+The following brain-goo leaking out of my ears was taken from this
+[blog post](https://blog.nestybox.com/2020/10/21/gitlab-dind.html) which
+explains how to make a containerized CI setup secure.
+
+## Solution 1: Gitlab Runner using Host's Container Engine - Docker-in-Docker with Service Container
+
+For demonstration purposes the
+[`tools/start-gitlab-runner-docker.sh`](../../tools/start-gitlab-runner.sh)
+starts a container running a Gitlab runner which communicates to the container
+engine on the host (via the mounted `/var/run/docker.sock` inside the CI
+container.)
+
+![docker-in-docker-service](docker-in-docker-service.drawio.svg)
+
+A job might look like this:
+
+```yaml
+lint:
+  image: generic:1.0.0
+  services:
+    - name: docker:24-dind
+      alias: docker
+  script:
+    - lint.sh
+```
+
+The Gitlab runner inside the CI container starts the container `generic:1.0.0`
+and the service container `docker:24-dind` which lets the `lint.sh` script use
+`docker run -v "$CI_BUILD_DIR:/workspace" ...`. The path `$CI_BUILD_DIR=/builds`
+is interpreted however on the Docker engine which is in this case the
+`docker:24-dind` which works because the Gitlab runner started the two job
+containers with the same mount for `$CI_BUILD_DIR=/builds`.
+
+The setup works is however not very secure as the Docker engine on the host is
+used and privilege escalation can be from inside the job containers (because
+they are run privileged because we use `docker run`).
+
+**Open Questions:** I am not sure how container image caching should be done for
+`docker:24-dind`. Could we create a `docker volume create image-cache` on the
+host and let instruct the runner to mount this volume `image-cache` also to the
+job's service container `docker:24-dind`?
+
+## Solution 2: Gitlab Runner Using Own Container Engine.
+
+Use the `pipglr` which provides the following architecture:
