@@ -39,7 +39,7 @@ stages:
 #     # When you use the dind service, you must instruct Docker to talk with
 #     # the daemon started inside of the service 'docker:*-dind'.
 #     # The daemon is available with a network connection instead of the default
-#     # /var/run/docker.sock socket.
+#     # /var/run/podman.sock socket.
 #     # Docker does this automatically by setting the DOCKER_HOST in
 #     # https://github.com/docker-library/docker/blob/master/docker-entrypoint.sh#L30
 #     # The 'docker' hostname is the alias of the service container as described
@@ -95,6 +95,18 @@ stages:
 #     - docker info
 #     - docker run alpine:latest cat /etc/os-release
 #
+docker-run:
+  stage: package
+  needs: []
+  image: docker:24
+  services:
+    - name: docker:24-dind
+      alias: docker
+  rules:
+    - *defaults-rules
+  script:
+    - docker run -v "$CI_BUILDS_DIR:/data" alpine:latest ls /data
+#
 # docker-remote-info:
 #   stage: package
 #   needs: []
@@ -102,7 +114,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     DOCKER_HOST: unix:///var/run/docker.sock
+#     DOCKER_HOST: unix:///var/run/podman.sock
 #   script:
 #     - docker info
 #
@@ -113,7 +125,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     DOCKER_HOST: unix:///var/run/docker.sock
+#     DOCKER_HOST: unix:///var/run/podman.sock
 #   script:
 #     - docker info
 #     - docker run alpine:latest cat /etc/os-release
@@ -125,7 +137,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   # variables:
-#   #   CONTAINER_HOST: unix:///var/run/docker.sock
+#   #   CONTAINER_HOST: unix:///var/run/podman.sock
 #   script:
 #     - podman info
 #     - podman run alpine:latest cat /etc/os-release
@@ -137,7 +149,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     CONTAINER_HOST: unix://var/run/docker.sock
+#     CONTAINER_HOST: unix://var/run/podman.sock
 #   script:
 #     - podman info
 #     - podman run alpine:latest cat /etc/os-release
@@ -150,7 +162,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     CONTAINER_HOST: unix://var/run/docker.sock
+#     CONTAINER_HOST: unix://var/run/podman.sock
 #   script:
 #     - apk add podman containers-common wget
 #     - cat /etc/containers/seccomp.json || true
@@ -165,7 +177,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     CONTAINER_HOST: unix://var/run/docker.sock
+#     CONTAINER_HOST: unix://var/run/podman.sock
 #   script:
 #     - apk add podman containers-common
 #     - podman info
@@ -179,7 +191,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     # CONTAINER_HOST: unix://var/run/docker.sock
+#     # CONTAINER_HOST: unix://var/run/podman.sock
 #     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
 #   script:
 #     - apk add podman git
@@ -196,7 +208,7 @@ stages:
 #   rules:
 #     - *defaults-rules
 #   variables:
-#     CONTAINER_HOST: unix://var/run/docker.sock
+#     CONTAINER_HOST: unix://var/run/podman.sock
 #     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
 #   script:
 #     - apk add podman git
@@ -206,18 +218,17 @@ stages:
 #     - docker run alpine:latest cat /etc/os-release
 #     - nix develop .#ci --command just --set parallel true lint
 
-test-volume-mount-docker:
-  stage: format
-  needs: []
-  image: alpine:latest
-  rules:
-    - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix://var/run/docker.sock
-  script:
-    - ls /mycache
-    - mkdir -p /mycache/a/b/c
-    - echo "asdf" > /mycache/a/b/c/A.txt
-    - apk add podman
-    # Mount subvolume
-    - podman run -v "mycache/a/b/c:/data" -w "/data" alpine:latest ls /data
+# test-volume-mount-docker:
+#   stage: format
+#   needs: []
+#   image: alpine:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     CONTAINER_HOST: unix://var/run/podman.sock
+#   script:
+#     - apk add podman
+#     - ls /auxvol
+#     - mkdir -p /auxvol/a/b/c
+#     - echo "asdf" > /auxvol/a/b/c/A.txt
+#     - podman run -v "auxvol/a/b/c:/data" -w "/data" alpine:latest ls /data
