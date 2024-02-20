@@ -212,6 +212,10 @@ test-volume-mount-docker:
   image: alpine:latest
   rules:
     - *defaults-rules
+  variables:
+    CONTAINER_HOST: unix://var/run/docker.sock
   script:
     - ls /mycache
     - echo "asdf" > /mycache/A.txt
+    - apk add podman
+    - podman run -v "mycache:/data" -w "/data" alpine:latest ls /data
