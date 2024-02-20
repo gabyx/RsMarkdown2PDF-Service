@@ -118,10 +118,11 @@ function register_runner() {
     modify_config ".runners.first().docker.pull_policy" \
         '["always", "if-not-present"]'
     modify_config ".runners.first().docker.volumes.append()" \
-        "/home/runner/podman.sock:/var/run/docker.sock:rw" string
+        "/home/runner/podman.sock:/var/run/podman.sock:rw" string
 
+    # Add an auxiliary volume `auxvol`.
     modify_config ".runners.first().docker.volumes.append()" \
-        "mycache:/mycache" string
+        "auxvol:/auxvol" string
 
     podman secret rm config.toml &>/dev/null || true
     podman secret create config.toml "$config_dir/config.toml" ||
