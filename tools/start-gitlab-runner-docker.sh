@@ -10,7 +10,13 @@
 # which will execute jobs over the `docker` executor.
 # The running container is not that safe in the sense that the Docker socket
 # is mounted into the container (privilege escalation can be done:
-# .https://github.com/stealthcopter/deepce).
+# - https://blog.nestybox.com/2020/10/21/gitlab-dind.html
+# - https://github.com/stealthcopter/deepce).
+#
+# TODO: This script should use the runtime `sysbox-runc` for better isolation.
+#       So far its not available on NixOS.
+#       https://github.com/NixOS/nixpkgs/issues/271901
+#
 # The `gitlab-runner` does not forward the socket to the job containers
 # because that would be to risky. Nevertheless,
 # docker-in-docker for a job works as shown below.
@@ -20,9 +26,7 @@
 # start-gitlab-runner-docker.sh [--force] [<token>]
 # ```
 # Read token from stdin.
-# ```shell
-# start-gitlab-runner-docker.sh [--force] -
-#
+
 # Usage in Pipeline:
 #
 # A job which uses `docker` to run/build images.
@@ -59,8 +63,21 @@ ROOT=$(git rev-parse --show-toplevel)
 force="false"
 max_jobs=4
 config_dir="$ROOT/.gitlab/local/config"
-runner_name="gitlab-runner-md2pdf"
+runner_name="gitlab-runner-md2pdf-docker"
 cores=$(grep "^cpu\\scores" /proc/cpuinfo | uniq | cut -d ' ' -f 3)
+
+function modify_config() {
+    local key="$1"
+    local value="$2"
+    local type="${3:-json}"
+
+    docker run --rm -v "$config_dir/config.toml:/config.toml" \
+        "ghcr.io/tomwright/dasel" put -f /config.toml \
+        -t "$type" \
+        -s "$key" \
+        -v "$value" ||
+        die "Could not set gitlab runner config key '$key' to '$value'"
+}
 
 function create() {
     local token="${1:-}"
@@ -79,21 +96,24 @@ function create() {
         --restart always \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$config_dir":/etc/gitlab-runner \
-        gitlab/gitlab-runner:latest || die "Could not create gitlab-runner"
+        gitlab/gitlab-runner:latest register || die "Could not create gitlab-runner"
 
     docker exec -it "$runner_name" gitlab-runner register \
         --non-interactive \
-        --url https://gitlab.com --token "$token" \
+        --url https://gitlab.com \
+        --token "$token" \
         --executor docker \
-        --description "md2pdf-ci-$USER" \
-        --docker-image "docker:24" \
+        --description "$runner_name" \
+        --docker-cache-dir "/cache" \
+        --docker-volumes "/cache" \
+        --docker-host "unix:///var/run/docker.sock" \
+        --docker-image "alpine:latest" \
         --docker-privileged \
         --docker-volumes "/certs/client" || die "Could not start gitlab runner"
 
-    # Set concurrency.
-    docker exec -it "$runner_name" \
-        sed -i "s/concurrent =.*/concurrent = $max_jobs/" \
-        "/etc/gitlab-runner/config.toml" || die "Could not set concurrency."
+    modify_config ".concurrent" "$max_jobs"
+    modify_config ".runners.first().docker.pull_policy" \
+        '["always", "if-not-present"]'
 
     docker exec -it "$runner_name" gitlab-runner start || die "Could not start runner."
 }
@@ -101,23 +121,23 @@ function create() {
 function stop() {
     if is_running; then
         print_info "Stop runner '$runner_name' ..."
-        podman stop "$runner_name"
+        docker stop "$runner_name"
 
     fi
 
     if is_exited; then
         # shellcheck disable=SC2046
-        podman rm $(podman ps -a -q)
+        docker rm $(docker ps -a -q)
     fi
 }
 
 function is_running() {
-    [ "$(podman inspect -f '{{.State.Status}}' "$runner_name" 2>/dev/null || true)" = 'running' ] || return 1
+    [ "$(docker inspect -f '{{.State.Status}}' "$runner_name" 2>/dev/null || true)" = 'running' ] || return 1
     return 0
 }
 
 function is_exited() {
-    [ "$(podman inspect -f '{{.State.Status}}' "$runner_name" 2>/dev/null || true)" = 'exited' ] || return 1
+    [ "$(docker inspect -f '{{.State.Status}}' "$runner_name" 2>/dev/null || true)" = 'exited' ] || return 1
     return 0
 }
 
