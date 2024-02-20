@@ -96,17 +96,14 @@ function create() {
         --restart always \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$config_dir":/etc/gitlab-runner \
-        docker.io/gitlab/gitlab-runner:latest register || die "Could not create gitlab-runner"
+        gitlab/gitlab-runner:latest || die "Could not create gitlab-runner"
 
     docker exec -it "$runner_name" gitlab-runner register \
         --non-interactive \
-        --url https://gitlab.com \
+        --url "https://gitlab.com" \
         --token "$token" \
         --executor docker \
         --description "$runner_name" \
-        --docker-cache-dir "/cache" \
-        --docker-volumes "/cache" \
-        --docker-host "unix:///var/run/docker.sock" \
         --docker-image "alpine:latest" \
         --docker-privileged \
         --docker-volumes "/certs/client" || die "Could not start gitlab runner"
