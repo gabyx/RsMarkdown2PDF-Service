@@ -96,7 +96,7 @@ function create() {
         --restart always \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$config_dir":/etc/gitlab-runner \
-        gitlab/gitlab-runner:latest register || die "Could not create gitlab-runner"
+        docker.io/gitlab/gitlab-runner:latest register || die "Could not create gitlab-runner"
 
     docker exec -it "$runner_name" gitlab-runner register \
         --non-interactive \

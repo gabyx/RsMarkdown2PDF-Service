@@ -83,7 +83,8 @@ stages:
 #     - *defaults-rules
 #   script:
 #     - nix develop .#ci --command just --set parallel true build
-#
+
+## Testing =================================================================
 # docker-run:
 #   stage: package
 #   needs: []
@@ -117,17 +118,17 @@ stages:
 #     - docker info
 #     - docker run alpine:latest cat /etc/os-release
 #
-podman-remote-run:
-  stage: package
-  needs: []
-  image: quay.io/podman/stable:latest
-  rules:
-    - *defaults-rules
-  # variables:
-  #   CONTAINER_HOST: unix:///var/run/docker.sock
-  script:
-    - podman info
-    - podman run alpine:latest cat /etc/os-release
+# podman-remote-run:
+#   stage: package
+#   needs: []
+#   image: quay.io/podman/stable:latest
+#   rules:
+#     - *defaults-rules
+#   # variables:
+#   #   CONTAINER_HOST: unix:///var/run/docker.sock
+#   script:
+#     - podman info
+#     - podman run alpine:latest cat /etc/os-release
 #
 # podman-remote-run&build:
 #   stage: package
@@ -170,23 +171,23 @@ podman-remote-run:
 #     - podman info
 #     - podman run alpine:latest cat /etc/os-release
 #     - cd tests && podman build --no-cache -t test:test -f Dockerfile2 .
-
-podman-remote-alpine-run&build&format:
-  stage: format
-  needs: []
-  image: alpine:latest
-  rules:
-    - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix://var/run/docker.sock
-    GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
-  script:
-    - apk add podman git
-    - . ./tools/general.sh && ci_setup_nix
-    - ln -s /usr/bin/podman /usr/bin/docker
-    - docker info
-    - docker run alpine:latest cat /etc/os-release
-    # Cannot mount $CI_BUILDS_DIR because its not on nthe host.
+#
+# podman-remote-alpine-run&build&format:
+#   stage: format
+#   needs: []
+#   image: alpine:latest
+#   rules:
+#     - *defaults-rules
+#   variables:
+#     # CONTAINER_HOST: unix://var/run/docker.sock
+#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+#   script:
+#     - apk add podman git
+#     - . ./tools/general.sh && ci_setup_nix
+#     - ln -s /usr/bin/podman /usr/bin/docker
+#     - docker info
+#     - docker run alpine:latest cat /etc/os-release
+#     # Cannot mount $CI_BUILDS_DIR because its not on nthe host.
 #
 # podman-remote-alpine-run&build&lint:
 #   stage: lint
@@ -204,3 +205,13 @@ podman-remote-alpine-run&build&format:
 #     - docker info
 #     - docker run alpine:latest cat /etc/os-release
 #     - nix develop .#ci --command just --set parallel true lint
+
+test-volume-mount-docker:
+  stage: format
+  needs: []
+  image: alpine:latest
+  rules:
+    - *defaults-rules
+  script:
+    - ls /image-cache
+    - echo "asdf" > /image-cache/A.txt
