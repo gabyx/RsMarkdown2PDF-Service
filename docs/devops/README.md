@@ -78,7 +78,7 @@ starts a container running a Gitlab runner which communicates to the container
 engine on the host (via the mounted `/var/run/docker.sock` inside the CI
 container.)
 
-![runner-uses-hosts-docker-engine](runner-uses-hosts-docker-engine.drawio.svg)
+![runner-uses-hosts-docker-engine](runner-uses-hosts-docker.drawio.svg)
 
 A job might look like this:
 
@@ -89,7 +89,8 @@ lint:
     - name: docker:24-dind
       alias: docker
   script:
-    - docker run -v "$CI_BUILD_DIR:/data" -w "/data" alpine:latest ls -a /data
+    - docker run -v "$CI_BUILD_DIR:/workspace" -w "/workspace" alpine:latest ls
+      -a /workspace
 ```
 
 The Gitlab runner inside the CI container starts the container `generic:1.0.0`
@@ -105,6 +106,11 @@ used and privilege escalation can done be from inside the job containers
 (because they are run privileged because we use `docker run`).
 
 **Open Questions/Notes:**
+
+- Why is the mount above with `$CI_BUILD_DIR:/data = /build:/data` possible. As
+  I understand: The path `/data` should be interpreted in `docker:24-dind` (Job
+  A - Service Container) and this path is itself a mount. I thought mounting
+  again an already mounted path is impossible.
 
 - I am not sure how container image caching should be done for `docker:24-dind`.
   Could we create a `docker volume create image-cache` on the host and let
@@ -178,4 +184,4 @@ The two solutions work with both their own stupid caveats.
 
 - Solution 1 has no troubles mounting `/build` but is insecure and can be made
   secure with `sysbox`.
-- where as solution 2
+- where as solution 2 uses `podman` (DinD) inside the CI container
