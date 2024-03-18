@@ -218,17 +218,20 @@ docker-run:
 #     - docker run alpine:latest cat /etc/os-release
 #     - nix develop .#ci --command just --set parallel true lint
 
-# test-volume-mount-docker:
-#   stage: format
-#   needs: []
-#   image: alpine:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     CONTAINER_HOST: unix://var/run/podman.sock
-#   script:
-#     - apk add podman
-#     - ls /auxvol
-#     - mkdir -p /auxvol/a/b/c
-#     - echo "asdf" > /auxvol/a/b/c/A.txt
-#     - podman run -v "auxvol/a/b/c:/data" -w "/data" alpine:latest ls /data
+test-volume-mount-docker:
+  stage: format
+  needs: []
+  image: alpine:latest
+  rules:
+    - *defaults-rules
+  variables:
+    # CONTAINER_HOST: unix://var/run/podman.sock
+  script:
+    - apk add podman
+    - ls /auxvol
+    - mkdir -p /auxvol/a/b/c
+    - echo "asdf" > /auxvol/a/b/c/A.txt
+    - mkdir -p /auxvol/podman
+    - podman --version
+    - podman --root /auxvol/podman --runroot /workspace/podman system service -t 0 &
+    - podman run -v "auxvol/a/b/c:/data" -w "/data" alpine:latest ls /data

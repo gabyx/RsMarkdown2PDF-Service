@@ -12,12 +12,9 @@ level="${1:-1}"
 echo ">>>> $level. Container: inside"
 
 # Run the image and build again.
-if [ "$level" -lt 3 ]; then
-    echo ">>>> $level. Container: Building podman..."
-    podman build -t podman-test . 1>/dev/null
-
+if [ "$level" -lt 10 ]; then
     echo ">>>> $level. Container: Launching a new container ..."
-    podman run -u podman --rm podman-test ./build.sh "$((level + 1))"
+    podman run -u podman --rm ttl.sh/podman-test ./run.sh "$((level + 1))"
 else
     echo ">>>> $level. Container: Finally reached container level: $level"
 fi

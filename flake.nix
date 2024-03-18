@@ -68,6 +68,7 @@
         nativeBuildInputsBasic = with pkgs; [
           rustToolchain
           cargo-watch
+          lldb_16 # for lldb_vscode
 
           just
           dasel

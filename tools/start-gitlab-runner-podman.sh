@@ -124,6 +124,9 @@ function register_runner() {
     modify_config ".runners.first().docker.volumes.append()" \
         "auxvol:/auxvol" string
 
+    modify_config ".runners.first().pre_build_script" \
+        "echo 'Prebuild'\\nenv" string
+
     podman secret rm config.toml &>/dev/null || true
     podman secret create config.toml "$config_dir/config.toml" ||
         die "Could not create config.toml secret."
