@@ -225,7 +225,7 @@ test-volume-mount-docker:
   rules:
     - *defaults-rules
   variables:
-    # CONTAINER_HOST: unix://var/run/podman.sock
+    CONTAINER_HOST: unix:///auxvol/job-${CI_JOB_ID}/podman-runroot
   script:
     - apk add podman
     - ls /auxvol
@@ -233,5 +233,10 @@ test-volume-mount-docker:
     - echo "asdf" > /auxvol/a/b/c/A.txt
     - mkdir -p /auxvol/podman
     - podman --version
-    - podman --root /auxvol/podman --runroot /workspace/podman system service -t 0 &
-    - podman run -v "auxvol/a/b/c:/data" -w "/data" alpine:latest ls /data
+    - env | sort -u
+    - podman --help
+    - unset CONTAINER_HOST; podman --root "/auxvol/job-${CI_JOB_ID}/podman-root" \
+      --runroot "/auxvol/job-${CI_JOB_ID}/podman-runroot" \
+      system service -t 0 \
+      unix:///auxvol/job-${CI_JOB_ID}/podman-runroot &
+    - podman run -v "auxvol:/data" -w "/data" alpine:latest ls /data
