@@ -185,3 +185,8 @@ The two solutions work with both their own stupid caveats.
 - Solution 1 has no troubles mounting `/build` but is insecure and can be made
   secure with `sysbox`.
 - where as solution 2 uses `podman` (DinD) inside the CI container
+
+## Links
+
+- [Gitlab runner in a system container.](https://blog.nestybox.com/2020/10/21/gitlab-dind.html#gitlab-runner--docker-in-a-system-container)
+- [PodmanInPodman-GitlabRunner](https://gitlab.com/qontainers/pipglr)

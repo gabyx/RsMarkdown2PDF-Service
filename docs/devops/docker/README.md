@@ -4,17 +4,25 @@ Run
 
 ```shell
 name=ttl.sh/podman-test
+
 podman build -f Containerfile -t "$name" --target original .
 podman push "$name"
 
-podman run --privileged --rm -it "$name" ./run.sh
+podman volume create storage
+podman run --privileged -v "storage:/storage" --rm -it "$name" ./run.sh
 ```
 
 to see that we can build `Containerfile` (`podman` engine) then execute the
 built container and inside call `./run.sh` again which recursively nests
-containers. You can also use
-`podman build -f Containerfile -t "$name" --target own .` to use an alpine
-podman image with the same issues.
+containers. You can also use the `alpine` image with:
+
+```shell
+name=ttl.sh/podman-test
+podman build -f Containerfile -t "$name" --target custom .
+podman push "$name"
+podman volume create storage
+podman run --privileged -v "storage:/storage" --rm -it "$name" ./run.sh
+```
 
 Its just too cool that this works? 🤣
 

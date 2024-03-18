@@ -235,8 +235,8 @@ test-volume-mount-docker:
     - podman --version
     - env | sort -u
     - podman --help
-    - unset CONTAINER_HOST; podman --root "/auxvol/job-${CI_JOB_ID}/podman-root" \
+    - CONTAINER_HOST= podman --root "/auxvol/job-${CI_JOB_ID}/podman-root" \
       --runroot "/auxvol/job-${CI_JOB_ID}/podman-runroot" \
-      system service -t 0 \
+      system service --time=0 \
       unix:///auxvol/job-${CI_JOB_ID}/podman-runroot &
     - podman run -v "auxvol:/data" -w "/data" alpine:latest ls /data
