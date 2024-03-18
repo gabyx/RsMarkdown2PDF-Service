@@ -15,10 +15,15 @@
     - [Shutdown](#shutdown)
   - [Locally Building Components](#locally-building-components)
   - [Deploying Components to the Cluster (Kubernetes)](#deploying-components-to-the-cluster-kubernetes)
-  - [Development](#development) - [Debugging in Rust](#debugging-in-rust) -
-  [Database Inspection](#database-inspection) - [Githooks](#githooks) -
-  [CI/CD](#cicd) - [Gitlab](#gitlab) - [Testing API Calls](#testing-api-calls)
-  <!--toc:end-->
+  - [Development](#development)
+    - [Debugging in Rust](#debugging-in-rust)
+    - [Database Inspection](#database-inspection)
+    - [Githooks](#githooks)
+    - [CI/CD](#cicd)
+      - [Gitlab](#gitlab)
+    - [Testing API Calls](#testing-api-calls)
+
+<!--toc:end-->
 
 This is a demo project to showcase a small microservice architecture by exposing
 
