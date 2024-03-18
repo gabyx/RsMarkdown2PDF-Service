@@ -3,7 +3,7 @@ FROM quay.io/podman/stable as original
 COPY ./Containerfile ./run.sh /home/podman/
 RUN chmod +x /home/podman/*.sh
 
-RUN date | base64 > /home/podman/image.version
+RUN date | md5sum | cut -d ' ' -f 1 > /image.version
 WORKDIR /home/podman
 
 # Alpine podman image.
@@ -66,5 +66,5 @@ RUN mkdir -p /var/lib/shared/overlay-images \
 COPY ./Containerfile ./run.sh /home/podman/
 RUN chmod +x /home/podman/*.sh
 
-RUN date | base64 > /home/podman/image.version
+RUN date | md5sum | cut -d ' ' -f 1 > /image.version
 WORKDIR /home/podman

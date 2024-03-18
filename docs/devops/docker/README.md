@@ -4,12 +4,14 @@ Run
 
 ```shell
 name=ttl.sh/podman-test
-
 podman build -f Containerfile -t "$name" --target original .
 podman push "$name"
 
-podman volume create storage
-podman run --privileged -v "storage:/storage" --rm -it "$name" ./run.sh
+podman volume rm podman-root && podman volume create podman-root || true
+podman run --privileged --device /dev/fuse \
+    -v "podman-root:/podman-root" \
+    -v "$HOME/.local/share/containers/storage:/var/lib/shared" \
+    --rm -it "$name" ./run.sh
 ```
 
 to see that we can build `Containerfile` (`podman` engine) then execute the
@@ -20,8 +22,12 @@ containers. You can also use the `alpine` image with:
 name=ttl.sh/podman-test
 podman build -f Containerfile -t "$name" --target custom .
 podman push "$name"
-podman volume create storage
-podman run --privileged -v "storage:/storage" --rm -it "$name" ./run.sh
+
+podman volume rm podman-root && podman volume create podman-root || true
+podman run --privileged --device /dev/fuse -v \
+    "podman-root:/podman-root" \
+    -v "$HOME/.local/share/containers/storage:/var/lib/shared" \
+    --rm -it "$name" ./run.sh
 ```
 
 Its just too cool that this works? 🤣
