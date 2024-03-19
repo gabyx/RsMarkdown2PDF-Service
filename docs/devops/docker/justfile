@@ -1,22 +1,35 @@
 set positional-arguments
 set shell := ["bash", "-cue"]
 root_dir := justfile_directory()
+name := "ttl.sh/podman-test"
 
-run target="original" user="root":
+build target:
     #!/usr/bin/env bash
-    set -e
-    set -u
+    set -eu
+    cd "{{root_dir}}"
+    podman build -f Containerfile -t "{{name}}" --target "{{target}}" .
+    podman push "{{name}}"
+
+run target="original" user="root": (build target)
+    #!/usr/bin/env bash
+    set -eu
+    cd "{{root_dir}}"
+
     user="{{user}}"
     target="{{target}}"
 
-    name=ttl.sh/podman-test
-    podman build -f Containerfile -t "$name" --target "$target" .
-    podman push "$name"
+    echo "Run as user: $user"
+    ns_args=()
+    [ "$user" = "root" ] || ns_args=("--userns=keep-id:uid=1000,gid=1000")
 
     podman volume rm podman-root && podman volume create podman-root || true
+
     podman run \
         --privileged \
+        "${ns_args[@]}" \
         --device /dev/fuse \
         -v "podman-root:/podman-root" \
         -v "$HOME/.local/share/containers/storage:/var/lib/shared" \
-        --rm -it "$name" ./run.sh 1 "$user"
+        --rm -it \
+        "$name" \
+        ./run.sh 1 "$user"

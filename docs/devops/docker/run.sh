@@ -6,16 +6,6 @@ set -e
 DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cd "$DIR" || exit 1
 
-level="$1"
-user="${2:-root}"
-vol_name="podman-root-$level"
-msg="-> $level. Container"
-
-ns_args=()
-if [ "$user" != "root" ]; then
-    ns_args=(--userns=keep-id --user podman)
-fi
-
 function indent() {
     cat | sed "s@^@| @g"
 }
@@ -30,16 +20,24 @@ function run_podman() {
         "$@"
 }
 
+function with_tty() {
+    [ "$with_tty" = "true" ] || return 1
+}
+
 function main() {
     # Build the image.
     echo "$msg: inside [version: $(cat /image.version)]"
+    if with_tty; then
+        echo "Bash when entering container:"
+        bash
+    fi
 
     # Run the image and build again.
     if [ "$level" -lt 5 ]; then
         echo "$msg: Launching a new container ..."
 
         # We need to make a new volume for the next podman
-        # to have the stuff it needs stored.
+        # to have the stuff it needs separated.
         echo "$msg: create volume:"
         run_podman volume create "$vol_name" || {
             echo "create failed: $vol_name"
@@ -52,16 +50,33 @@ function main() {
         # [`additionalimages`](https://www.redhat.com/sysadmin/image-stores-podman)
         # to next podman to have caching.
 
+        echo "$msg: Simple container run test:"
+        run_podman run \
+            --privileged \
+            "${tty_args[@]}" \
+            "${ns_args[@]}" \
+            ttl.sh/podman-test \
+            head /etc/os-release
+
+        echo "$msg: Start new container:"
+
+        echo
         run_podman \
             run \
+            --privileged \
+            "${tty_args[@]}" \
             "${ns_args[@]}" \
             -v "$vol_name:/podman-root:Z" \
             -v "/var/lib/shared:/var/lib/shared" \
-            --privileged \
             --rm ttl.sh/podman-test \
             ./run.sh "$((level + 1))" "$user" || true
 
         echo
+
+        if with_tty; then
+            echo "Bash after container:"
+            bash
+        fi
 
     else
         echo "$msg: Finally reached container level: $level"
@@ -70,4 +85,25 @@ function main() {
     echo "$msg: leaving"
 }
 
-main 2>&1 | indent
+level="$1"
+user="${2:-root}"
+vol_name="podman-root-$level"
+msg="-> $level. Container"
+with_tty="false"
+
+tty_args=()
+if with_tty; then
+    tty_args=(-it)
+fi
+
+ns_args=()
+if [ "$user" != "root" ]; then
+    ns_args=("--userns=keep-id")
+fi
+
+# Run the recursion.
+if ! with_tty; then
+    main 2>&1 | indent
+else
+    main
+fi
