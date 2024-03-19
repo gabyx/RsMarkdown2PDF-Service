@@ -11,6 +11,11 @@ user="${2:-root}"
 vol_name="podman-root-$level"
 msg="-> $level. Container"
 
+ns_args=()
+if [ "$user" != "root" ]; then
+    ns_args=(--userns=keep-id --user podman)
+fi
+
 function indent() {
     cat | sed "s@^@| @g"
 }
@@ -49,6 +54,7 @@ function main() {
 
         run_podman \
             run \
+            "${ns_args[@]}" \
             -v "$vol_name:/podman-root:Z" \
             -v "/var/lib/shared:/var/lib/shared" \
             --privileged \
