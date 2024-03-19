@@ -1,0 +1,22 @@
+set positional-arguments
+set shell := ["bash", "-cue"]
+root_dir := justfile_directory()
+
+run target="original" user="root":
+    #!/usr/bin/env bash
+    set -e
+    set -u
+    user="{{user}}"
+    target="{{target}}"
+
+    name=ttl.sh/podman-test
+    podman build -f Containerfile -t "$name" --target "$target" .
+    podman push "$name"
+
+    podman volume rm podman-root && podman volume create podman-root || true
+    podman run \
+        --privileged \
+        --device /dev/fuse \
+        -v "podman-root:/podman-root" \
+        -v "$HOME/.local/share/containers/storage:/var/lib/shared" \
+        --rm -it "$name" ./run.sh 1 "$user"
