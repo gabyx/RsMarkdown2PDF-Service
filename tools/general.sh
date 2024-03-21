@@ -76,7 +76,7 @@ function ci_setup_githooks() {
         bash -s -- -- --use-manual --non-interactive --prefix "$installPrefix"
 
     git hooks config enable-containerized-hooks --global --set
-    git hooks config container-manager-types --global --set "podman"
+    git hooks config container-manager-types --global --set "podman,docker"
 
     print_info "Pull all shared Githooks repositories."
     git hooks shared update
@@ -98,24 +98,23 @@ function ci_setup_nix() {
     } >~/.config/nix/nix.conf
 }
 
-function ci_docker_login() {
-    local user="$1"
-    local token="$2"
-
-    [ -n "$token" ] || die "Docker login token is empty"
-    echo "$token" |
-        docker login --password-stdin --username "$user" ||
-        die "Could not log into docker."
+# Run the container manager which is defined.
+function ci_container_mgr() {
+    if command -v podman &>/dev/null; then
+        podman "$@"
+    else
+        docker "$@"
+    fi
 }
 
 # Define the container id `CI_JOB_CONTAINER_ID` where
 # this job runs. Useful to mount same volumes as in
 # this container with `ci_run_podman`.
-function ci_job_container_setup() {
+function ci_container_mgr_setup() {
     export CONTAINER_HOST="unix://var/run/podman.sock"
     print_info "Container host: '$CONTAINER_HOST'"
 
-    job_container_id=$(podman ps \
+    job_container_id=$(ci_container_mgr ps \
         --filter "label=com.gitlab.gitlab-runner.type=build" \
         --filter "label=com.gitlab.gitlab-runner.job.id=$CI_JOB_ID" \
         --filter "label=com.gitlab.gitlab-runner.project.id=$CI_PROJECT_ID" \
@@ -129,11 +128,21 @@ function ci_job_container_setup() {
     print_info "Job container id: '$CI_JOB_CONTAINER_ID'"
 }
 
+function ci_container_mgr_login() {
+    local user="$1"
+    local token="$2"
+
+    [ -n "$token" ] || die "Docker login token is empty"
+    echo "$token" |
+        ci_container_mgr login --password-stdin --username "$user" ||
+        die "Could not log into docker."
+}
+
 # Run podman with volume mount from the
 # current build container `CI_JOB_CONTAINER_ID`.
-function ci_podman_run() {
+function ci_container_mgr_run() {
     [ -n "$CI_JOB_CONTAINER_ID" ] ||
         ci_define_job_container_id
 
-    podman run --volumes-from "$CI_JOB_CONTAINER_ID" "$@"
+    ci_container_mgr run --volumes-from "$CI_JOB_CONTAINER_ID" "$@"
 }
