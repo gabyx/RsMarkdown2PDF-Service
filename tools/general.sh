@@ -76,6 +76,7 @@ function ci_setup_githooks() {
         bash -s -- -- --use-manual --non-interactive --prefix "$installPrefix"
 
     git hooks config enable-containerized-hooks --global --set
+    git hooks config container-manager-types --global --set "podman"
 
     print_info "Pull all shared Githooks repositories."
     git hooks shared update

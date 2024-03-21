@@ -9,10 +9,12 @@ FROM docker:24 as ci-docker
 RUN apk add git
 
 # Docker-in-Docker with Nix.
+# ===============================================
 FROM ci-docker as ci-docker-nix
 RUN [ "TARGETPLATFORM" = "linux/amd64" ] || echo "Platform not yet supported."
 
 # Setup Nix.
+# ===============================================
 RUN mkdir -p /container-setup
 COPY ./tools /container-setup
 RUN . /container-setup/general.sh && ci_setup_nix
@@ -23,15 +25,22 @@ RUN cd /container-setup && nix --accept-flake-config \
         build --no-link ".#devShells.x86_64-linux.ci"
 
 # Format image.
-FROM ci-docker as ci-format
-RUN apk add jq curl bash just findutils parallel
+# ===============================================
+FROM alpine:latest as ci-format
+RUN apk add git jq curl bash just findutils parallel podman
+
 
 # Lint image.
+# ===============================================
 FROM ci-docker-nix as ci-lint
+FROM ci-docker-nix as ci-lint-docs
 
 # Build image.
+# ===============================================
 FROM ci-docker-nix as ci-build
 
+# Test
+# ===============================================
 FROM alpine:latest as ci-test
 RUN apk add sudo
 ARG USER_NAME=ci

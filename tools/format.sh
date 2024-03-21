@@ -27,6 +27,7 @@ function ci_assert_no_diffs() {
 
 function run_format_shared_hooks() {
     print_info "Run all formats scripts in shared hook repositories."
+
     git hooks exec --containerized \
         ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
 

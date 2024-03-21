@@ -90,6 +90,6 @@ lint-docs regex=".*":
 
 # CI Stuff
 ###############################################################################
-upload-ci-images:
+upload-ci-images *args:
     cd "{{root_dir}}" && \
-        .gitlab/scripts/upload-images.sh
+        .gitlab/scripts/upload-images.sh {{args}}

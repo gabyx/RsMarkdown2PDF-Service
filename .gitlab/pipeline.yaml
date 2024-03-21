@@ -95,17 +95,17 @@ stages:
 #     - docker info
 #     - docker run alpine:latest cat /etc/os-release
 #
-docker-run:
-  stage: package
-  needs: []
-  image: docker:24
-  services:
-    - name: docker:24-dind
-      alias: docker
-  rules:
-    - *defaults-rules
-  script:
-    - docker run -v "$CI_BUILDS_DIR:/data" alpine:latest ls /data
+# docker-run:
+#   stage: package
+#   needs: []
+#   image: docker:24
+#   services:
+#     - name: docker:24-dind
+#       alias: docker
+#   rules:
+#     - *defaults-rules
+#   script:
+#     - docker run -v "$CI_BUILDS_DIR:/data" alpine:latest ls /data
 #
 # docker-remote-info:
 #   stage: package
@@ -232,3 +232,13 @@ test-volume-mount-docker:
     - podman --version
     - ci_podman_run -v "auxvol:/data" -w "/data"
       alpine:latest ls -al "$CI_PROJECT_DIR"
+
+format:
+  stage: format
+  needs: []
+  image: gabyxgabyx/rsmd2pdf-service:ci-format-2.0.0
+  rules:
+    - *defaults-rules
+  script:
+    - source .gitlab/scripts/before-script.sh
+    - just format
