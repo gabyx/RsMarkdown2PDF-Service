@@ -110,8 +110,9 @@ function ci_docker_login() {
 # Define the container id `CI_JOB_CONTAINER_ID` where
 # this job runs. Useful to mount same volumes as in
 # this container with `ci_run_podman`.
-function ci_define_job_container_id() {
-    print_info "Define job container vars."
+function ci_job_container_setup() {
+    export CONTAINER_HOST="unix://var/run/podman.sock"
+    print_info "Container host: '$CONTAINER_HOST'"
 
     job_container_id=$(podman ps \
         --filter "label=com.gitlab.gitlab-runner.type=build" \
@@ -124,11 +125,12 @@ function ci_define_job_container_id() {
     [ -n "$job_container_id" ] || die "Job id is empty."
 
     export CI_JOB_CONTAINER_ID="$job_container_id"
+    print_info "Job container id: '$CI_JOB_CONTAINER_ID'"
 }
 
 # Run podman with volume mount from the
 # current build container `CI_JOB_CONTAINER_ID`.
-function ci_run_podman() {
+function ci_podman() {
     [ -n "$CI_JOB_CONTAINER_ID" ] ||
         ci_define_job_container_id
 

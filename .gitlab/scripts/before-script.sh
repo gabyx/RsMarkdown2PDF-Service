@@ -6,6 +6,6 @@ set -u
 ROOT_DIR=$(git rev-parse --show-toplevel)
 . "$ROOT_DIR/tools/general.sh"
 
-ci_define_job_container_id
+ci_job_container_setup
 
 unset ROOT_DIR

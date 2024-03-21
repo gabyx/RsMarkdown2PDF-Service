@@ -224,14 +224,11 @@ test-volume-mount-docker:
   image: alpine:latest
   rules:
     - *defaults-rules
-  variables:
-    CONTAINER_HOST: unix://var/run/podman.sock
-  before_script:
   script:
-    - apk add podman
+    - apk add podman git
     - source .gitlab/scripts/before-script.sh
     - ls /auxvol
     - mkdir -p /auxvol/a/b/c && touch /auxvol/a/b/c/A.txt
     - podman --version
-    - ci_podman_run -v "auxvol:/data" -w "/data"
+    - ci_podman -v "auxvol:/data" -w "/data"
       alpine:latest ls -al "$CI_PROJECT_DIR"
