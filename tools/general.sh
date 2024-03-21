@@ -130,9 +130,9 @@ function ci_job_container_setup() {
 
 # Run podman with volume mount from the
 # current build container `CI_JOB_CONTAINER_ID`.
-function ci_podman() {
+function ci_podman_run() {
     [ -n "$CI_JOB_CONTAINER_ID" ] ||
         ci_define_job_container_id
 
-    podman --volumes-from "$CI_JOB_CONTAINER_ID" "$@"
+    podman run --volumes-from "$CI_JOB_CONTAINER_ID" "$@"
 }
