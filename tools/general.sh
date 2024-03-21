@@ -54,9 +54,9 @@ function ci_is_running() {
 }
 
 function ci_setup_githooks() {
-    print_info "Install Githooks."
-    local installPrefix="$1"
+    local installPrefix="${1:-$CI_BUILDS_DIR/githooks}"
     mkdir -p "$installPrefix"
+    print_info "Install Githooks in '$installPrefix'."
 
     if [ -n "${NIX_PATH:-}" ] && [ ! -f /etc/os-release ]; then
         # Write some OS detection file which is not available in nixos images.
