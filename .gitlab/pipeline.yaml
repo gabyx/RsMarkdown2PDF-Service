@@ -231,7 +231,7 @@ test-volume-mount-docker:
     - mkdir -p /auxvol/a/b/c && touch /auxvol/a/b/c/A.txt
     - podman --version
     - tail -f /dev/null
-    - ci_container_mgr_run -v "$(pwd):/data" -w "/data"
+    - ci_container_mgr_run
       alpine:latest ls -al "$CI_PROJECT_DIR" /data
 # format:
 #   stage: format
