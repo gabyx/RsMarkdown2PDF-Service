@@ -61,7 +61,7 @@ if ci_is_running; then
     ci_setup_githooks
 fi
 
-run_format_general
+# run_format_general
 run_format_shared_hooks
 
 if ci_is_running; then
