@@ -9,11 +9,16 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 cd "$ROOT_DIR"
 
 trap clean_up EXIT
+TEMP_RUN_CONFIG=""
 
 function clean_up() {
     if [ "${CI:-}" = "true" ]; then
-        rm -rf "$GITHOOKS_INSTALL_PREFIX" || true
+        rm -rf "$CI_GITHOOKS_INSTALL_PREFIX" || true
         git clean -dfx || die "Could not clean Git dir."
+
+        if [ -f "$TEMP_RUN_CONFIG" ]; then
+            rm -rf "$TEMP_RUN_CONFIG"
+        fi
     fi
 }
 
@@ -28,13 +33,22 @@ function ci_assert_no_diffs() {
 function run_format_shared_hooks() {
     print_info "Run all formats scripts in shared hook repositories."
 
-    local temp
-    temp=$(mktemp)
+    TEMP_RUN_CONFIG=$(mktemp)
 
     cat <<<"
-    shared-mount-dest:
-    workspace-mount-dest:
-    " | sed -E 's/^\s+//g' >"$temp"
+        shared-path-dest: $CI_GITHOOKS_INSTALL_PREFIX/.githooks/shared
+        workspace-path-dest: $ROOT_DIR
+        auto-mount-workspace: false
+        auto-mount-shared: false
+        args: [ '--volumes-from' , '$CI_JOB_CONTAINER_ID' ]
+    " | sed -E 's/^\s+//g' >"$TEMP_RUN_CONFIG"
+
+    echo "Setting containerized run config for Githooks."
+    cat "$TEMP_RUN_CONFIG"
+
+    # Set the mount arguments to influence
+    # Githooks containerized execution.
+    export GITHOOKS_CONTAINERIZED_RUN_CONFIG="$TEMP_RUN_CONFIG"
 
     git hooks exec --containerized \
         ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
@@ -47,6 +61,8 @@ function run_format_shared_hooks() {
 
     git hooks exec --containerized \
         ns:githooks-python/scripts/format-python-all.yaml -- --force --dir "."
+
+    rm -rf "$TEMP_RUN_CONFIG"
 }
 
 function run_format_general() {

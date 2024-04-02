@@ -81,7 +81,7 @@ function ci_setup_githooks() {
     print_info "Pull all shared Githooks repositories."
     git hooks shared update
 
-    export GITHOOKS_INSTALL_PREFIX="$installPrefix"
+    export CI_GITHOOKS_INSTALL_PREFIX="$installPrefix"
 }
 
 function ci_setup_nix() {
