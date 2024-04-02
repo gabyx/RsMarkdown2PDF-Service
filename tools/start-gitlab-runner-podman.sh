@@ -72,7 +72,8 @@ max_jobs=4
 config_dir="$ROOT/.gitlab/local/config"
 runner_name="gitlab-runner-md2pdf-podman"
 cores=$(grep "^cpu\\scores" /proc/cpuinfo | uniq | cut -d ' ' -f 3)
-image="registry.gitlab.com/qontainers/pipglr:latest"
+# image="registry.gitlab.com/qontainers/pipglr:latest"
+image="pipglr:dev-latest-alpine"
 
 function clean_up() {
     if [ -f "$config_dir/config.toml" ]; then

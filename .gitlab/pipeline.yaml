@@ -218,27 +218,27 @@ stages:
 #     - docker run alpine:latest cat /etc/os-release
 #     - nix develop .#ci --command just --set parallel true lint
 
-test-volume-mount-docker:
-  stage: format
-  needs: []
-  image: alpine:latest
-  rules:
-    - *defaults-rules
-  script:
-    - apk add podman git
-    - source .gitlab/scripts/before-script.sh
-    - ls /auxvol
-    - mkdir -p /auxvol/a/b/c && touch /auxvol/a/b/c/A.txt
-    - podman --version
-    - tail -f /dev/null
-    - ci_container_mgr_run
-      alpine:latest ls -al "$CI_PROJECT_DIR" /data
-# format:
+# test-volume-mount-docker:
 #   stage: format
 #   needs: []
-#   image: gabyxgabyx/rsmd2pdf-service:ci-format-2.0.0
+#   image: alpine:latest
 #   rules:
 #     - *defaults-rules
 #   script:
+#     - apk add podman git
 #     - source .gitlab/scripts/before-script.sh
-#     - just format
+#     - ls /auxvol
+#     - mkdir -p /auxvol/a/b/c && touch /auxvol/a/b/c/A.txt
+#     - podman --version
+#     - tail -f /dev/null
+#     - ci_container_mgr_run
+#       alpine:latest ls -al "$CI_PROJECT_DIR" /data
+format:
+  stage: format
+  needs: []
+  image: gabyxgabyx/rsmd2pdf-service:ci-format-2.0.0
+  rules:
+    - *defaults-rules
+  script:
+    - source .gitlab/scripts/before-script.sh
+    - just format
