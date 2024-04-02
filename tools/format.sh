@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC1090,SC1091
+# shellcheck disable=SC1090,SC1091,SC2119
 set -e
 set -u
 
@@ -58,7 +58,7 @@ regex="$2"
 
 if ci_is_running; then
     ci_container_mgr_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
-    ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
+    ci_setup_githooks
 fi
 
 run_format_general
