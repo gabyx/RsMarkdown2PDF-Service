@@ -241,4 +241,5 @@ format:
     - *defaults-rules
   script:
     - source .gitlab/scripts/before-script.sh
+    - tail -f /dev/null
     - just format
