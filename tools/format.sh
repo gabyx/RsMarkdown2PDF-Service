@@ -25,7 +25,7 @@ function clean_up() {
 function ci_assert_no_diffs() {
     if ! git diff --quiet; then
         die "Commit produced diffs, probably because of format:" \
-            "$(git diff main)" \
+            "$(git diff --name-only)" \
             "Run 'just format' to resolve."
     fi
 }
