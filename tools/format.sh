@@ -57,7 +57,7 @@ parallel="$1"
 regex="$2"
 
 if ci_is_running; then
-    ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
+    ci_container_mgr_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
     ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
 fi
 
