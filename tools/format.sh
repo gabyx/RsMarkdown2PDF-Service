@@ -48,7 +48,7 @@ function run_format_shared_hooks() {
 
     # Set the mount arguments to influence
     # Githooks containerized execution.
-    export GITHOOKS_CONTAINERIZED_RUN_CONFIG="$TEMP_RUN_CONFIG"
+    export GITHOOKS_CONTAINER_RUN_CONFIG="$TEMP_RUN_CONFIG"
 
     git hooks exec --containerized \
         ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
