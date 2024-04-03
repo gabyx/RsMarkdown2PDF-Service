@@ -241,6 +241,7 @@ format:
     - *defaults-rules
   script:
     - source .gitlab/scripts/before-script.sh
+    - podman info
     - tail -f /dev/null
     - just format
 
@@ -253,5 +254,6 @@ format2:
   script:
     # - source .gitlab/scripts/before-script.sh
     - whoami
+    - podman info
     - tail -f /dev/null
     # - just format
