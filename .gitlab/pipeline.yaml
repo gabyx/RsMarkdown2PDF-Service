@@ -245,12 +245,13 @@ format:
     - just format
 
 format2:
-  stage: format2
+  stage: format
   needs: []
   image: gabyxgabyx/rsmd2pdf-service:ci-format-2-2.0.0
   rules:
     - *defaults-rules
   script:
     # - source .gitlab/scripts/before-script.sh
+    - whoami
     - tail -f /dev/null
     # - just format
