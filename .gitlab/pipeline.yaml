@@ -233,29 +233,12 @@ stages:
 #     - tail -f /dev/null
 #     - ci_container_mgr_run
 #       alpine:latest ls -al "$CI_PROJECT_DIR" /data
-# format:
-#   stage: format
-#   needs: []
-#   image: gabyxgabyx/rsmd2pdf-service:ci-format-2.0.0
-#   rules:
-#     - *defaults-rules
-#   script:
-#     # - source .gitlab/scripts/before-script.sh
-#     - apk add --no-cache --update  fuse-overlayfs
-#     - sed -i 's/#mount_program/mount_program/' /etc/containers/storage.conf
-#     - podman info
-#     - tail -f /dev/null
-#     - just format
-
-format2:
+format:
   stage: format
   needs: []
-  image: quay.io/podman/stable:latest
+  image: gabyxgabyx/rsmd2pdf-service:ci-format-2.0.0
   rules:
     - *defaults-rules
   script:
-    # - source .gitlab/scripts/before-script.sh
-    - whoami
-    - podman info
-    - tail -f /dev/null
-    # - just format
+    - source .gitlab/scripts/before-script.sh
+    - just format
