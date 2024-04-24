@@ -75,6 +75,7 @@ regex="$2"
 if ci_is_running; then
     ci_container_mgr_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
     ci_setup_githooks
+    git hooks install
 fi
 
 # run_format_general
