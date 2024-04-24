@@ -15,9 +15,9 @@ watch:
     cd "{{comp_dir}}" && cargo watch -x 'build'
 
 format:
-    cd "{{comp_dir}}" &&
+    cd "{{comp_dir}}" && \
         "{{root_dir}}/tools/format-rust.sh" {{args}}
 
 lint *args:
-    cd "{{comp_dir}}" &&
+    cd "{{comp_dir}}" && \
         "{{root_dir}}/tools/lint-rust.sh" {{args}}
