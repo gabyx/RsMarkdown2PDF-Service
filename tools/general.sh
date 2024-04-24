@@ -53,14 +53,13 @@ function ci_is_running() {
     return 1
 }
 
-function ci_wrap_container_or_nix() {
+function ci_wrap_container() {
     local container="$1"
-    local flake_attr="$2"
-    shift 2
+    shift 1
     local cmd=("$@")
 
     if [ "$OSTYPE" = "nixos" ]; then
-        nix develop "$flake_attr" --command "${cmd[@]}"
+        "${cmd[@]}"
     else
         ci_container_mgr_run_mounted "$(pwd)" "$container" "${cmd[@]}"
     fi

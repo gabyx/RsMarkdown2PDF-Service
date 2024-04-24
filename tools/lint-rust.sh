@@ -7,8 +7,7 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 . "$ROOT_DIR/tools/general.sh"
 
 cd "$ROOT_DIR"
-ci_wrap_container_or_nix \
+ci_wrap_container \
     docker.io/gabyxgabyx/rsmd2pdf-service:ci-lint-2.0.1 \
-    .#ci \
-    cargo clippy --no-deps -- \
-    -A clippy::needless_return "$@"
+    nix develop .#ci --command \
+    cargo clippy --no-deps -- -A clippy::needless_return "$@"
