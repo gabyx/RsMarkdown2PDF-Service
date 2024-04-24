@@ -3,11 +3,6 @@
 # or use `nix develop` to start a sandboxed environment to
 # do other non-docker related stuff.
 
-FROM docker:24-dind as ci-docker-dind
-
-FROM docker:24 as ci-docker
-RUN apk add git
-
 FROM alpine:latest as base-podman
 RUN apk add findutils coreutils git jq curl bash just parallel podman
 
