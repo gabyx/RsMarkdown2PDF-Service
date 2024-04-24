@@ -15,9 +15,9 @@ RUN [ "TARGETPLATFORM" = "linux/amd64" ] || echo "Platform not yet supported."
 
 # Setup Nix.
 # ===============================================
-RUN mkdir -p /container-setup
 COPY ./tools /container-setup
-RUN . /container-setup/general.sh && ci_setup_nix
+RUN apk add bash
+RUN bash -c ". /container-setup/general.sh && ci_setup_nix"
 
 # Pre-cache the whole Nix packages.
 COPY flake.nix flake.lock rust-toolchain.toml /container-setup/
@@ -29,6 +29,9 @@ RUN cd /container-setup && nix --accept-flake-config \
 FROM alpine:latest as ci-format
 RUN apk add git jq curl bash just findutils parallel podman
 
+FROM docker.io/instrumentisto/rust:nightly-alpine as ci-format-rust
+RUN rustup component add rustfmt
+
 
 # Lint image.
 # ===============================================
@@ -37,7 +40,15 @@ FROM ci-docker-nix as ci-lint-docs
 
 # Build image.
 # ===============================================
-FROM ci-docker-nix as ci-build
+FROM alpine:latest as ci-build
+COPY ./tools /container-setup
+RUN apk add bash
+RUN bash -c ". /container-setup/general.sh && ci_setup_nix"
+
+# Pre-cache the whole Nix packages.
+COPY flake.nix flake.lock rust-toolchain.toml /container-setup/
+RUN cd /container-setup && nix --accept-flake-config \
+        build --no-link ".#devShells.x86_64-linux.ci"
 
 # Test
 # ===============================================

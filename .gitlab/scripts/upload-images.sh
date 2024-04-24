@@ -32,12 +32,15 @@ if [ "${CI:-}" = "true" ]; then
     ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
 fi
 
-build_ci_image "ci-test" "$repository" "$tag"
+# build_ci_image "ci-test" "$repository" "$tag"
 
 build_ci_image "ci-docker" "$repository" "$tag"
 build_ci_image "ci-docker-dind" "$repository" "$tag"
 
 build_ci_image "ci-format" "$repository" "$tag"
+build_ci_image "ci-format-rust" "$repository" "$tag"
+
 build_ci_image "ci-lint" "$repository" "$tag"
 build_ci_image "ci-lint-docs" "$repository" "$tag"
+
 build_ci_image "ci-build" "$repository" "$tag"
