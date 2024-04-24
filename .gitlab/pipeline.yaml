@@ -52,17 +52,15 @@ stages:
 #   script:
 #     - just format
 #
-# lint:
-#   stage: lint
-#   needs: []
-#   image: gabyxgabyx/rsmd2pdf-service:ci-lint-1.0.0
-#   services: *default-dind-service
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
-#   script:
-#     - nix develop .#ci --command just --set parallel true lint
+lint:
+  stage: lint
+  needs: []
+  image: gabyxgabyx/rsmd2pdf-service:ci-lint-2.0.0
+  rules:
+    - *defaults-rules
+  script:
+    - source .gitlab/scripts/before-script.sh
+    - just lint
 #
 # lint-docs:
 #   stage: lint
@@ -84,155 +82,6 @@ stages:
 #   script:
 #     - nix develop .#ci --command just --set parallel true build
 
-## Testing =================================================================
-# docker-run:
-#   stage: package
-#   needs: []
-#   image: docker:24
-#   rules:
-#     - *defaults-rules
-#   script:
-#     - docker info
-#     - docker run alpine:latest cat /etc/os-release
-#
-# docker-run:
-#   stage: package
-#   needs: []
-#   image: docker:24
-#   services:
-#     - name: docker:24-dind
-#       alias: docker
-#   rules:
-#     - *defaults-rules
-#   script:
-#     - docker run -v "$CI_BUILDS_DIR:/data" alpine:latest ls /data
-#
-# docker-remote-info:
-#   stage: package
-#   needs: []
-#   image: docker:24
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     DOCKER_HOST: unix:///var/run/podman.sock
-#   script:
-#     - docker info
-#
-# docker-remote-run&build:
-#   stage: package
-#   needs: []
-#   image: docker:24
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     DOCKER_HOST: unix:///var/run/podman.sock
-#   script:
-#     - docker info
-#     - docker run alpine:latest cat /etc/os-release
-#
-# podman-remote-run:
-#   stage: package
-#   needs: []
-#   image: quay.io/podman/stable:latest
-#   rules:
-#     - *defaults-rules
-#   # variables:
-#   #   CONTAINER_HOST: unix:///var/run/podman.sock
-#   script:
-#     - podman info
-#     - podman run alpine:latest cat /etc/os-release
-#
-# podman-remote-run&build:
-#   stage: package
-#   needs: []
-#   image: quay.io/podman/stable:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     CONTAINER_HOST: unix://var/run/podman.sock
-#   script:
-#     - podman info
-#     - podman run alpine:latest cat /etc/os-release
-#     - cd tests && podman build -t test:test -f Dockerfile2 .
-#
-# podman-remote-alpine-run&build:
-#   stage: package
-#   needs: []
-#   image: alpine:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     CONTAINER_HOST: unix://var/run/podman.sock
-#   script:
-#     - apk add podman containers-common wget
-#     - cat /etc/containers/seccomp.json || true
-#     - podman info
-#     - podman run alpine:latest cat /etc/os-release
-#     - cd tests && podman build --security-opt seccomp=unconfined --no-cache -t test:test -f Dockerfile .
-#
-# podman-remote-alpine-run&build2:
-#   stage: package
-#   needs: []
-#   image: alpine:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     CONTAINER_HOST: unix://var/run/podman.sock
-#   script:
-#     - apk add podman containers-common
-#     - podman info
-#     - podman run alpine:latest cat /etc/os-release
-#     - cd tests && podman build --no-cache -t test:test -f Dockerfile2 .
-#
-# podman-remote-alpine-run&build&format:
-#   stage: format
-#   needs: []
-#   image: alpine:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     # CONTAINER_HOST: unix://var/run/podman.sock
-#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
-#   script:
-#     - apk add podman git
-#     - . ./tools/general.sh && ci_setup_nix
-#     - ln -s /usr/bin/podman /usr/bin/docker
-#     - docker info
-#     - docker run alpine:latest cat /etc/os-release
-#     # Cannot mount $CI_BUILDS_DIR because its not on nthe host.
-#
-# podman-remote-alpine-run&build&lint:
-#   stage: lint
-#   needs: []
-#   image: alpine:latest
-#   rules:
-#     - *defaults-rules
-#   variables:
-#     CONTAINER_HOST: unix://var/run/podman.sock
-#     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
-#   script:
-#     - apk add podman git
-#     - . ./tools/general.sh && ci_setup_nix
-#     - ln -s /usr/bin/podman /usr/bin/docker
-#     - docker info
-#     - docker run alpine:latest cat /etc/os-release
-#     - nix develop .#ci --command just --set parallel true lint
-
-# test-volume-mount-docker:
-#   stage: format
-#   needs: []
-#   image: alpine:latest
-#   rules:
-#     - *defaults-rules
-#   script:
-#     - apk add podman git
-#     - source .gitlab/scripts/before-script.sh
-#     - ls /auxvol
-#     - mkdir -p /auxvol/a/b/c && touch /auxvol/a/b/c/A.txt
-#     - podman --version
-#     - tail -f /dev/null
-#     - ci_container_mgr_run
-#       alpine:latest ls -al "$CI_PROJECT_DIR" /data
 format:
   stage: format
   needs: []

@@ -26,7 +26,7 @@ function build_ci_image() {
 }
 
 repository="${1:-gabyxgabyx/rsmd2pdf-service}"
-tag="${2:-2.0.0}"
+tag="${2:-2.0.1}"
 
 if [ "${CI:-}" = "true" ]; then
     ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
