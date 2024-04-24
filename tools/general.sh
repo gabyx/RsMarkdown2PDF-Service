@@ -153,9 +153,11 @@ function ci_container_mgr_run() {
 }
 
 function ci_container_mgr_run_mounted() {
-    local repo workspace in_cmd
+    local repo workspace_rel in_cmd
     repo=$(git rev-parse --show-toplevel)
-    workspace=$(cd "$1" && pwd)
+    workspace_rel=$(cd "$1" && pwd)
+    workspace_rel=$(realpath --relative-to "$repo" "$workspace_rel")
+
     shift 1
     in_cmd=("$@")
 
@@ -165,8 +167,7 @@ function ci_container_mgr_run_mounted() {
     if ! ci_is_running; then
         cmd=("${in_cmd[@]}")
         mnt_args+=(-v "$repo:/repo")
-        mnt_args+=(-v "$workspace:/workspace")
-        mnt_args+=(-w "/workspace")
+        mnt_args+=(-w "/repo/$workspace_rel")
     else
         # Not needed to mount anything, since already existing
         # under the same path as `repo`.
@@ -177,10 +178,11 @@ function ci_container_mgr_run_mounted() {
         for arg in "${in_cmd[@]}"; do
             cmd+=("$(echo "$arg" |
                 sed -E \
-                    -e "s@/workspace@$workspace@g" \
+                    -e "s@/workspace@$workspace_rel@g" \
                     -e "s@/repo@$repo@g")")
         done
-        mnt_args+=(-w "$workspace")
+
+        mnt_args+=(-w "$repo/$workspace_rel")
     fi
 
     ci_container_mgr_run "${mnt_args[@]}" "${cmd[@]}"
