@@ -24,6 +24,11 @@
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-23.11";
     # Also see the 'stable-packages' overlay at 'overlays/default.nix'.
 
+    githooks = {
+      url = "github:gabyx/githooks?dir=nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs = {
@@ -37,6 +42,7 @@
     nixpkgs,
     nixpkgsStable,
     rust-overlay,
+    githooks,
     ...
   } @ inputs: let
     # Supported systems for your flake packages, shell, etc.
@@ -83,21 +89,18 @@
 
         # Things needed only at compile-time.
         nativeBuildInputsDev = with pkgs; [
+          coreutils
+          findutils
+
+          curl
+          jq
+          bash
+          githooks.packages.${pkgs.system}.default
+
           k3s
           httpie
           podman
           dbeaver
-        ];
-
-        githooksBuildInput = with pkgs; [
-          coreutils
-          findutils
-          git
-          curl
-          jq
-          bash
-          unzip
-          parallel
         ];
 
         # Things needed at runtime.
@@ -110,7 +113,7 @@
 
         ci = pkgs.mkShell {
           inherit buildInputs;
-          nativeBuildInputs = nativeBuildInputsBasic ++ githooksBuildInput;
+          nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev;
         };
       }
     );

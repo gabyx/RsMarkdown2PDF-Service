@@ -68,24 +68,9 @@ function ci_wrap_container() {
 function ci_setup_githooks() {
     local installPrefix="${1:-$CI_BUILDS_DIR/githooks}"
     mkdir -p "$installPrefix"
+
     print_info "Install Githooks in '$installPrefix'."
-
-    if [ -n "${NIX_PATH:-}" ] && [ ! -f /etc/os-release ]; then
-        # Write some OS detection file which is not available in nixos images.
-        local version
-        version=$(grep -E -m 1 "nixos-" "$ROOT_DIR/.gitlab/pipeline.yaml" |
-            sed -E "s/.*:nixos-(.*)/\1/")
-
-        {
-            echo ID=nixos
-            echo VERSION_ID=\"$version\"
-        } >/etc/os-release
-
-    fi
-
-    print_info "Install Githooks."
-    curl -sL "https://raw.githubusercontent.com/gabyx/githooks/main/scripts/install.sh" |
-        bash -s -- -- --non-interactive --prefix "$installPrefix"
+    githooks-cli installer --non-interactive --prefix "$installPrefix"
 
     git hooks config enable-containerized-hooks --global --set
     git hooks config container-manager-types --global --set "podman,docker"

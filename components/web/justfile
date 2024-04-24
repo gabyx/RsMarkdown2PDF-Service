@@ -12,5 +12,3 @@ build *args:
 build-image *args:
 
 format:
-
-lint:
