@@ -103,8 +103,16 @@ function ci_setup_nix() {
 # Run the container manager which is defined.
 function ci_container_mgr() {
     if command -v podman &>/dev/null; then
+        echo "Running podman as:"
+        printf "'%s' " "$@"
+        echo
+
         podman "$@"
     else
+        echo "Running docker as:"
+        printf "'%s' " "$@"
+        echo
+
         docker "$@"
     fi
 }
@@ -140,11 +148,44 @@ function ci_container_mgr_login() {
         die "Could not log into docker."
 }
 
-# Run podman with volume mount from the
+# Run container mgr. In CI with volume mount from the
 # current build container `CI_JOB_CONTAINER_ID`.
 function ci_container_mgr_run() {
-    [ -n "$CI_JOB_CONTAINER_ID" ] ||
-        ci_define_job_container_id
+    if ci_is_running; then
+        ci_container_mgr run --volumes-from "$CI_JOB_CONTAINER_ID" "$@"
+    else
+        ci_container_mgr run "$@"
+    fi
+}
 
-    ci_container_mgr run --volumes-from "$CI_JOB_CONTAINER_ID" "$@"
+function ci_container_mgr_run_mounted() {
+    local repo workspace
+    repo=$(git rev-parse --show-toplevel)
+    workspace=$(cd "$1" && pwd)
+    shift 1
+
+    local mnt_args=()
+    local cmd=()
+
+    if ! ci_is_running; then
+        cmd=("$@")
+        mnt_args+=(-v "$repo:/repo")
+        mnt_args+=(-v "$workspace:/workspace")
+        mnt_args+=(-w "/workspace")
+    else
+        # Not needed to mount anything, since already existing
+        # under the same path as `repo`.
+        #
+        # All `/repo` and `/workspace` paths in
+        # command given are replaced with correct
+        # paths to mounted volume in CI
+        cmd=()
+        for arg in "$@"; do
+            cmd+=("$(echo "$arg" | sed -E "s@/workspace@/$workspace@g")")
+            cmd+=("$(echo "$arg" | sed -E "s@/repo@/$repo@g")")
+        done
+        mnt_args+=(-w "$workspace")
+    fi
+
+    ci_container_mgr_run "${mnt_args[@]}" "${cmd[@]}"
 }
