@@ -27,8 +27,32 @@ function ci_assert_no_diffs() {
 
 function run_lint_shared_hooks() {
     print_info "Run all formats scripts in shared hook repositories."
+
+    if ci_is_running; then
+        TEMP_RUN_CONFIG=$(mktemp)
+
+        cat <<<"
+        shared-path-dest: $CI_GITHOOKS_INSTALL_PREFIX/.githooks/shared
+        workspace-path-dest: $ROOT_DIR
+        auto-mount-workspace: false
+        auto-mount-shared: false
+        args: [ '--volumes-from' , '$CI_JOB_CONTAINER_ID' ]
+    " | sed -E 's/^\s+//g' >"$TEMP_RUN_CONFIG"
+
+        echo "Setting containerized run config for Githooks."
+        cat "$TEMP_RUN_CONFIG"
+
+        # Set the mount arguments to influence
+        # Githooks containerized execution.
+        export GITHOOKS_CONTAINER_RUN_CONFIG_FILE="$TEMP_RUN_CONFIG"
+    fi
+
     git hooks exec --containerized \
         ns:githooks-shell/scripts/check-shell-all.yaml -- --force --dir "."
+
+    if ci_is_running; then
+        rm -rf "$TEMP_RUN_CONFIG"
+    fi
 }
 
 function run_lint_general() {

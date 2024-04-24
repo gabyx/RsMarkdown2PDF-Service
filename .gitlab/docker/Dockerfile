@@ -27,11 +27,9 @@ RUN cd /container-setup && nix --accept-flake-config \
 # Format image.
 # ===============================================
 FROM alpine:latest as ci-format
-RUN apk add git jq curl bash just findutils parallel podman
+RUN apk add findutils coreutils git jq curl bash just parallel podman
 
-FROM docker.io/instrumentisto/rust:nightly-alpine as ci-format-rust
-RUN rustup component add rustfmt
-
+FROM docker.io/instrumentisto/rust:alpine as ci-format-rust
 
 # Lint image.
 # ===============================================
@@ -40,27 +38,4 @@ FROM ci-docker-nix as ci-lint-docs
 
 # Build image.
 # ===============================================
-FROM alpine:latest as ci-build
-COPY ./tools /container-setup
-RUN apk add bash
-RUN bash -c ". /container-setup/general.sh && ci_setup_nix"
-
-# Pre-cache the whole Nix packages.
-COPY flake.nix flake.lock rust-toolchain.toml /container-setup/
-RUN cd /container-setup && nix --accept-flake-config \
-        build --no-link ".#devShells.x86_64-linux.ci"
-
-# Test
-# ===============================================
-FROM alpine:latest as ci-test
-RUN apk add sudo
-ARG USER_NAME=ci
-ARG USER_UID=1000
-ARG USER_GID=1000
-RUN adduser "$USER_NAME" -D -u "$USER_UID" -g "$USER_GID" -h "/home/$USER_NAME" && \
-    mkdir -p /etc/sudoers.d && \
-    echo "$USER_NAME ALL=(root) NOPASSWD:ALL" > "/etc/sudoers.d/$USER_NAME" && \
-    chmod 0440 "/etc/sudoers.d/$USER_NAME" && \
-    chown -R "$USER_NAME:$USER_NAME" /home
-RUN apk add podman
-USER "$USER_NAME"
+FROM ci-docker-nix as ci-build
