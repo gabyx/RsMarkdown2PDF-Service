@@ -33,9 +33,10 @@ function ci_assert_no_diffs() {
 function run_format_shared_hooks() {
     print_info "Run all formats scripts in shared hook repositories."
 
-    TEMP_RUN_CONFIG=$(mktemp)
+    if ci_is_running; then
+        TEMP_RUN_CONFIG=$(mktemp)
 
-    cat <<<"
+        cat <<<"
         shared-path-dest: $CI_GITHOOKS_INSTALL_PREFIX/.githooks/shared
         workspace-path-dest: $ROOT_DIR
         auto-mount-workspace: false
@@ -43,12 +44,13 @@ function run_format_shared_hooks() {
         args: [ '--volumes-from' , '$CI_JOB_CONTAINER_ID' ]
     " | sed -E 's/^\s+//g' >"$TEMP_RUN_CONFIG"
 
-    echo "Setting containerized run config for Githooks."
-    cat "$TEMP_RUN_CONFIG"
+        echo "Setting containerized run config for Githooks."
+        cat "$TEMP_RUN_CONFIG"
 
-    # Set the mount arguments to influence
-    # Githooks containerized execution.
-    export GITHOOKS_CONTAINER_RUN_CONFIG_FILE="$TEMP_RUN_CONFIG"
+        # Set the mount arguments to influence
+        # Githooks containerized execution.
+        export GITHOOKS_CONTAINER_RUN_CONFIG_FILE="$TEMP_RUN_CONFIG"
+    fi
 
     git hooks exec --containerized \
         ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
@@ -62,7 +64,9 @@ function run_format_shared_hooks() {
     git hooks exec --containerized \
         ns:githooks-python/scripts/format-python-all.yaml -- --force --dir "."
 
-    rm -rf "$TEMP_RUN_CONFIG"
+    if ci_is_running; then
+        rm -rf "$TEMP_RUN_CONFIG"
+    fi
 }
 
 function run_format_general() {
@@ -75,7 +79,6 @@ regex="$2"
 if ci_is_running; then
     ci_container_mgr_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
     ci_setup_githooks
-    git hooks install
 fi
 
 # run_format_general
