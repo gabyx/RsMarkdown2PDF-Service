@@ -117,7 +117,7 @@ function register_runner() {
     # Modify Gitlab runner config.
     modify_config ".concurrent" "$max_jobs"
     modify_config ".runners.first().docker.pull_policy" \
-        '["always", "if-not-present"]'
+        '["always"]'
     modify_config ".runners.first().docker.volumes.append()" \
         "/home/runner/podman.sock:/var/run/podman.sock:rw" string
 
