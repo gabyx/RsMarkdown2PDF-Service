@@ -90,12 +90,13 @@
         ];
 
         githooksBuildInput = with pkgs; [
+          coreutils
+          findutils
           git
           curl
           jq
           bash
           unzip
-          findutils
           parallel
         ];
 

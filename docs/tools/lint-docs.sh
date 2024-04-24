@@ -10,7 +10,6 @@ cd "$ROOT_DIR"
 
 print_info "Running vale over all markdown documents."
 ci_container_mgr_run_mounted "$(pwd)" \
-    docker.io/gabyxgabyx/rsmd2pdf-service:ci-lint-2.0.1 \
     jdkato/vale:latest \
     --config docs/.vale/vale.ini \
     docs README.md

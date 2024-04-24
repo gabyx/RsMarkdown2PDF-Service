@@ -8,35 +8,29 @@ FROM docker:24-dind as ci-docker-dind
 FROM docker:24 as ci-docker
 RUN apk add git
 
-# Docker-in-Docker with Nix.
+FROM alpine:latest as base-podman
+RUN apk add findutils coreutils git jq curl bash just parallel podman
+
+# Nix Image
 # ===============================================
-FROM ci-docker as ci-docker-nix
+FROM base-podman as ci-nix
 RUN [ "TARGETPLATFORM" = "linux/amd64" ] || echo "Platform not yet supported."
-
-# Setup Nix.
-# ===============================================
 COPY ./tools /container-setup
-RUN apk add bash
+# Install Nix and pre-cache the env.
 RUN bash -c ". /container-setup/general.sh && ci_setup_nix"
-
-# Pre-cache the whole Nix packages.
 COPY flake.nix flake.lock rust-toolchain.toml /container-setup/
 RUN cd /container-setup && nix --accept-flake-config \
         build --no-link ".#devShells.x86_64-linux.ci"
 
 # Format image.
 # ===============================================
-FROM alpine:latest as ci-format
-RUN apk add findutils coreutils git jq curl bash just parallel podman
-
-FROM docker.io/instrumentisto/rust:alpine as ci-format-rust
+FROM ci-nix as ci-format
 
 # Lint image.
 # ===============================================
-FROM ci-format as ci-lint
-FROM ci-format as ci-lint-docs
-FROM ci-docker-nix as ci-lint-rust
+FROM ci-nix as ci-lint
+FROM ci-nix as ci-lint-docs
 
 # Build image.
 # ===============================================
-FROM ci-docker-nix as ci-build
+FROM ci-nix as ci-build
