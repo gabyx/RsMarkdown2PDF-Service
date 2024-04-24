@@ -29,12 +29,12 @@ format:
     source "{{root_dir}}/tools/general.sh" && \
         cd "{{comp_dir}}" && \
     	ci_container_mgr_run_mounted "$(pwd)" \
-    	    docker.io/gabyxgabyx/rsmd2pdf-service:ci-format-rust-2.0.0 \
+    	    docker.io/gabyxgabyx/rsmd2pdf-service:ci-format-rust-2.0.1 \
     	    cargo fmt -- --config-path /repo
 
 lint *args:
     source "{{root_dir}}/tools/general.sh" && \
         cd "{{comp_dir}}" && \
     	ci_container_mgr_run_mounted "$(pwd)" \
-    	    docker.io/gabyxgabyx/rsmd2pdf-service:ci-lint-2.0.0 \
+    	    docker.io/gabyxgabyx/rsmd2pdf-service:ci-lint-2.0.1 \
             /repo/tools/run-rust-lint.sh {{args}}
