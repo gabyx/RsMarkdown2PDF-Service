@@ -35,6 +35,7 @@ FROM docker.io/instrumentisto/rust:alpine as ci-format-rust
 # ===============================================
 FROM ci-format as ci-lint
 FROM ci-format as ci-lint-docs
+FROM ci-format-rust as ci-lint-rust
 
 # Build image.
 # ===============================================

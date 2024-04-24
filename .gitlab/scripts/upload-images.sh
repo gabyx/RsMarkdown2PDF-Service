@@ -32,13 +32,7 @@ if [ "${CI:-}" = "true" ]; then
     ci_docker_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
 fi
 
-build_ci_image "ci-docker" "$repository" "$tag"
-build_ci_image "ci-docker-dind" "$repository" "$tag"
-
-build_ci_image "ci-format" "$repository" "$tag"
-build_ci_image "ci-format-rust" "$repository" "$tag"
-
-build_ci_image "ci-lint" "$repository" "$tag"
-build_ci_image "ci-lint-docs" "$repository" "$tag"
-
-build_ci_image "ci-build" "$repository" "$tag"
+readarray -t images < <(grep -E "as ci-.*" .gitlab/docker/Dockerfile | sed -E 's@.*as (ci-.*)$@\1@g')
+for image in "${images[@]}"; do
+    build_ci_image "$image" "$repository" "$tag"
+done
