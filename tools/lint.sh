@@ -64,7 +64,7 @@ regex="$2"
 
 if ci_is_running; then
     ci_container_mgr_login gabyxgabyx "$DOCKER_REPOSITORY_READ_TOKEN"
-    ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
+    ci_setup_githooks
 fi
 
 run_lint_general
