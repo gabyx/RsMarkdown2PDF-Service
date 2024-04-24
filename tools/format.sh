@@ -50,18 +50,23 @@ function run_format_shared_hooks() {
         # Set the mount arguments to influence
         # Githooks containerized execution.
         export GITHOOKS_CONTAINER_RUN_CONFIG_FILE="$TEMP_RUN_CONFIG"
+    else
+        if command -v githooks-cli &>/dev/null; then
+            print_warning "Githooks not available: linting not complete."
+            return 0
+        fi
     fi
 
-    git hooks exec --containerized \
+    githooks-cli exec --containerized \
         ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
 
-    git hooks exec --containerized \
+    githooks-cli exec --containerized \
         ns:githooks-configs/scripts/format-configs-all.yaml -- --force --dir "."
 
-    git hooks exec --containerized \
+    githooks-cli exec --containerized \
         ns:githooks-docs/scripts/format-docs-all.yaml -- --force --dir "."
 
-    git hooks exec --containerized \
+    githooks-cli exec --containerized \
         ns:githooks-python/scripts/format-python-all.yaml -- --force --dir "."
 
     if ci_is_running; then

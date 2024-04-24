@@ -53,6 +53,19 @@ function ci_is_running() {
     return 1
 }
 
+function ci_wrap_container_or_nix() {
+    local container="$1"
+    local flake_attr="$2"
+    shift 2
+    local cmd=("$@")
+
+    if [ "$OSTYPE" = "nixos" ]; then
+        nix develop "$flake_attr" --command "${cmd[@]}"
+    else
+        ci_container_mgr_run_mounted "$(pwd)" "$container" "${cmd[@]}"
+    fi
+}
+
 function ci_setup_githooks() {
     local installPrefix="${1:-$CI_BUILDS_DIR/githooks}"
     mkdir -p "$installPrefix"

@@ -24,7 +24,6 @@ FROM ci-nix as ci-format
 # Lint image.
 # ===============================================
 FROM ci-nix as ci-lint
-FROM ci-nix as ci-lint-docs
 
 # Build image.
 # ===============================================
