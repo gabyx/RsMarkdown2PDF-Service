@@ -19,7 +19,7 @@ format:
         cd "{{comp_dir}}" && \
     	ci_container_mgr_run_mounted "$(pwd)" \
     	docker.io/instrumentisto/rust:nightly-alpine \
-    	sh -c "rustup component add rustfmt; cargo fmt -- --config-path /repo"
+    	cargo fmt -- --config-path /repo
 
 lint *args:
     cd "{{comp_dir}}" && \
