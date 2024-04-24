@@ -106,7 +106,7 @@ function ci_container_mgr() {
         echo -e "Running podman as:\n$(printf "'%s' " "podman" "$@")" >&2
         podman "$@"
     else
-        echo -e "Running docker as:\n$(printf "'%s' " "docker" "$@")" >&2
+        echo -e "Running docker as:\n$(printf "'%s' " "docker" "$@")"
         docker "$@"
     fi
 }
