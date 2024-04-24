@@ -12,7 +12,7 @@ trap clean_up EXIT
 
 function clean_up() {
     if [ "${CI:-}" = "true" ]; then
-        rm -rf "$GITHOOKS_INSTALL_PREFIX" || true
+        rm -rf "$CI_GITHOOKS_INSTALL_PREFIX" || true
         git clean -dfx || die "Could not clean Git dir."
     fi
 }
