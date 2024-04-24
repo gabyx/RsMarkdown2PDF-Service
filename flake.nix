@@ -96,7 +96,9 @@
           jq
           bash
           githooks.packages.${pkgs.system}.default
+        ];
 
+        nativeBuildInputsLocalDev = with pkgs; [
           k3s
           httpie
           podman
@@ -108,7 +110,7 @@
       in {
         default = pkgs.mkShell {
           inherit buildInputs;
-          nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev;
+          nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev ++ nativeBuildInputsLocalDev;
         };
 
         ci = pkgs.mkShell {

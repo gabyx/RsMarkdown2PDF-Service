@@ -36,7 +36,8 @@ lint:
     - *defaults-rules
   script:
     - source .gitlab/scripts/before-script.sh
-    - just --set parallel true lint
+    - nix develop .#ci --command
+      just --set parallel true lint
 #
 lint-docs:
   stage: lint
@@ -46,7 +47,8 @@ lint-docs:
     - *defaults-rules
   script:
     - source .gitlab/scripts/before-script.sh
-    - just --set parallel true lint-docs
+    - nix develop .#ci --command
+      just --set parallel true lint-docs
   allow_failure: true
 
 build:
