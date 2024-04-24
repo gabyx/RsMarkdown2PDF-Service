@@ -68,4 +68,5 @@ format:
     - *defaults-rules
   script:
     - source .gitlab/scripts/before-script.sh
-    - just --set parallel true format
+    - nix develop .#ci --command
+      just --set parallel true format
