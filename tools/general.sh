@@ -73,7 +73,7 @@ function ci_setup_githooks() {
 
     print_info "Install Githooks."
     curl -sL "https://raw.githubusercontent.com/gabyx/githooks/main/scripts/install.sh" |
-        bash -s -- -- --use-manual --non-interactive --prefix "$installPrefix"
+        bash -s -- -- --non-interactive --prefix "$installPrefix"
 
     git hooks config enable-containerized-hooks --global --set
     git hooks config container-manager-types --global --set "podman,docker"
