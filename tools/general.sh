@@ -103,16 +103,10 @@ function ci_setup_nix() {
 # Run the container manager which is defined.
 function ci_container_mgr() {
     if command -v podman &>/dev/null; then
-        echo "Running podman as:"
-        printf "'%s' " "$@"
-        echo
-
+        echo -e "Running podman as:\n$(printf "'%s' " "podman" "$@")"
         podman "$@"
     else
-        echo "Running docker as:"
-        printf "'%s' " "$@"
-        echo
-
+        echo -e "Running docker as:\n$(printf "'%s' " "docker" "$@")"
         docker "$@"
     fi
 }
@@ -159,16 +153,17 @@ function ci_container_mgr_run() {
 }
 
 function ci_container_mgr_run_mounted() {
-    local repo workspace
+    local repo workspace in_cmd
     repo=$(git rev-parse --show-toplevel)
     workspace=$(cd "$1" && pwd)
     shift 1
+    in_cmd=("$@")
 
     local mnt_args=()
     local cmd=()
 
     if ! ci_is_running; then
-        cmd=("$@")
+        cmd=("${in_cmd[@]}")
         mnt_args+=(-v "$repo:/repo")
         mnt_args+=(-v "$workspace:/workspace")
         mnt_args+=(-w "/workspace")
@@ -179,10 +174,11 @@ function ci_container_mgr_run_mounted() {
         # All `/repo` and `/workspace` paths in
         # command given are replaced with correct
         # paths to mounted volume in CI
-        cmd=()
-        for arg in "$@"; do
-            cmd+=("$(echo "$arg" | sed -E "s@/workspace@/$workspace@g")")
-            cmd+=("$(echo "$arg" | sed -E "s@/repo@/$repo@g")")
+        for arg in "${in_cmd[@]}"; do
+            cmd+=("$(echo "$arg" |
+                sed -E \
+                    -e "s@/workspace@$workspace@g" \
+                    -e "s@/repo@$repo@g")")
         done
         mnt_args+=(-w "$workspace")
     fi
