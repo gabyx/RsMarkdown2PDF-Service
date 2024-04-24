@@ -9,5 +9,5 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 cd "$ROOT_DIR" &&
     ci_container_mgr_run_mounted "$(pwd)" \
         docker.io/gabyxgabyx/rsmd2pdf-service:ci-lint-rust-2.0.1 \
-        cargo clippy "$@" -- \
+        cargo clippy --no-deps "$@" -- \
         -A clippy::needless_return

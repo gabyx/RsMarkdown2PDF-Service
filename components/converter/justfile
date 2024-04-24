@@ -22,8 +22,5 @@ format:
     	    cargo fmt -- --config-path /repo
 
 lint *args:
-    source "{{root_dir}}/tools/general.sh" && \
-        cd "{{comp_dir}}" && \
-    	ci_container_mgr_run_mounted "$(pwd)" \
-    	    docker.io/gabyxgabyx/rsmd2pdf-service:ci-lint-2.0.1 \
-            /repo/tools/run-rust-lint.sh {{args}}
+    cd "{{comp_dir}}" &&
+        "{{root_dir}}/tools/lint-rust.sh" {{args}}
