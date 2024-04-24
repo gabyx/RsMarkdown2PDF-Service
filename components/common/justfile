@@ -14,7 +14,7 @@ build-image *args:
 watch:
     cd "{{comp_dir}}" && cargo watch -x 'build'
 
-format:
+format *args:
     cd "{{comp_dir}}" && \
         "{{root_dir}}/tools/format-rust.sh" {{args}}
 
