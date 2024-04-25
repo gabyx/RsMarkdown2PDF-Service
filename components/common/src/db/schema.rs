@@ -46,7 +46,4 @@ diesel::table! {
 
 diesel::joinable!(job_logs -> jobs (job_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    job_logs,
-    jobs,
-);
+diesel::allow_tables_to_appear_in_same_query!(job_logs, jobs,);

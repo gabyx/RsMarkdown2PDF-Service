@@ -24,6 +24,11 @@
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-23.11";
     # Also see the 'stable-packages' overlay at 'overlays/default.nix'.
 
+    githooks = {
+      url = "github:gabyx/githooks?dir=nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs = {
@@ -37,6 +42,7 @@
     nixpkgs,
     nixpkgsStable,
     rust-overlay,
+    githooks,
     ...
   } @ inputs: let
     # Supported systems for your flake packages, shell, etc.
@@ -68,14 +74,13 @@
         nativeBuildInputsBasic = with pkgs; [
           rustToolchain
           cargo-watch
+          lldb_16 # for lldb_vscode
 
           just
           dasel
           parallel
-          docker
           tilt
           kustomize
-          dbeaver
           sqlfluff # Linter
 
           python311Packages.isort
@@ -84,18 +89,20 @@
 
         # Things needed only at compile-time.
         nativeBuildInputsDev = with pkgs; [
-          k3s
-          httpie
-        ];
+          coreutils
+          findutils
 
-        githooksBuildInput = with pkgs; [
-          git
           curl
           jq
           bash
-          unzip
-          findutils
-          parallel
+          githooks.packages.${pkgs.system}.default
+        ];
+
+        nativeBuildInputsLocalDev = with pkgs; [
+          k3s
+          httpie
+          podman
+          dbeaver
         ];
 
         # Things needed at runtime.
@@ -103,12 +110,12 @@
       in {
         default = pkgs.mkShell {
           inherit buildInputs;
-          nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev;
+          nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev ++ nativeBuildInputsLocalDev;
         };
 
         ci = pkgs.mkShell {
           inherit buildInputs;
-          nativeBuildInputs = nativeBuildInputsBasic ++ githooksBuildInput;
+          nativeBuildInputs = nativeBuildInputsBasic ++ nativeBuildInputsDev;
         };
       }
     );
