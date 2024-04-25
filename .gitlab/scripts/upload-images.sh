@@ -11,7 +11,7 @@ cd "$ROOT_DIR"
 function build_ci_image() {
     local image_type="$1"
     local repository="$2"
-    local tag="$image_type"
+    local tag="$image_type-$3"
 
     local image_name="$repository:$tag"
 
