@@ -35,7 +35,7 @@ where
 pub fn get_env_var(key: &'static str) -> KeyVal<String> {
     return KeyVal {
         key,
-        value: env::var(key).unwrap_or_else(|_| panic!("Expect environment variable '{}' to be defined.",
-            key)),
+        value: env::var(key)
+            .unwrap_or_else(|_| panic!("Expect environment variable '{}' to be defined.", key)),
     };
 }

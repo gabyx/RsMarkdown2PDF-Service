@@ -12,8 +12,11 @@ create-cluster *args:
 delete-cluster *args:
     @cd "{{root_dir}}" && ./tools/delete-kind-cluster.sh md2pdf {{args}}
 
-start-gitlab-runner token *args:
-    @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh {{args}} "{{token}}"
+start-gitlab-runner-docker token *args:
+    @cd "{{root_dir}}" && ./tools/start-gitlab-runner-docker.sh {{args}} "{{token}}"
+
+start-gitlab-runner-podman token *args:
+    @cd "{{root_dir}}" && ./tools/start-gitlab-runner-podman.sh {{args}} "{{token}}"
 
 start-db-tool:
     @cd "{{root_dir}}" && dbeaver
@@ -87,6 +90,6 @@ lint-docs regex=".*":
 
 # CI Stuff
 ###############################################################################
-upload-ci-images:
+upload-ci-images *args:
     cd "{{root_dir}}" && \
-        .gitlab/scripts/upload-images.sh
+        .gitlab/scripts/upload-images.sh {{args}}

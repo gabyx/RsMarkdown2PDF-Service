@@ -9,8 +9,7 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 cd "$ROOT_DIR"
 
 print_info "Running vale over all markdown documents."
-docker run --rm \
-    -v "$(pwd):/workspace" \
-    -w /workspace jdkato/vale:latest \
+ci_container_mgr_run_mounted "$(pwd)" \
+    jdkato/vale:latest \
     --config docs/.vale/vale.ini \
     docs README.md
