@@ -26,7 +26,7 @@ function ci_assert_no_diffs() {
 }
 
 function run_lint_shared_hooks() {
-    print_info "Run all formats scripts in shared hook repositories."
+    print_info "Run all lint scripts in shared hook repositories."
 
     if ci_is_running; then
         TEMP_RUN_CONFIG=$(mktemp)
