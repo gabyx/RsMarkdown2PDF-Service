@@ -12,7 +12,6 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 MSNV="2.14.0"
 OURNV=$(nix eval --raw --expr "builtins.nixVersion")
 vercomp=$(nix eval --expr "builtins.compareVersions \"${OURNV}\" \"${MSNV}\"")
-
 if [ "$vercomp" = "-1" ]; then
 
     print_warning \

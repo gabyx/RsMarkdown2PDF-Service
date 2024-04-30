@@ -2,9 +2,9 @@
 # shellcheck disable=SC1090,SC1091
 # shellcheck disable=SC2154,SC2086
 
-ROOT_DIR=$(git rev-parse --show-toplevel)
-. "$ROOT_DIR/tools/log.sh"
-unset ROOT_DIR
+_ROOT_DIR=$(git rev-parse --show-toplevel)
+. "$_ROOT_DIR/tools/log.sh"
+unset _ROOT_DIR
 
 function ci_is_running() {
     if [ "${CI:-}" = "true" ]; then

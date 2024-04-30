@@ -4,6 +4,8 @@
 # a shell with all the necessary setup to get things rolling in an incremental
 # fashion.
 {
+  description = "md2pdf-service";
+
   # Flake inputs. These are the only external inputs we use to build the system
   # and describe all further build configuration.
   #
@@ -29,15 +31,24 @@
   #
   # Moral of the story: DO NOT EXPAND THIS INPUT LIST WITHOUT GOOD REASON.
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # Nixpkgs (take the systems nixpkgs version)
+    nixpkgs.url = "nixpkgs";
 
-    systems.url = "github:nix-systems/default";
+    # You can access packages and modules from different nixpkgs revs
+    # at the same time. Here's an working example:
+    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-23.11";
+    # Also see the 'stable-packages' overlay at 'overlays/default.nix'.
 
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs = {
         systems.follows = "systems";
       };
+    };
+
+    githooks = {
+      url = "github:gabyx/githooks?dir=nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     rust-overlay = {
@@ -47,6 +58,8 @@
         flake-utils.follows = "flake-utils";
       };
     };
+
+    systems.url = "github:nix-systems/default";
   };
 
   # [tag:custom-nix-config] Custom configuration. We use this to add our own
@@ -65,6 +78,7 @@
     nixpkgs,
     flake-utils,
     rust-overlay,
+    githooks,
     ...
   }: let
     systems = with flake-utils.lib; [
@@ -89,7 +103,7 @@
         # ideally, in a utopia, this would be the only way Nix worked in the
         # future, but it's too buggy for right now...
         #
-        # XXX FIXME (aseipp): enable this, one day...
+        # XXX FIXME: enable this, one day...
         config.contentAddressedByDefault = false;
       };
 
@@ -100,29 +114,61 @@
           buck2 = pkgs.callPackage ./buck2 {};
         };
 
-        shell = flake-utils.lib.flattenTree {
-          # These are all tools from upstream
-          inherit (pkgs.gitAndTools) gh git;
-          inherit
-            (pkgs)
+        rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ../../rust-toolchain.toml;
+
+        # These are the global dependencies used for the whole project.
+        # This could be
+        nativeBuildInputs = {
+          basic = with pkgs; [
             coreutils
             findutils
-            curl # downloading and fundamental scripts
-            tagref
+            gh
+            git
+            curl
             watchman # fs integration
-            ;
+            bash
 
-          # Include buck2, of course
-          inherit (packages) buck2;
+            githooks.packages.${pkgs.system}.default
+            packages.buck2
 
-          # add a convenient alias for 'buck bxl' on some scripts. note that
+            rustToolchain
+            cargo-watch
+            lldb_16 # for lldb_vscode
+
+            jq
+            just
+            tagref
+            dasel
+            parallel
+            tilt
+            kustomize
+            sqlfluff # Linter
+
+            python311Packages.isort
+            python311Packages.black
+          ];
+
+          # Thinsg needed for local development.
+          localDev = with pkgs; [
+            k3s
+            httpie
+            podman
+            dbeaver
+          ];
+        };
+
+        # Things needed at runtime.
+        buildInputs = with pkgs; [postgresql];
+
+        shell = flake-utils.lib.flattenTree {
+          # Add a convenient alias for 'buck bxl' on some scripts. note that
           # the 'bxl' cell location can be changed in .buckconfig without
           # changing the script
           bxl = pkgs.writeShellScriptBin "bxl" ''
             exec ${jobs.packages.buck2}/bin/buck bxl "bxl//top.bxl:$1" -- "''${@:2}"
           '';
 
-          # a convenient script for starting a vm, that can then run buildbarn
+          # A convenient script for starting a vm, that can then run buildbarn
           # in an isolated environment
           start-buildbarn-vm = pkgs.writeShellScriptBin "start-buildbarn-vm" ''
             export NIX_DISK_IMAGE=$(buck root -k project)/buildbarn-vm.qcow2
@@ -136,10 +182,10 @@
         };
 
         # The default Nix shell. This is populated by direnv and used for the
-        # interactive console that a developer uses when they use buck2, sl,
+        # interactive console that a developer uses when they use buck2
         # et cetera.
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = builtins.attrValues shell;
+          nativeBuildInputs = nativeBuildInputs.basic ++ nativeBuildInputs.localDev ++ buildInputs ++ (builtins.attrValues shell);
         };
 
         # Formatter for your nix files, available through 'nix fmt'
