@@ -1,5 +1,12 @@
+# Temporary Files
 .direnv
 .env*
 !.envrc
 !*.tmpl
+
+# Build Files
 target
+buck-out
+
+# Watchman
+.use-watchman

@@ -1,7 +1,7 @@
 [repositories]
 root = .
 prelude = buck/prelude
-bxl = buck/prelude/bxl
+# bxl = buck/prelude/bxl
 
 [buildfile]
 name = BUILD

@@ -5,7 +5,7 @@
     ],
     "ignore_dirs": [
         "buck-out",
-        ".direnv",
+        ".direnv"
     ],
     "ignore_vcs": [
         ".git",
@@ -20,4 +20,3 @@
     ],
     "illegal_fstypes_advice": "use a local directory"
 }
-

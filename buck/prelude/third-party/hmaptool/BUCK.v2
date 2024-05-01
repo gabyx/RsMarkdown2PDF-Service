@@ -1,0 +1,13 @@
+prelude = native  # Avoid warnings and auto-formatters
+
+prelude.export_file(
+    name = "_hmaptool",
+    src = "hmaptool",
+    mode = "reference",
+)
+
+prelude.command_alias(
+    name = "hmaptool",
+    exe = ":_hmaptool",
+    visibility = ["PUBLIC"],
+)
