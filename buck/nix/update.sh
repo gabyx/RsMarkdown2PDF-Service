@@ -110,7 +110,7 @@ print_info "Updating flake=$FLAKE, buck=$BUCK"
 
 ## Step 1: Update the flake.lock file.
 if [ "$FLAKE" = "1" ]; then
-    nix flake --accept-flake-config update "${ROOT_DIR}/buck/nix"
+    nix flake --accept-flake-config update "${ROOT_DIR}"
 fi
 
 ## Step 2: Update buck2 nix expression

@@ -1,7 +1,8 @@
-[repositories]
+[cells]
 root = .
 prelude = buck/prelude
-# bxl = buck/prelude/bxl
+prelude-meta = buck/prelude-meta
+bxl = buck/prelude/bxl
 
 [buildfile]
 name = BUILD

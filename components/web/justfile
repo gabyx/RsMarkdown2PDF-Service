@@ -8,6 +8,11 @@ root_dir := `git rev-parse --show-toplevel`
 watch:
 
 build *args:
+    cd "{{comp_dir}}" && cargo build "${@:1}"
+
+# Use reindeer to write rules for the Buck build system.
+buckify:
+    cd "{{comp_dir}}" && reindeer --third-party-dir external buckify
 
 build-image *args:
 

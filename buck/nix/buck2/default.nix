@@ -9,7 +9,7 @@
   sqlite,
 }: let
   rustChannel = "nightly";
-  rustVersion = "2023-05-28";
+  rustVersion = "2024-02-01";
 
   my-rust-bin = rust-bin."${rustChannel}"."${rustVersion}".default.override {
     extensions = ["rust-analyzer"];
@@ -22,13 +22,13 @@
 in
   rustPlatform.buildRustPackage {
     pname = "buck2";
-    version = "unstable-2023-09-25";
+    version = "unstable-2024-05-01";
 
     src = fetchFromGitHub {
       owner = "facebook";
       repo = "buck2";
-      rev = "7c0c983940e2d5397af7c2d1e02eccd0f087d44d";
-      hash = "sha256-r2egZc1cbLMyXe10ztQLLq0qHKSAgp2b8wk+x/fQtlM=";
+      rev = "702045bd4e229252b2bf8a87372710b77cec1a36";
+      hash = "sha256-PrsgShwekWxqk9pEQybiudSkdsdIduYfFfGuuw6SoqA=";
     };
 
     cargoLock = {
