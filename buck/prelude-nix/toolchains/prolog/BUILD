@@ -1,4 +1,4 @@
-load("@prelude//toolchains/nixpkgs.bzl", "nix")
+load("@prelude-nix//toolchains/nixpkgs.bzl", "nix")
 
 nix.rules.build(
     name = "scryer",

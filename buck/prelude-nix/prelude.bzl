@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//prelude.bzl -- Global import shim.
+# @prelude-nix//prelude.bzl -- Global import shim.
 #
 # NOTE: this module is handled in a special way by Buck2; anything exported here
 # by using a public symbol name is available in *all* BUILD files, available to
@@ -22,9 +22,9 @@
 # necessary one for buck1 compatibility. So this is one thing we can do better.)
 #
 # NOTE: the symbols exported here *are not implicitly included* in the `.bzl`
-# files located inside the prelude// cell; that would be an obvious recursive
+# files located inside the prelude-nix// cell; that would be an obvious recursive
 # import error, so prelude code must `load()` symbols explicitly. It is only
-# `.bzl` files outside of the prelude// cell, and BUILD files, which have these
+# `.bzl` files outside of the prelude-nix// cell, and BUILD files, which have these
 # symbols available.
 #
 # REMEMBER: Do not taunt Happy Fun Ball, and do not add things to this file
@@ -34,23 +34,23 @@
 
 ## ---------------------------------------------------------------------------------------------------------------------
 
-load("@prelude//basics/config.bzl", _config = "config")
+load("@prelude-nix//basics/config.bzl", _config = "config")
 
-load("@prelude//basics/pkg.bzl",
+load("@prelude-nix//basics/pkg.bzl",
   _owner = "owner",
   _license = "license",
   _description = "description",
   _version = "version",
 )
 
-load("@prelude//basics/alias.bzl", _alias = "alias")
-load("@prelude//basics/asserts.bzl", _asserts = "asserts")
-load("@prelude//basics/files.bzl", _files = "files")
-load("@prelude//basics/download.bzl", _download = "download")
-load("@prelude//basics/paths.bzl", _paths = "paths")
-load("@prelude//basics/genrule.bzl", _genrule = "genrule")
+load("@prelude-nix//basics/alias.bzl", _alias = "alias")
+load("@prelude-nix//basics/asserts.bzl", _asserts = "asserts")
+load("@prelude-nix//basics/files.bzl", _files = "files")
+load("@prelude-nix//basics/download.bzl", _download = "download")
+load("@prelude-nix//basics/paths.bzl", _paths = "paths")
+load("@prelude-nix//basics/genrule.bzl", _genrule = "genrule")
 
-load("@prelude//basics/types.bzl",
+load("@prelude-nix//basics/types.bzl",
   "attributes",
   "providers",
 )

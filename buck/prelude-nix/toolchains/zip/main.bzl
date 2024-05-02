@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//zip.bzl -- zip and archive files
+# @prelude-nix//zip.bzl -- zip and archive files
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//:zip.bzl", "zip_file")
+#    load("@prelude-nix//:zip.bzl", "zip_file")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ __create = rule(
     attrs = {
         "srcs": attrs.list(attrs.source(allow_directory = False), default = []),
         "out": attrs.option(attrs.string(), default = None),
-        "_zip": attrs.default_only(attrs.dep(default = "@prelude//toolchains/zip:zip")),
+        "_zip": attrs.default_only(attrs.dep(default = "@prelude-nix//toolchains/zip:zip")),
     }
 )
 

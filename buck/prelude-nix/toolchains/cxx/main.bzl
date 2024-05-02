@@ -1,18 +1,18 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//toolchains/rust/main.bzl -- rust toolchain
+# @prelude-nix//toolchains/rust/main.bzl -- rust toolchain
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//toolchains/rust/main.bzl", "rust")
+#    load("@prelude-nix//toolchains/rust/main.bzl", "rust")
 
 """Rust toolchain."""
 
 ## ---------------------------------------------------------------------------------------------------------------------
 
-load("@prelude//basics/pkg.bzl", "pkg")
-load("@prelude//toolchains/nixpkgs.bzl", "nix")
+load("@prelude-nix//basics/pkg.bzl", "pkg")
+load("@prelude-nix//toolchains/nixpkgs.bzl", "nix")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 

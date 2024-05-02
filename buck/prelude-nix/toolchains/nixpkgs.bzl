@@ -2,13 +2,13 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//toolchains/nixpkgs.bzl -- nixpkgs utilities
+# @prelude-nix//toolchains/nixpkgs.bzl -- nixpkgs utilities
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//toolchains/nixpkgs.bzl", "nix")
+#    load("@prelude-nix//toolchains/nixpkgs.bzl", "nix")
 
-load("@prelude//basics/files.bzl", "files")
+load("@prelude-nix//basics/files.bzl", "files")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 
@@ -94,10 +94,10 @@ def __nix_build(ctx: AnalysisContext, build_name: str, expr, binary: str | None 
     ] + run_info
 
 __nix_attrs = {
-    "_nixpkgs": attrs.default_only(attrs.dep(default = "prelude//toolchains:nixpkgs.tar.gz")),
+    "_nixpkgs": attrs.default_only(attrs.dep(default = "prelude-nix//toolchains:nixpkgs.tar.gz")),
     "_overlays": attrs.default_only(attrs.named_set(attrs.dep(), default = {
         # XXX FIXME (aseipp): [tag:add-nixpkgs-overlay] sync with BUILD file somehow?
-        "overlay-rust": "prelude//toolchains:nixpkgs-overlay-rust.tar.gz",
+        "overlay-rust": "prelude-nix//toolchains:nixpkgs-overlay-rust.tar.gz",
     })),
     "deps": attrs.list(attrs.dep(), default = []),
 }
@@ -113,7 +113,7 @@ __build = rule(
 ## ---------------------------------------------------------------------------------------------------------------------
 
 def __get_toolchain(key: str, name: str, ps: list[typing.Any]) -> Attr:
-    name: str = "@prelude//toolchains/{}:{}".format(key, name)
+    name: str = "@prelude-nix//toolchains/{}:{}".format(key, name)
     return attrs.toolchain_dep(default = name, providers = ps)
 
 def __toolchain_rule(impl, attrs, **kwargs):

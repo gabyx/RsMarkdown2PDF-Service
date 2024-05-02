@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: Apache-2.0
 
-# @prelude//bxl/hello.bxl -- Hello world, in BXL.
+# @prelude-nix//bxl/hello.bxl -- Hello world, in BXL.
 #
 # HOW TO USE THIS MODULE:
 #

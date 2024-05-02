@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//platform/defs.bzl -- platform and host definitions
+# @prelude-nix//platform/defs.bzl -- platform and host definitions
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//platform/defs.bzl", "host_config")
+#    load("@prelude-nix//platform/defs.bzl", "host_config")
 
 """Platform and host definitions."""
 
@@ -92,16 +92,16 @@ __execution_platform = rule(
 def _host_cpu_configuration() -> str:
     arch = host_info().arch
     if arch.is_aarch64:
-        return "prelude//platform/cpu:aarch64"
+        return "prelude-nix//platform/cpu:aarch64"
     else:
-        return "prelude//platform/cpu:x86_64"
+        return "prelude-nix//platform/cpu:x86_64"
 
 def _host_os_configuration() -> str:
     os = host_info().os
     if os.is_macos:
-        return "prelude//platform/os:darwin"
+        return "prelude-nix//platform/os:darwin"
     else:
-        return "prelude//platform/os:linux"
+        return "prelude-nix//platform/os:linux"
 
 host_config = struct(
     cpu = _host_cpu_configuration(),
@@ -113,9 +113,9 @@ def generate_platforms(variants):
     execution platform matching the host platform."""
 
     for (cpu, os) in variants:
-        cpu_configuration = "prelude//platform/cpu:{}".format(cpu)
-        os_configuration = "prelude//platform/os:{}".format(os)
-        visibility = [ "prelude//..." ]
+        cpu_configuration = "prelude-nix//platform/cpu:{}".format(cpu)
+        os_configuration = "prelude-nix//platform/os:{}".format(os)
+        visibility = [ "prelude-nix//..." ]
 
         __execution_platform(
             name = "{}-{}".format(cpu, os),
@@ -144,5 +144,5 @@ def generate_platforms(variants):
         cpu_configuration = _host_cpu_configuration(),
         os_configuration = _host_os_configuration(),
         remote_enabled = use_remote_by_default,
-        visibility = [ "prelude//..." ],
+        visibility = [ "prelude-nix//..." ],
     )

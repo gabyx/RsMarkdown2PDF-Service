@@ -1,11 +1,11 @@
 # SPDX-FileCopyrightText: © 2017 The Bazel Authors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# @prelude//basics/paths.bzl -- File path manipulation functions.
+# @prelude-nix//basics/paths.bzl -- File path manipulation functions.
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//basics/paths.bzl", "paths")
+#    load("@prelude-nix//basics/paths.bzl", "paths")
 
 """Skylib module containing file path manipulation functions.
 

@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//basics/files.bzl -- File utilities.
+# @prelude-nix//basics/files.bzl -- File utilities.
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//basics/files.bzl", "files")
+#    load("@prelude-nix//basics/files.bzl", "files")
 
 """Rules for managing and manipulating files."""
 

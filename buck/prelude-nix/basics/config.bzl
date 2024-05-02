@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//basics/config.bzl -- configuration for the prelude.
+# @prelude-nix//basics/config.bzl -- configuration for the prelude.
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//basics/config.bzl", "config")
+#    load("@prelude-nix//basics/config.bzl", "config")
 
 """Configuration rules and information."""
 

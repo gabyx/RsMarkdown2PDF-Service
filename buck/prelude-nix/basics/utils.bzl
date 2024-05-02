@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//basics/utils.bzl -- General utilities shared over the codebase.
+# @prelude-nix//basics/utils.bzl -- General utilities shared over the codebase.
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//basics/utils.bzl", "utils")
+#    load("@prelude-nix//basics/utils.bzl", "utils")
 
 """Miscellaneous utilities."""
 

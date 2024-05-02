@@ -1,11 +1,11 @@
 # SPDX-FileCopyrightText: © 2017 The Bazel Authors. All rights reserved.
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//basics/asserts.bzl -- Assertion functions.
+# @prelude-nix//basics/asserts.bzl -- Assertion functions.
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//basics/asserts.bzl", "asserts")
+#    load("@prelude-nix//basics/asserts.bzl", "asserts")
 
 """Testing support.
 

@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//basics/pkg.bzl -- Support for PACKAGE file metadata
+# @prelude-nix//basics/pkg.bzl -- Support for PACKAGE file metadata
 #
 # HOW TO USE THIS MODULE:
 #
@@ -15,7 +15,7 @@
 #   - pkg.rule_with_metadata(**kwargs) -> rule
 #   - pkg.rule_apply_metadata(fn) -> fn
 #
-# Load this module with: load("@prelude//basics/pkg.bzl", "pkg")
+# Load this module with: load("@prelude-nix//basics/pkg.bzl", "pkg")
 
 """PACKAGE file support."""
 
@@ -32,7 +32,7 @@ def owner(name: str) -> None:
         fail(
             """Invalid owner: {}
 
-            The list of valid owners can be seen in @prelude//basics/pkg.bzl
+            The list of valid owners can be seen in @prelude-nix//basics/pkg.bzl
             """.format(name)
         )
 

@@ -1,15 +1,15 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//toolchains/bash/main.bzl -- bash utilities
+# @prelude-nix//toolchains/bash/main.bzl -- bash utilities
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//toolchains/bash/main.bzl", "bash")
+#    load("@prelude-nix//toolchains/bash/main.bzl", "bash")
 
 """Bash toolchain."""
 
-load("@prelude//basics/files.bzl", "files")
+load("@prelude-nix//basics/files.bzl", "files")
 
 ## ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ __run_rule = rule(
     impl = __run_impl,
     attrs = {
         "args": attrs.list(attrs.arg()),
-        "_sh": attrs.default_only(attrs.dep(default = "@prelude//toolchains/bash:oil")),
+        "_sh": attrs.default_only(attrs.dep(default = "@prelude-nix//toolchains/bash:oil")),
     },
 )
 

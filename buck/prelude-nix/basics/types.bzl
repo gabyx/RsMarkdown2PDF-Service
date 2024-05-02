@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: Apache-2.0
 
-# @prelude//basics/types.bzl -- Global types for Buck rules.
+# @prelude-nix//basics/types.bzl -- Global types for Buck rules.
 #
 # HOW TO USE THIS MODULE:
 #
@@ -9,13 +9,13 @@
 
 """Providers used by all Buck rules in this prelude."""
 
-load("@prelude//basics/files.bzl", "files")
-load("@prelude//toolchains/nixpkgs.bzl", "nix");
-load("@prelude//toolchains/bash/main.bzl", "bash");
-load("@prelude//toolchains/cxx/main.bzl", "cxx");
-load("@prelude//toolchains/prolog/main.bzl", "prolog");
-load("@prelude//toolchains/rust/main.bzl", "rust");
-load("@prelude//toolchains/zip/main.bzl", "zipfile");
+load("@prelude-nix//basics/files.bzl", "files")
+load("@prelude-nix//toolchains/nixpkgs.bzl", "nix");
+load("@prelude-nix//toolchains/bash/main.bzl", "bash");
+load("@prelude-nix//toolchains/cxx/main.bzl", "cxx");
+load("@prelude-nix//toolchains/prolog/main.bzl", "prolog");
+load("@prelude-nix//toolchains/rust/main.bzl", "rust");
+load("@prelude-nix//toolchains/zip/main.bzl", "zipfile");
 
 ## ---------------------------------------------------------------------------------------------------------------------
 

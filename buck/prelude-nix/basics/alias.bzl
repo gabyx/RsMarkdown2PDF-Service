@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//basics/alias.bzl -- alias() rule.
+# @prelude-nix//basics/alias.bzl -- alias() rule.
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//basics/alias.bzl", "alias")
+#    load("@prelude-nix//basics/alias.bzl", "alias")
 
 """Target aliases.
 

@@ -1,5 +1,5 @@
-[repositories]
-prelude = .
+[cells]
+prelude-nix = .
 
 [buildfile]
 name = BUILD

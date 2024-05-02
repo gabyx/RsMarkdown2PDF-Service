@@ -1,11 +1,11 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//toolchains/prolog/main.bzl -- prolog toolchain
+# @prelude-nix//toolchains/prolog/main.bzl -- prolog toolchain
 #
 # HOW TO USE THIS MODULE:
 #
-#    load("@prelude//toolchains/prolog/main.bzl", "prolog")
+#    load("@prelude-nix//toolchains/prolog/main.bzl", "prolog")
 
 """Scryer Prolog toolchain."""
 
@@ -40,7 +40,7 @@ __scryer_program = rule(
         "srcs": attrs.list(attrs.source()),
         "start": attrs.option(attrs.source(), default = None),
         "args": attrs.list(attrs.arg(), default = []),
-        "_scryer": attrs.default_only(attrs.dep(default = "@prelude//toolchains/prolog:scryer")),
+        "_scryer": attrs.default_only(attrs.dep(default = "@prelude-nix//toolchains/prolog:scryer")),
     },
 )
 

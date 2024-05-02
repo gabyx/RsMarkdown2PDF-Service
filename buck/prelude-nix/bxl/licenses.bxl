@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: Apache-2.0
 
-# @prelude//bxl/licenses.bxl -- License information for BXL.
+# @prelude-nix//bxl/licenses.bxl -- License information for BXL.
 #
 # HOW TO USE THIS MODULE (from the command line):
 #

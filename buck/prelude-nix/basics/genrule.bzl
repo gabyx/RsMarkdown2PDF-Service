@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-# @prelude//basics/genrule.bzl -- genrule() implementation.
+# @prelude-nix//basics/genrule.bzl -- genrule() implementation.
 #
 # HOW TO USE THIS MODULE:
 #
@@ -165,7 +165,7 @@ genrule = rule(
 
         "_oil": attrs.default_only(
             attrs.dep(
-                default = "@prelude//toolchains/bash:oil",
+                default = "@prelude-nix//toolchains/bash:oil",
                 providers = [ DefaultInfo ]
             ),
         ),

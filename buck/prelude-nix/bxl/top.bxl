@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2022 Austin Seipp
 # SPDX-License-Identifier: Apache-2.0
 
-# @prelude//bxl/top.bxl -- top-level entry point for BXL scripts.
+# @prelude-nix//bxl/top.bxl -- top-level entry point for BXL scripts.
 #
 # HOW TO USE THIS MODULE:
 #
