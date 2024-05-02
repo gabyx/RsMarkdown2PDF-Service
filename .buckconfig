@@ -1,17 +1,19 @@
 [cells]
 root = .
-prelude = buck/prelude
-; prelude = buck/prelude-meta
-bxl = buck/prelude/bxl
+prelude = buck/prelude-nix
+prelude-nix = buck/prelude-nix
+prelude-meta = buck/prelude-meta
+
+bxl = buck/prelude-nix/bxl
 
 [buildfile]
 name = BUILD
 
 [build]
-execution_platforms = prelude//platform:default
+execution_platforms = prelude-nix//platform:default
 
 [parser]
-target_platform_detector_spec = target:root//...->prelude//platform:default target:prelude//...->prelude//platform:default
+target_platform_detector_spec = target:root//...->prelude-nix//platform:default target:prelude-nix//...->prelude-nix//platform:default
 
 [project]
 ignore=.git,.sl,.jj
