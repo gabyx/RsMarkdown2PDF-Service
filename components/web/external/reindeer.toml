@@ -134,9 +134,7 @@ buildscript_genrule = "buildscript_run"    # Rule for running a build script to 
 
 # Load the macros to which the rules above will resolve.
 buckfile_imports = """
-load("@prelude-meta//rust:cargo_buildscript.bzl", "buildscript_run")
-load("@prelude-meta//rust:cargo_package.bzl", "cargo")
-load("//components/web/external/macros:external_rust.bzl", "external_rust_cxx_library", "external_rust_prebuilt_cxx_library")
+load("@prelude-nix//rust:cargo_package.bzl", "cargo")
 """
 
 # Banner comment for the generated BUCK File.

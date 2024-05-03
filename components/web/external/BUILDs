@@ -5,9 +5,7 @@
 ## Updating goes over `just buckify`.
 ##
 
-load("@prelude-meta//rust:cargo_buildscript.bzl", "buildscript_run")
-load("@prelude-meta//rust:cargo_package.bzl", "cargo")
-load("//components/web/external/macros:external_rust.bzl", "external_rust_cxx_library", "external_rust_prebuilt_cxx_library")
+load("@prelude-nix//rust:cargo_package.bzl", "cargo")
 
 alias(
     name = "dotenv",

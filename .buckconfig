@@ -2,7 +2,7 @@
 root = .
 prelude = buck/prelude-nix
 prelude-nix = buck/prelude-nix
-prelude-meta = buck/prelude-meta
+; prelude-meta = buck/prelude-meta
 
 bxl = buck/prelude-nix/bxl
 

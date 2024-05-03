@@ -40,21 +40,25 @@ def __nix_build(ctx: AnalysisContext, build_name: str, expr, binary: str | None 
 
     overlay_args = []
     for (name, dep) in overlays:
-        overlay_args.append(cmd_args(dep, format="  -I "+name+"=file://$PWD/{} \\"))
+        overlay_args.append(cmd_args(dep, format="  -I "+name+"=\"file://$PWD/{}\" \\"))
 
     out_link = ctx.actions.declare_output("out.link")
     build_sh, _ = ctx.actions.write(
         "build.sh",
         cmd_args([
             "#!/usr/bin/env bash",
+            "",
             "set -euo pipefail",
+            "",
             "[ -f /buildbarn/profile ] && source /buildbarn/profile",
+            "",
             "export NIX_PATH=",
+            "",
             "nix build \\",
-            "  -I buckroot=$PWD \\",
-            cmd_args(nixpkgs, format="  -I buckpkgs=file://$PWD/{} \\"),
+            "  -I buckroot=\"$PWD\" \\",
+            cmd_args(nixpkgs, format="  -I buckpkgs=\"file://$PWD/{}\" \\"),
         ] + overlay_args + [
-            cmd_args(build_nix, format="  -f {} \\"),
+            cmd_args(build_nix, format="  -f \"{}\" \\"),
             "  --out-link \"$1\"",
             "", # XXX: newline for readability in terminal
         ]),
